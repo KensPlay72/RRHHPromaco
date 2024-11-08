@@ -1,0 +1,651 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bolsa de Empleo{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bolsaempleo.css' %}">
+
+    <!-- Iconos -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Nerko+One&display=swap" rel="stylesheet">
+
+    <!-- Moment.js y Moment-Timezone -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+    <!-- CSS y JS de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+</head>
+
+<body id="body-pd">
+
+    {% include 'menu.html' %}
+
+    {% include 'cerrarsesion.html' %}
+
+    
+    <form method="GET" action="{% url 'bolsaempleo' %}" id="filterForm">
+        <div class="encabezado">
+            <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+            </div>
+            <input type="text" class="form-control" placeholder="Buscar" id="buscar" name="search" value="{{ search }}" autocomplete="off" />
+          </div>
+        <h1 class="titulo-encabezado">Bolsa de Empleo</h1>
+        {% if request.session.bolsaempleo_escribir %}
+        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Candidato</button>
+        {% endif %}
+      </div>
+
+      <div class="tabla">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Candidato</th>
+                        <th>
+                            Puesto que Aspira
+                            <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-aspira')"></ion-icon>
+                            <div id="filtro-aspira" class="filter-popup" style="display: none;">
+                                {% for puesto in puestos_en_bolsa %}
+                                    <label>
+                                        <input type="checkbox" name="puestosaspira" value="{{ puesto.id }}" 
+                                            {% if puesto.id|stringformat:"i" in puestos_aspira %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                                        {{ puesto.nombre_puestos }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </th>
+                        <th>
+                            Puesto que Aplica
+                            <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-aplica')"></ion-icon>
+                            <div id="filtro-aplica" class="filter-popup" style="display: none;">
+                                {% for puesto in puestos_en_bolsa %}
+                                    <label>
+                                        <input type="checkbox" name="puestosaplica" value="{{ puesto.id }}" 
+                                            {% if puesto.id|stringformat:"i" in puestos_aplica %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                                        {{ puesto.nombre_puestos }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </th>
+                        
+                        <th>Teléfono</th>
+                        <th>
+                            Ciudad
+                            <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-ciudad')"></ion-icon>
+                            <div id="filtro-ciudad" class="filter-popup" style="display: none;">
+                                {% for ciudad in ciudades %}
+                                    <label>
+                                        <input type="checkbox" name="ciudad" value="{{ ciudad.id }}" 
+                                            {% if ciudad.id|stringformat:"i" in ciudad_id %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                                        {{ ciudad.nombre_ciudades }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </th>
+                        <th>Medio de Reclutamiento</th>
+                        <th>
+                            Estado
+                            <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-estado')"></ion-icon>
+                            <div id="filtro-estado" class="filter-popup1" style="display: none;">
+                                {% for estado_opcion in estados %}
+                                    <label>
+                                        <input type="checkbox" name="estado" value="{{ estado_opcion }}" 
+                                            {% if estado_opcion in estado %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                                        {{ estado_opcion }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </th>
+                        {% if request.session.bolsaempleo_escribir %}
+                        <th>Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in bolsa_empleos %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.nombre_candidato }}</td>
+                            <td>{{ item.puestosaspira_nombres|join:", " }}</td>
+                            <td>{{ item.puestosaplica_nombres|join:", " }}</td>
+                            <td>{{ item.telefono }}</td>
+                            <td>{{ item.ciudad.nombre_ciudades }}</td>
+                            <td>{{ item.medio_reclutamiento.nombre_medio_de_reclutamiento }}</td>
+                            <td>{{ item.estado }}</td>
+                            {% if request.session.bolsaempleo_escribir %}
+                            <td style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                                    <ion-icon name="create-outline" class="icon"></ion-icon>
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" id="btninfo" data-bs-target="#modaldetalles" data-id="{{ item.id }}" onclick="mostrardetalles(this)">
+                                    <ion-icon name="information-circle-outline" class="icon"></ion-icon>
+                                </button>
+                                {% if item.ruta %}
+                                    <a href="{% url 'descargar_pdf' item.id %}" class="btn btn-success" id="btndescargar">
+                                        <ion-icon name="download-outline" class="icon"></ion-icon>
+                                    </a>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        
+      <script type="application/json" id="bolsaempleos-data">
+        [
+            {% for item in bolsa_empleos %}
+                {
+                    "id": "{{ item.id|default:''|escapejs }}",
+                    "dni": "{{ item.dni|default:''|escapejs }}",
+                    "nombre_candidato": "{{ item.nombre_candidato|default:''|escapejs }}",
+                    "puestosaspira": "{{ item.puestosaspira|escapejs }}",
+                    "puestosaplica": "{{ item.puestosaplica|escapejs }}",
+                    "telefono": "{{ item.telefono|default:''|escapejs }}",
+                    "telefono2": "{{ item.telefono2|default:''|escapejs }}",
+                    "estado": "{{ item.estado|default:''|escapejs }}",
+                    "ciudad": "{% if item.ciudad %}{{ item.ciudad.id|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                    "nombre_ciudad": "{% if item.ciudad %}{{ item.ciudad.nombre_ciudades|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                    "medio_reclutamiento": "{% if item.medio_reclutamiento %}{{ item.medio_reclutamiento.id|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                    "nombre_medio_reclutamiento": "{% if item.medio_reclutamiento %}{{ item.medio_reclutamiento.nombre_medio_de_reclutamiento|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                    "edad": "{{ item.edad|escapejs }}",
+                    "fecha_nacimiento": "{{ item.fecha_nacimiento|default:''|escapejs }}",
+                    "estadocivil": "{{ item.estadocivil|default:''|escapejs }}",
+                    "nhijos": "{{ item.nhijos|escapejs }}",
+                    "direccion": "{{ item.direccion|default:''|escapejs }}",
+                    "mediomovilizacion": "{{ item.mediomovilizacion|default:''|escapejs }}",
+                    "experiencia": "{{ item.experiencia|default:''|escapejs }}",
+                    "observacion": "{{ item.observacion|default:''|escapejs }}"
+                }
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+    
+ <!-- Paginación -->
+ <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <!-- Botón "Anterior" -->
+        {% if bolsa_empleos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ bolsa_empleos.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% for aspira in puestos_aspira %}&puestosaspira={{ aspira }}{% endfor %}{% for aplica in puestos_aplica %}&puestosaplica={{ aplica }}{% endfor %}{% for ciudad in ciudad_id %}&ciudad={{ ciudad }}{% endfor %}">
+                    Anterior
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+            </li>
+        {% endif %}
+
+        <!-- Mostrar un rango reducido de páginas -->
+        {% for num in page_range %}
+            {% if bolsa_empleos.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% for aspira in puestos_aspira %}&puestosaspira={{ aspira }}{% endfor %}{% for aplica in puestos_aplica %}&puestosaplica={{ aplica }}{% endfor %}{% for ciudad in ciudad_id %}&ciudad={{ ciudad }}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Botón "Siguiente" -->
+        {% if bolsa_empleos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ bolsa_empleos.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% for aspira in puestos_aspira %}&puestosaspira={{ aspira }}{% endfor %}{% for aplica in puestos_aplica %}&puestosaplica={{ aplica }}{% endfor %}{% for ciudad in ciudad_id %}&ciudad={{ ciudad }}{% endfor %}">
+                    Siguiente
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Siguiente</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+    </div>
+    
+    <div class="botones-container">
+        <a href="{% url 'exportar_bolsa_empleos' %}" id="bolsaempleoexcel" class="btn classbotones botonesinferioresdiv">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+        </a>
+    </div>
+    
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Registrar Candidato</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="register-form-bolsaempleo" enctype="multipart/form-data">
+                      <div class="form-group">
+                          <label>DNI</label>
+                          <input type="text" name="dni" id="dni" class="form-control" maxlength="13"
+                              oninput="validateNumber(this)"
+                              title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                              placeholder="DNI">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="nombre_candidato">Nombre del Candidato</label>
+                          <input type="text" name="nombre_candidato" id="nombre_candidato" class="form-control"
+                              placeholder="Nombre del Candidato">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label for="puesto">Puesto al que Aspira</label>
+                        <div class="custom-select-wrapper">
+                            <div id="select-puestos-aspira" class="custom-select">
+                                Seleccione uno o más puestos
+                            </div>
+                            <div class="custom-options" id="options-puestos-aspira">
+                                {% for item in puestos %}
+                                    <label>
+                                        <input type="checkbox" value="{{ item.id }}" name="puestoaspira[]">
+                                        {{ item.nombre_puestos }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <br>
+                      <div class="form-group">
+                          <label for="ciudad">Ciudad</label>
+                          <select name="ciudad" id="ciudad" class="form-control">
+                              <option value="" selected disabled>Seleccione una Ciudad</option>
+                              {% for item in ciudades %}
+                              <option value="{{ item.id }}">{{ item.nombre_ciudades }}</option>
+                          {% endfor %}
+                          </select>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="mediosReclutamiento">Medio de Reclutamiento</label>
+                          <select name="mediosReclutamiento" id="mediosReclutamiento" class="form-control">
+                              <option value="" selected disabled>Seleccione un Medio de Reclutamiento</option>
+                              {% for item in medios_reclutamiento %}
+                              <option value="{{ item.id }}">{{ item.nombre_medio_de_reclutamiento }}</option>
+                          {% endfor %}
+                          </select>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="telefono">Número de Teléfono</label>
+                          <input type="text" name="telefono" id="telefono" class="form-control"
+                              placeholder="Número de teléfono" oninput="validateNumber(this)">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="telefono">Número de Teléfono Secundario</label>
+                          <input type="text" name="telefono2" id="telefono2" class="form-control"
+                              placeholder="Número de teléfono Secundario" oninput="validateNumber(this)">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="estado">Estado</label>
+                          <select name="estado" id="estado" class="form-control">
+                              <option value="" disabled selected>Seleccione un Estado</option>
+                              <option value="REGISTRADO">REGISTRADO</option>
+                              <option value="CONTACTADO">CONTACTADO</option>
+                              <option value="NO CONTACTADO">NO CONTACTADO</option>
+                              <option value="ENTREVISTADO">ENTREVISTADO</option>
+                              <option value="DESCARTADO">DESCARTADO</option>
+                              <option value="RECHAZÓ">RECHAZÓ</option>
+                          </select>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label>Edad</label>
+                          <input type="text" name="edad" id="edad" class="form-control" placeholder="Edad"
+                              readonly disabled>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label>Fecha de Nacimiento</label>
+                          <input type="date" name="fechanacimiento" id="fechanacimiento" class="form-control"
+                              onchange="calculateAge()">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="">Estado Civil</label>
+                          <select id="estadocivil" name="estadocivil" class="form-control">
+                              <option value="" selected disabled>Selecione un Estado Civil</option>
+                              <option value="SOLTERO">SOLTERO</option>
+                              <option value="CASADO">CASADO</option>
+                              <option value="DIVORCIADO">DIVORCIADO</option>
+                              <option value="VIUDO">VIUDO</option>
+                              <option value="UNION LIBRE">UNION LIBRE</option>
+                          </select>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="">Numero de Hijos</label>
+                          <input type="text" name="nhijos" id="nhijos" class="form-control"
+                              placeholder="Número de teléfono" oninput="validateNumber(this)">
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label for="experiencia">Experiencia</label>
+                        <textarea name="experiencia" id="experiencia" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe la Experiencia"></textarea>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <textarea name="direccion" id="direccion" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe la Direccion"></textarea>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label for="observacion">Observación</label>
+                        <textarea name="observacion" id="observacion" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe tus observaciones aquí"></textarea>
+                      </div>                      
+                      <br>
+                      <div class="form-group">
+                          <label for="">Medio de Movilizacion</label>
+                          <select id="mediomovilizacion" name="mediomovilizacion" class="form-control">
+                              <option value="" selected disabled>Selecione un Medio de Movilización</option>
+                              <option value="CARRO">CARRO</option>
+                              <option value="MOTO">MOTO</option>
+                              <option value="TRANSPORTE PUBLICO">TRANSPORTE PUBLICO</option>
+                              <option value="OTRO">OTRO</option>
+                          </select>
+                      </div>
+                      <br>
+                      <div class="form-group">
+                          <label for="cv">CV</label>
+                          <div class="file-drop-area" id="file-drop-area">
+                              <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                              <input type="file" id="cv" name="cv" class="form-control"
+                                  accept=".pdf">
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                          <button type="submit" class="btn btn classbotones">Guardar</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+
+  
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Editar Candidato</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="update-form-bolsaempleo" enctype="multipart/form-data">
+                <div class="form-group">
+                  <label>ID</label>
+                  <input type="text" name="ideditar" id="ideditar" class="form-control" disabled>
+              </div>
+              <br>
+                  <div class="form-group">
+                      <label>DNI</label>
+                      <input type="text" name="dnieditar" id="dnieditar" class="form-control" maxlength="13"
+                          oninput="validateNumber(this)"
+                          title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                          placeholder="DNI">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="nombre_candidato">Nombre del Candidato</label>
+                      <input type="text" name="nombre_candidatoeditar" id="nombre_candidatoeditar" class="form-control"
+                          placeholder="Nombre del Candidato">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                    <label for="puesto">Puesto al que Aspira</label>
+                    <div class="custom-select-wrapper">
+                        <div id="select-puestos-aspira-editar" class="custom-select">
+                            Seleccione uno o más puestos
+                        </div>
+                        <div class="custom-options" id="options-puestos-aspira-editar">
+                            {% for item in puestos %}
+                            <label>
+                                <input type="checkbox" value="{{ item.id }}" name="puestoaspiraeditar[]"
+                                    {% if item.id in puestos_aspira %}checked{% endif %}>
+                                {{ item.nombre_puestos }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <!-- Puesto al que Aplica -->
+                <div class="form-group">
+                    <label for="puesto">Puesto al que Aplica</label>
+                    <div class="custom-select-wrapper">
+                        <div id="select-puestos-aplica" class="custom-select">
+                            Seleccione uno o más puestos
+                        </div>
+                        <div class="custom-options" id="options-puestos-aplica">
+                            {% for item in puestos %}
+                            <label>
+                                <input type="checkbox" value="{{ item.id }}" name="puestoaplica[]"
+                                    {% if item.id in puestos_aplica %}checked{% endif %}>
+                                {{ item.nombre_puestos }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <br>
+                    <div class="form-group">
+                      <label for="ciudad">Ciudad</label>
+                      <select name="ciudadeditar" id="ciudadeditar" class="form-control">
+                          <option value="" selected disabled>Seleccione una Ciudad</option>
+                          {% for item in ciudades %}
+                          <option value="{{ item.id }}">{{ item.nombre_ciudades }}</option>
+                      {% endfor %}
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="mediosReclutamiento">Medio de Reclutamiento</label>
+                      <select name="mediosReclutamientoeditar" id="mediosReclutamientoeditar" class="form-control">
+                          <option value="" selected disabled>Seleccione un Medio de Reclutamiento</option>
+                          {% for item in medios_reclutamiento %}
+                          <option value="{{ item.id }}">{{ item.nombre_medio_de_reclutamiento }}</option>
+                      {% endfor %}
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="telefono">Número de Teléfono</label>
+                      <input type="text" name="telefonoeditar" id="telefonoeditar" class="form-control"
+                          placeholder="Número de teléfono" oninput="validateNumber(this)">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="telefono">Número de Teléfono Secundario</label>
+                      <input type="text" name="telefono2editar" id="telefono2editar" class="form-control"
+                          placeholder="Número de teléfono Secundario" oninput="validateNumber(this)">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="estado">Estado</label>
+                      <select name="estadoeditar" id="estadoeditar" class="form-control">
+                          <option value="" disabled selected>Seleccione un Estado</option>
+                          <option value="REGISTRADO">REGISTRADO</option>
+                          <option value="CONTACTADO">CONTACTADO</option>
+                          <option value="NO CONTACTADO">NO CONTACTADO</option>
+                          <option value="ENTREVISTADO">ENTREVISTADO</option>
+                          <option value="DESCARTADO">DESCARTADO</option>
+                          <option value="RECHAZÓ">RECHAZÓ</option>
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label>Edad</label>
+                      <input type="text" name="edadeditar" id="edadeditar" class="form-control" placeholder="Edad"
+                          readonly disabled>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label>Fecha de Nacimiento</label>
+                      <input type="date" name="fechanacimientoeditar" id="fechanacimientoeditar" class="form-control"
+                          onchange="calculateAgeedit()">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="">Estado Civil</label>
+                      <select id="estadocivileditar" name="estadocivileditar" class="form-control">
+                          <option value="" selected disabled>Selecione un Estado Civil</option>
+                          <option value="SOLTERO">SOLTERO</option>
+                          <option value="CASADO">CASADO</option>
+                          <option value="DIVORCIADO">DIVORCIADO</option>
+                          <option value="VIUDO">VIUDO</option>
+                          <option value="UNION LIBRE">UNION LIBRE</option>
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="">Numero de Hijos</label>
+                      <input type="text" name="nhijoseditar" id="nhijoseditar" class="form-control"
+                          placeholder="Número de teléfono" oninput="validateNumber(this)">
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="experiencia">Experiencia</label>
+                      <textarea name="experienciaeditar" id="experienciaeditar" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe la Experiencia"></textarea>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="direccion">Dirección</label>
+                      <textarea name="direccioneditar" id="direccioneditar" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe la Direccion"></textarea>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="observacion">Observación</label>
+                      <textarea name="observacioneditar" id="observacioneditar" cols="30" rows="3" class="form-control"
+                          placeholder="Escribe tus observaciones aquí"></textarea>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="">Medio de Movilizacion</label>
+                      <select id="mediomovilizacioneditar" name="mediomovilizacioneditar" class="form-control">
+                          <option value="" selected disabled>Selecione un Medio de Movilización</option>
+                          <option value="CARRO">CARRO</option>
+                          <option value="MOTO">MOTO</option>
+                          <option value="TRANSPORTE PUBLICO">TRANSPORTE PUBLICO</option>
+                          <option value="OTRO">OTRO</option>
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                      <label for="cv">CV</label>
+                      <div class="file-drop-area" id="file-drop-area">
+                          <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                          <input type="file" id="cveditar" name="cveditar" class="form-control" accept=".pdf">
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      <button type="submit" class="btn btn classbotones">Guardar</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modaldetalles" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Detalles de Bolsa de Empleos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="detalles-id"></span></p>
+                <hr>
+                <p><strong>DNI:</strong> <span id="detalles-dni"></span></p>
+                <hr>
+                <p><strong>Nombre Candidato:</strong> <span id="detalles-nombre-candidato"></span></p>
+                <hr>
+                <p><strong>Teléfono:</strong> <span id="detalles-telefono"></span></p>
+                <hr>
+                <p><strong>Teléfono 2:</strong> <span id="detalles-telefono2"></span></p>
+                <hr>
+                <p><strong>Estado:</strong> <span id="detalles-estado"></span></p>
+                <hr>
+                <p><strong>Ciudad:</strong> <span id="detalles-ciudad"></span></p>
+                <hr>
+                <p><strong>Medio de Reclutamiento:</strong> <span id="detalles-medio-reclutamiento"></span></p>
+                <hr>
+                <p><strong>Edad:</strong> <span id="detalles-edad"></span></p>
+                <hr>
+                <p><strong>Fecha de Nacimiento:</strong> <span id="detalles-fecha-nacimiento"></span></p>
+                <hr>
+                <p><strong>Estado Civil:</strong> <span id="detalles-estadocivil"></span></p>
+                <hr>
+                <p><strong>Número de Hijos:</strong> <span id="detalles-nhijos"></span></p>
+                <hr>
+                <p><strong>Dirección:</strong> <span id="detalles-direccion"></span></p>
+                <hr>
+                <p><strong>Medio de Movilización:</strong> <span id="detalles-mediomovilizacion"></span></p>
+                <hr>
+                <p><strong>Experiencia:</strong> <span id="detalles-experiencia"></span></p>
+                <hr>
+                <p><strong>Observación:</strong> <span id="detalles-observacion"></span></p>
+            </div>
+            <div class="modal-footer" style="max-height: 70px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+    <script src="{% static 'js/bolsaempleo.js' %}"></script>
+    <script src="{% static 'js/tiempologout.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Imprimir Contrato{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/telefonos/impresiontelefono.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container">
+        <form id="register-form-contratacion">
+            <input type="hidden" name="contratacion_id" value="{{ contratacion.id }}">
+            <div class="header-section">
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo" rowspan="4">
+                            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO">
+                            <p>Proveedora de Materiales de Construcción S de R.L.</p>
+                        </td>
+                        <td class="header-title" rowspan="4">
+                            
+                            {% if telefonia.estado == "ASIGNADO" %}
+                            Registro de Constancia de Entrega de Teléfono
+                            {% endif %}
+                            {% if telefonia.estado == "REASIGNADO" %}
+                            Registro de Acuerdo de Reasignación de Teléfono
+                            {% endif %}
+                            {% if telefonia.estado == "DEDUCIDO" %}
+                            Registro de Nota de Deducción de Teléfono
+                            {% endif %}
+                        </td>
+                        <td class="header-info">
+                            <p><strong>CÓDIGO:</strong> RRHH-RE-16</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>VERSIÓN:</strong> 00</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>FECHA DE ACTUALIZACIÓN:</strong> 08/03/2024</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>ELABORADO POR:</strong> DEPTO. PROCESO</p>
+                        </td>
+                    </tr>
+                </table>  
+            </div>
+            <br><br><br>
+            <div class="header">
+                <h2>Choluteca {{ telefonia.fecha }}</h2>
+                <h2>Correlativo: {{ telefonia.correlativo }}</h2>
+            </div>
+            <br><br><br><br><br>
+            <div class="cuerpo">
+                {% if telefonia.estado == "ASIGNADO" %}
+                <p>Yo <b>{{ telefonia.nombre }}</b> con número de identidad <b>{{telefonia.dni}}</b> unidad de negocio <b>{{ telefonia.unidad_de_negocio.nombre_unidad_de_negocio }}</b>
+                    del Departamento <b>{{telefonia.departamento.nombre_departamento}}</b> hago constar que recibo un telefono <b>{{nombre_telefono }}</b> - ID <b>{{telefonia.nombretelefono}}</b> con MEI
+                    <b>{{telefonia.MEI}}</b> y linea telefonico <b>{{telefonia.lineatelefonica}}</b> del presente plan corporativo
+                    de la empresa PROMACO, el telefono es de caracter <b>{{ telefonia.caracter}}</b>.
+                    
+                    {% if telefonia.caracter == "DEDUCIDO" %}
+                        con un valor de L.<b>{{ telefonia.valor_formateado }}</b> en un tiempo de pago de <b>{{ telefonia.tiempopago }}</b> meses cuya cuota quincenal es de L.<b>{{ telefonia.quincena_formateada }}</b>. 
+                        De igual manera, autorizo plenamente que se procese a la deducción en caso de extravío y maltrato del antes aparato mencionado.
+                    {% endif %}
+                </p>
+                <br><br><br>
+                <p><b>Nota:</b><i>Me comprometo a utilizar el teléfono de forma adecuada para uso estrictamente relacionado
+                    con la empresa y a usar el chip de la linea mencionada únicamente en telefono asignado por la empresa, si
+                    hago incumplimento de la misma quedo a disposición de firmar llamados de atención. 
+                </i></p>
+                {% endif %}
+                {% if telefonia.estado == "REASIGNADO" %}
+                <p>Yo <b>{{ telefonia.nombre }}</b> con número de identidad <b>{{telefonia.dni}}</b> unidad de negocio <b>{{ telefonia.unidad_de_negocio.nombre_unidad_de_negocio }}</b>
+                    del Departamento <b>{{telefonia.departamento.nombre_departamento}}</b> hago constar que recibo un telefono <b>{{nombre_telefono }}</b> - ID <b>{{telefonia.nombretelefono}}</b> con MEI
+                    <b>{{telefonia.MEI}}</b> y linea telefonico <b>{{telefonia.lineatelefonica}}</b> del presente plan corporativo
+                    de la empresa PROMACO con un valor de L.<b>{{ telefonia.valor_formateado }}</b>, que será de carácter <b>({{telefonia.estado}})</b>
+                    de igual manera autorizo plenamente que se proceda a la dediccion en caso de extravio y maltrato del antes aparato mencionado.
+                    La linea telefónica <b>{{telefonia.lineatelefonica}}</b> del presenta plan coporativo de la empresa que tenia asignado
+                    <b>{{ telefonia.nombre }}</b> quedara bajo custoria de <b>{{telefonia.asignacionnueva}}</b> mientras se Reasigna al nuevo colaborador.
+                    De igual manera autorizo plenamente que se proceda a la deducción en caso de extravío y maltrato del antes aparato mencionado.
+                    </p>
+                    <br>
+                    <p><b>Nota:</b><i>Me comprometo a utilizar el teléfono de forma adecuada para uso estrictamente relacionado
+                        con la empresa y a usar el chip de la linea mencionada únicamente en telefono asignado por la empresa, si
+                        hago incumplimento de la misma quedo a disposición de firmar llamados de atención. 
+                    </i></p>
+                {% endif %}
+                {% if telefonia.estado == "DEDUCIDO" %}
+                <p>Yo <b>{{ telefonia.nombre }}</b> con número de identidad <b>{{telefonia.dni}}</b> unidad de negocio <b>{{ telefonia.unidad_de_negocio.nombre_unidad_de_negocio }}</b>
+                    del Departamento <b>{{telefonia.departamento.nombre_departamento}}</b> firmo la presente nota de decucción de valor de depreciación que corresponder a L. <b>{{ telefonia.valor_formateado }}</b>
+                    de un telefono <b>{{nombre_telefono }}</b> - ID <b>{{telefonia.nombretelefono}}</b> con MEI
+                    <b>{{telefonia.MEI}}</b> y linea telefonico <b>{{telefonia.lineatelefonica}}</b> del presente plan corporativo
+                    de la empresa PROMACO.</p>
+                    <p>Autorizo plenamente que se procedera a la deducción por extravio del teléfono antes mencionado por un tiempo de <b>{{telefonia.tiempopago}}</b> quincenas
+                        con un valor de quincesa de L. <b>{{ telefonia.valorquincena|floatformat:0 }}</b>.
+                    </p>
+                    {% endif %}
+            </div>
+            <br><br><br><br><br>
+            <br><br><br><br><br>
+
+            <!-- Firma o Huella -->
+            <div class="footer">
+                <hr style="width: 400px; background-color: black; height: 2px; color:black;">
+                <p><b>Firma o Huella Del Colaborador</b></p>
+            </div>
+            {% if telefonia.observacion %}
+            <br><br><br><br>
+            <div class="observacion">
+                <p><b>Observaciones: </b><u> {{ telefonia.observacion }}</u></p>
+            </div>
+        {% endif %}
+        
+        
+            <div class="footer">
+                <button type="submit" class="print-button" id="guardarButton">Guardar</button>
+            </div>
+        </form>        
+    </div>
+    <script>
+        window.onload = function() {
+            window.print();  
+        };
+    
+        window.onafterprint = function() {
+            window.location.href = "{% url 'telefonos' %}";  
+        };
+    </script>
+</body>
+
+</html>

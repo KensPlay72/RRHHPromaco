@@ -1,0 +1,160 @@
+{% load static %}
+{% load humanize %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Imprimir Cesantias{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/cesantias.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container">   
+        <div class="header">
+            {% if cesantia.empresa|lower == "promaco" %}
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO">
+        {% elif cesantia.empresa|lower == "msgad" %}
+            <img src="{% static 'img/logo_multi.png' %}" alt="Logo MSGAD" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "importadora" %}
+            <img src="{% static 'img/importadora.png' %}" alt="Logo Importadora" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "urbanizadora" %}
+            <img src="{% static 'img/urbanizadora.png' %}" alt="Logo Urbanizadora" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "pp" %}
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo Urbanizadora" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "triturados" %}
+            <img src="{% static 'img/triturados.png' %}" alt="Logo Triturados" style="width: 200px;">
+        {% else %}
+            <img src="{% static 'img/default.png' %}" alt="Logo por defecto">
+        {% endif %}        
+            <span>Id: {{ cesantia.correlativo }}</span>
+        </div><br>
+        <div class="header"><h1><b>PAGO DE CESANTIA ANUAL</b></h1></div>
+        <br><br>
+        <div class="infor">
+            <div class="infoizquierdo">
+                <p>NOMBRE DE LA SUCURSAL</p>
+                <p>NOMBRE DE LA EMPRESA</p>
+                <p>NOMBRE DEL EMPLEADO</p>
+                <p>DNI DEL EMPLEADO</p>
+                <p>DEPARTAMENTO</p>
+                <p>PERIODO</p>
+                <p>SUELDO ACTUAL</p>
+            </div>
+            <div class="infoderecho">
+                <p>:{{ cesantia.sucursal }}</p>
+                <p>:{{ cesantia.empresa }}</p>
+                <p>:{{ cesantia.nombre_empleado }}</p>
+                <p>:{{ cesantia.dni_empleado }}</p>
+                <p>:{{ cesantia.departamento }}</p>
+                <p>:DEL {{ cesantia.fecha_inicial|date:"d/m/Y" }} AL {{ cesantia.fecha_final|date:"d/m/Y" }}</p>
+                <p>: {{ sueldo_actual_formateado }}</p>
+            </div>
+        </div>
+        <br><br><br><br><br>
+        <div class="header">
+            <h2><b><u>PAGO DE CESANTIA DEL AÑO {{ cesantia.año }} {{ cesantia_actual_formateado }}</u></b></h2>
+        </div>
+        <br><br><br><br><br>
+        <div class="divtextos">
+            <div class="textos">
+                <p>RECIBO CONFORME LA CANTIDAD DE {{ cesantia_letras }} LPS, POR CONCEPTO DE PAGO DE CESANTIA.</p>
+            </div>
+            <br>
+            <div class="textos">
+                <p>EXTENDIDA EN LA CIUDAD DE CHOLUTECA A LOS {{ cesantia.fecha_extencion|date:"d" }} DIAS DEL MES DE {{ cesantia.fecha_extencion|date:"F"|upper }} DEL {{ cesantia.fecha_extencion|date:"Y" }}.</p>
+            </div>
+        </div>
+        <br><br><br><br><br>
+        <br><br><br><br><br><br><br><br>
+        <div class="header">
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>Por: {{ cesantia.nombre_autoriza }}</p>
+                <p>DNI: {{ cesantia.dni_autoriza }}</p>
+                <p>{{ cesantia.cargo_autoriza }}</p>
+            </div>
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>Por: {{ cesantia.nombre_empleado }}</p>
+                <p>DNI: {{ cesantia.dni_empleado }}</p>
+                <p>EMPLEADO</p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <br><br><br>
+        <div class="header2">
+        {% if cesantia.empresa|lower == "promaco" %}
+        <br><br><br><br><br><br>
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO" >
+        {% elif cesantia.empresa|lower == "msgad" %}
+            <img src="{% static 'img/logo_multi.png' %}" alt="Logo MSGAD" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "importadora" %}
+            <img src="{% static 'img/importadora.png' %}" alt="Logo Importadora" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "urbanizadora" %}
+            <img src="{% static 'img/urbanizadora.png' %}" alt="Logo Urbanizadora" style="width: 200px;">
+        {% elif cesantia.empresa|lower == "pp" %}
+            <br><br><br><br><br><br>
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo pp">
+        {% elif cesantia.empresa|lower == "triturados" %}
+            <img src="{% static 'img/triturados.png' %}" alt="Logo Triturados" style="width: 200px;">
+        {% else %}
+            <img src="{% static 'img/default.png' %}" alt="Logo por defecto">
+        {% endif %}     
+            <h1>ACUERDO</h1>
+        </div>
+        <div class="textos1">
+            <br><br><br><br><br>
+            <div class="texto2">
+                <p>Yo, <b>{{ cesantia.nombre_autoriza }}</b> con identidad <b>{{ cesantia.dni_autoriza }}</b> en condición de {{ cesantia.cargo_autoriza }}
+                    , en vista de la solicitud de pago de cesantías anuales el colaborador <b>{{ cesantia.nombre_empleado }}</b> con identidad No. <b>{{ cesantia.dni_empleado }}</b>
+                    ,asi mismo <b><u>HACEMOS CONSTAR:</u></b> La legalidad del presente acuerdo de pago de Cesantías laborales, por mutuo consentimiento, el cual se negocia un pago al 
+                    contado <b>{{ cesantia.porcentaje }} %</b> sobre su cesantía anual por año.
+                </p>
+            </div>
+            <br><br>
+            <div class="texto2">
+                <p>Haciendo un total de <b>{{ cesantia_letras_final }}</b> Lps , por concepto de pago de cesantías anuales correspondientes a los años
+                    <b>{{ cesantia.año }}</b> liberando así de toda responsabilidad presente y futura a la empresa <b>{{ cesantia.empresa }}</b>
+                    , por lo que se respetara el contenido en todo y en cada una de sus partes del presente acuerdo celebrado entre el trabajador y la Empresa. 
+                </p>
+            </div>
+            <br><br>
+            <div class="texto2">
+                <p><b>EXTENDIDA EN LA CIUDAD DE CHOLUTECA A LOS {{ cesantia.fecha_extencion|date:"d" }} DIAS DEL MES DE {{ cesantia.fecha_extencion|date:"F"|upper }} DEL {{ cesantia.fecha_extencion|date:"Y" }}.</p></b>
+            </div>
+        </div>
+        <br><br><br><br><br>
+        <br><br><br><br><br>
+        <br><br><br>
+        <div class="header">
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>Por: {{ cesantia.nombre_autoriza }}</p>
+                <p>DNI: {{ cesantia.dni_autoriza }}</p>
+                <p>{{ cesantia.cargo_autoriza }}</p>
+            </div>
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>Por: {{ cesantia.nombre_empleado }}</p>
+                <p>DNI: {{ cesantia.dni_empleado }}</p>
+                <p>EMPLEADO</p>
+            </div>
+        </div>
+
+    <script>
+        window.onload = function() {
+            window.print();  
+        };
+    
+        window.onafterprint = function() {
+            window.location.href = "{% url 'cesantias' %}";  
+        };
+    </script>
+</body>
+
+</html>

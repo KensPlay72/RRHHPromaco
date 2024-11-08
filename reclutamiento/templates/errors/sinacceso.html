@@ -1,0 +1,23 @@
+<!-- resources/views/errors/404.blade.php -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/errors.css' %}">
+
+<html lang="es">
+</head>
+
+<body>
+    <div class="encabezadocontroltiempo">
+        <img src=" {% static '/img/logoblanco.png' %}" alt="Logo">
+    </div>
+    <div class="encabezadocontroltiempo2">
+        <h2>NO TIENES ACCESO A ESTA PAGINA</h2>
+    </div>
+    <br><br><br><br><br>
+    <div class="container">
+        <h1>La página que buscas no tienes permisos para ingresar</h1>
+        <p>Porfavor comunicate con tu jefe inmediato</p>
+        <p><a href="{% url 'dashboard' %}">Volver al inicio</a></p>
+    </div>
+</body>
+
+</html>

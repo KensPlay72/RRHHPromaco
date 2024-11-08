@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Control de Tiempo
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/controltiempo.css' %}">
+
+<div class="encabezadocontroltiempo">
+    <a href="{% url 'dashboard' %}">
+        <img src="{% static 'img/logoblanco.png' %}" alt="img">
+    </a>
+    <div class="dropdown2">
+        <button class="dropbtn" style="display: flex; align-items: center; color:white; margin-right: 20px;">
+            <i class="fas fa-user" style="margin-right: 5px;"></i>
+            {{ request.session.username }} 
+            <span style="margin: 0 10px;">|</span>
+            <span class="glow"></span>
+            <span style="margin-left: 10px" id="sesiones-activas">{{ sesiones_activas }}</span>
+            <i class="fas fa-chevron-down" style="margin-left: 10px;"></i>
+        </button>
+        <div class="dropdown2-content">
+            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        </div>
+    </div>
+</div>
+<div class="encabezadocontroltiempo2">
+    <h4>CONTROL DE TIEMPO</h4>
+</div>
+<div class="encabezado">
+    <form action="{% url 'controltiempo' %}" method="GET">
+      <div class="input-group" style="margin-top:10px;" >
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <button style="margin-bottom:5px;" type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Control de Tiempo</button>
+</div>
+
+
+<div class="botones-container">
+    <button id="controlTiempoButton" type="button" class="btn classbotones botonesinferioresdiv"><a style="color: white;" href="{% url 'controlplazas' %}">Control de Plazas</a></button>
+  </div>
+
+<div class="tabla" style="margin-top:-20px">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Unidad de Negocio</th>
+                <th>Departamento</th>
+                <th>Puesto</th>
+                <th>Unid Puesto</th>
+                <th>Tiempo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in controlesTiempo %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.unidad_de_negocio.nombre_unidad_de_negocio }}</td>
+                    <td>{{ item.departamento.nombre_departamento }}</td>
+                    <td>{{ item.puestos.nombre_puestos }}</td>
+                    <td>{{ item.unid_puesto }}</td>
+                    <td>{{ item.tiempo }}</td>
+                    <td>
+                        {% if item.estado == 'ACTIVO' %}
+                            <b style="color: green;">{{ item.estado }}</b>
+                        {% else %}
+                            <b style="color: red;">{{ item.estado }}</b>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Script para pasar los datos de controlesTiempo al formulario de edición -->
+    <script type="application/json" id="controles-data">
+        [
+            {% for item in controlesTiempo %}
+                {
+                    "id": "{{ item.id }}",
+                    "unidad_de_negocio": "{{ item.unidad_de_negocio.id }}",  
+                    "departamento": "{{ item.departamento.id }}", 
+                    "puestos": "{{ item.puestos.id }}",  
+                    "tiempo": "{{ item.tiempo|escapejs }}",
+                    "estado": "{{ item.estado|escapejs }}"
+                }
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+      </script>
+      
+      
+      
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if controlesTiempo.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ controlesTiempo.previous_page_number }}&search={{ search }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+
+            {% for num in page_range %}
+                {% if controlesTiempo.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if controlesTiempo.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ controlesTiempo.next_page_number }}&search={{ search }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Siguiente</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Control de Tiempo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-controltiempo" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocio" id="unidadnegocio" class="form-control" required>
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in unidadesNegocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamento" id="departamento" class="form-control" required>
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Puesto</label>
+                        <select name="puestos" id="puestos" class="form-control" required>
+                            <option value="" selected disabled>Seleccione un Puesto</option>
+                            {% for item in puestos %}
+                                <option value="{{ item.id }}">{{ item.nombre_puestos }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Tiempo</label>
+                        <input type="text" name="tiempo" id="tiempo" class="form-control"
+                            oninput="validateNumber(this)" placeholder="Tiempo" required autocomplete="off">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estado" id="estado" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Departamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-controltiempo" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ID">ID</label>
+                        <input type="text" name="ideditar" id="ideditar" disabled class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocioeditar" id="unidadnegocioeditar" class="form-control" required>
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in unidadesNegocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamentoeditar" id="departamentoeditar" class="form-control" required>
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Puesto</label>
+                        <select name="puestoseditar" id="puestoseditar" class="form-control" required>
+                            <option value="" selected disabled>Seleccione un Puesto</option>
+                            {% for item in puestos %}
+                                <option value="{{ item.id }}">{{ item.nombre_puestos }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Tiempo</label>
+                        <input type="text" name="tiempoeditar" id="tiempoeditar" class="form-control"
+                            oninput="validateNumber(this)" placeholder="Tiempo" required autocomplete="off">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/controltiempo.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,603 @@
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Requisición de Personal</title>
+    <link rel="stylesheet" href="{% static 'css/perfilpuesto/requisa.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container">
+        <form autocomplete='off'>
+            <input type="hidden" id="requisaid" value="{{ perfil_puesto.id }}">
+            <div class="header-section">
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo" rowspan="4">
+                            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="img" width="120px">
+                            <p>Proveedora de Materiales de Construcción S de R.L.</p>
+                        </td>
+                        <td class="header-title" id="titulotabla" rowspan="4" style="font-size: 20px">Registro de Requisición de Personal</td>
+                        <td class="header-info">
+                            <p><strong>CÓDIGO:</strong> RRHH-RE-10</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>VERSIÓN:</strong> 00</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>FECHA DE ACTUALIZACIÓN:</strong> 08/03/2024</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>ELABORADO POR:</strong> DEPTO. PROCESO</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br id="espace">
+            <div class="header-section">
+                <table class="header-table notas2">
+                    <tr>
+                        <td id="nota">NOTA</td>
+                        <td style="text-align: justify;" id="notados">Este formato responde a la necesidad de obtener la mayor cantidad de información posible sobre la vacante y el perfil del candidato requerido para ocupar el cargo, con el fin de realizar una selección que responda a sus necesidades y al control del recurso humano en la empresa.</td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <!-- Información General -->
+            <section class="section">
+                <h2>Información General</h2>
+            
+                <div class="row">
+                    <label>Salario Base: <input type="text" id="salario_base" name="salario-base"></label>
+                </div>
+            
+                <!-- Fila para checkboxes -->
+                <div class="row" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: nowrap;">
+                    <label style="flex-basis: 15%; white-space: nowrap;">Combustible: <input type="checkbox" id="combustible-checkbox" name="compensacion[]" {% if "DEPRECIACION Y COMBUSTIBLE" in perfil_puesto.plan_de_compensacion %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Viáticos: <input type="checkbox" id="viaticos-checkbox" name="compensacion[]"></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Depreciación: <input type="checkbox" id="depreciacion-checkbox" name="compensacion[]" {% if "DEPRECIACION Y COMBUSTIBLE" in perfil_puesto.plan_de_compensacion %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Comisión: <input type="checkbox" id="comision-checkbox" name="compensacion[]" {% if "COMISION" in perfil_puesto.plan_de_compensacion %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Bono: <input type="checkbox" id="bono-checkbox" name="compensacion[]" {% if "BONO" in perfil_puesto.plan_de_compensacion %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Recarga: <input type="checkbox" id="recarga-checkbox" name="compensacion[]"></label>
+                </div>
+            
+                <!-- Fila para los inputs de monto/mes -->
+                <div class="row">
+                    <label style="display: none; flex-direction: column;" id="combustible-monto-label">Fijo/Variable <p>Combustible</p> <input type="text" id="combustible-monto"  style="width: 100px;"></label>
+                    <label style="display: none; flex-direction: column;" id="viaticos-monto-label">Monto/Mes <p>Viáticos</p> <input type="text" id="viaticos-monto"  style="width: 100px;"></label>
+                    <label style="display: none; flex-direction: column;" id="depreciacion-monto-label">Monto/Mes <p>Depreciación</p> <input type="text" id="depreciacion-monto"  style="width: 100px;"></label>
+                    <label style="display: none; flex-direction: column;" id="comision-monto-label">Monto/Mes <p>Comisión</p> <input type="text" id="comision-monto"  style="width: 100px;"></label>
+                    <label style="display: none; flex-direction: column;" id="bono-monto-label">Monto/Mes <p>Bono</p> <input type="text" id="bono-monto"  style="width: 100px;"></label>
+                    <label style="display: none; flex-direction: column;" id="recarga-monto-label">Monto/Mes <p>Recarga</p> <input type="text" id="recarga-monto"  style="width: 100px;"></label>
+                </div>
+            </section>
+            
+
+            <hr>
+
+            
+            <!-- El puesto responde a -->
+            <section class="section">
+                <h2>Información del puesto</h2>
+            <div class="row">
+                <label style="width: 300px;">Puesto: 
+                    <input type="text" style="width: 300px;"  id="inputpuesto" value="{{ perfil_puesto.nombre_cargo }}">
+                </label>
+                <label>Sucursal: 
+                    <select name="puesto" id="sucursal_select" >
+                        <option value="" selected disabled>Seleccione un Sucursal</option>
+                        {% for item in all_sucursales %}
+                            <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Departamento: 
+                    <select name="departamento" id="departamento_select" >
+                        <option value="" selected disabled>Seleccione un Departamento</option>
+                        {% for item in all_departamentos %}
+                            <option value="{{ item.id }}" {% if item.nombre_departamento == perfil_puesto.departamento %}selected{% endif %}>
+                                {{ item.nombre_departamento }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>               
+            </div>
+                <div class="row">
+                    <label>Cantidad Requeridad: <input type="text" style="width: 100px;" name="cantidad-requerida" value="1" disabled></label>
+                    <label for="hora-inicio" style="display:flex; justify-content:center; align-items:center;">Horario:
+                        <input type="time" id="hora-inicio" name="hora-inicio" style=" margin-left:20px" >
+                        <span style="padding: 10px;">a</span>
+                        <input type="time" id="hora-final" name="hora-final">
+                    </label>
+                    <label>Centro de Costos: <input type="text" id="centrocostos"></label>
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- El puesto responde a -->
+            <section class="section">
+                <h2>El puesto responde a</h2>
+                <div class="row" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: nowrap;">
+                    <label style="flex-basis: 15%; white-space: nowrap;">
+                        Creación de puesto nuevo: 
+                        <input type="checkbox" id="puestonuevo_checkbox" name="puestonuevo" {% if "NUEVO" in perfil_puesto.tipo_perfil %}checked{% endif %}>
+                    </label>                    
+                    <label style="flex-basis: 15%; white-space: nowrap;">Incapacidad: <input type="checkbox" id="incapacidad" name="incapacidad"></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Reemplazo: <input type="checkbox" id="reemplazo" name="Reemplazo"></label>
+                    <label>Tiempo del Primer Contrato: <input type="number" name="cantidad-requerida" id="tiempoprimercontrato" style="width: 200px;"></label>
+                </div>
+                <div class="row">
+                    <label>Modalidad de Contrato: 
+                        <select name="contrato" id="tipo_contrato" >
+                            <option value="" selected disabled>Seleccione un Contrato</option>
+                            {% for item in all_tipos_contrato %}
+                                <option value="{{ item.id }}">
+                                    {{ item.nombre_tipo_de_contrato }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                </label>
+                    <label>Motivo: <input type="text" name="cantidad-requerida" id="motivo"></label>
+                    <label style="display:flex;">Nombre del Empleado a Reemplazar: <input type="text" name="cantidad-requerida" id="nombrereemplazar" style="width: 300px;"></label>
+                </div>
+            </section>
+            
+            <hr>
+            
+            <section class="section">
+                <h2>Funciones Principales del puesto</h2>
+                <div class="row">
+                    <textarea id="funciones_cargo" name="funciones_cargo" rows="2" cols="50" placeholder="Escribe aquí las funciones Principales a cumplir">{{ funciones_text }}</textarea>
+                </div>
+                <div class="row">
+                    <label>Formación Académica:
+                        <select name="formacionacademica" id="formacionacademica">
+                            <option value="" selected disabled>SELECCIONA UNA FORMACION</option>
+                            <option value="BACHILLER">BACHILLER</option>
+                            <option value="EST. UNIVERSITARIO">EST. UNIVERSITARIO</option>
+                            <option value="TÉCNICO">TÉCNICO</option>
+                            <option value="PREGRADO">PREGRADO</option>
+                            <option value="POSGRADO">POSGRADO</option>
+                            <option value="OTROS ESTUDIOS">OTROS ESTUDIOS</option>
+                        </select>
+                    </label>
+            
+                    <!-- Habilidades Ferreteros -->
+                    <label>Habilidades Ferreteros:
+                        <div class="custom-select-wrapper">
+                            <div id="select-categorias-ferreteros" class="custom-select">Seleccione</div>
+                            <div class="custom-options" id="options-categorias-ferreteros">
+                                <label>
+                                    <input type="checkbox" value="ELECTRICIDAD" name="ferreteros[]"> Electricidad
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="FONTANERIA" name="ferreteros[]"> Fontanería
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="PINTURA" name="ferreteros[]"> Pintura
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="TORNILLERIA" name="ferreteros[]"> Tornillería
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="CONSTRUCCION" name="ferreteros[]"> Construcción
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="HOGAR" name="ferreteros[]"> Hogar
+                                </label>
+                            </div>
+                        </div>
+                    </label>
+            
+                    <!-- Habilidades Informáticas -->
+                    <label>Habilidades Informáticas:
+                        <div class="custom-select-wrapper">
+                            <div id="select-categorias-informaticas" class="custom-select">Seleccione</div>
+                            <div class="custom-options" id="options-categorias-informaticas">
+                                <label>
+                                    <input type="checkbox" value="WORD-EXCEL" name="informatica[]"> Word-Excel-Power Point
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="SAP" name="informatica[]"> SAP
+                                </label>
+                            </div>
+                        </div>
+                    </label>
+            
+                    <!-- Habilidades Interpersonales -->
+                    <label>Habilidades Personales:
+                        <div class="custom-select-wrapper">
+                            <div id="select-categorias-interpersonales" class="custom-select">Seleccione</div>
+                            <div class="custom-options" id="options-categorias-interpersonales">
+                                <label>
+                                    <input type="checkbox" value="NOGOCIACION" name="personales[]"> Habilidades de negociación
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="EQUIPO" name="personales[]"> Capacidad para trabajar en equipo
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="RESOLVER-CONFLICTOS" name="personales[]"> Capacidad para resolver conflictos
+                                </label>
+                            </div>
+                        </div>
+                    </label>
+            
+                    <!-- Habilidades Analíticas -->
+                    <label>Habilidades Analíticas:
+                        <div class="custom-select-wrapper">
+                            <div id="select-categorias-analiticas" class="custom-select">Seleccione</div>
+                            <div class="custom-options" id="options-categorias-analiticas">
+                                <label>
+                                    <input type="checkbox" value="ANALIZAR-DATOS" name="analiticas[]"> Analizar datos
+                                </label>
+                                <label>
+                                    <input type="checkbox" value="INTERPRETAR-INFORMACION" name="analiticas[]"> Interpretar información
+                                </label>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </section>
+            
+            <hr>
+
+            <!-- Equipos y Herramientas -->
+            <section class="section generalbottom">
+                <h2>Equipos y Herramientas Necesarias</h2>
+                <div class="row" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: nowrap;">
+                    <label style="flex-basis: 15%; white-space: nowrap;">Computador: <input type="checkbox" id="computador-checkbox"value="COMPUTADOR" name="materiales[]"{% if "COMPUTADOR" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Licencia SAP: <input type="checkbox" id="licencia-checkbox" value="LICENCIA SAP" name="materiales[]" {% if "LICENCIA SAP" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Celular: <input type="checkbox" id="celular-checkbox" value="CELULAR" name="materiales[]" {% if "CELULAR" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Licencia IVEND: <input type="checkbox" id="ivend-checkbox" value="LICENCIA IVEND" name="materiales[]" {% if "LICENCIA IVEND" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                </div>
+                <div class="row" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: nowrap;">
+                    <label style="flex-basis: 15%; white-space: nowrap;">Escritorio: <input type="checkbox" id="escritorio-checkbox" value="ESCRITORIO" name="materiales[]" {% if "ESCRITORIO" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Silla: <input type="checkbox" id="silla-checkbox" value="SILLA" name="materiales[]" {% if "SILLA" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Uniforme: <input type="checkbox" id="uniforme-checkbox" value="UNIFORME" name="materiales[]" {% if "UNIFORME" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                    <label style="flex-basis: 15%; white-space: nowrap;">Correo: <input type="checkbox" id="email-checkbox" value="CORREO" name="materiales[]" {% if "CORREO" in perfil_puesto.materiales_equipos %}checked{% endif %}></label>
+                </div>
+            </section>
+            <hr>
+            <br>    
+            <div class="footer">
+                <div class="firma">
+                    <hr style="border: 1px solid black; margin-bottom:-0.5px;width: 200px;" >
+                    <p>Jefe/Gerente Solicitante</p>
+                </div>
+                <div class="firma">
+                    <hr style="border: 1px solid black; margin-bottom:-0.5px;width: 200px;" >
+                    <p>Gerente Recusos Humanos</p>
+                </div>
+                <div class="firma">
+                    <hr style="border: 1px solid black; margin-bottom:-0.5px; width: 200px;" >
+                    <p>Gerente General</p>
+                </div>
+            </div>
+            <br>
+            <div class="footer">
+                <button id="registrar_requisa" class="submit-button">Registrar</button>
+            </div>
+        </form>
+    </div>
+
+    <button class="print-button1" onclick="window.location.href='{% url 'perfilpuesto' %}'">Volver</button>
+
+
+    <!-- Incluye Flatpickr en tu proyecto -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'js/sweetaler2.min.js' %}"></script>
+
+<script>
+    document.getElementById('hora-final').addEventListener('change', function() {
+        var horaInicio = document.getElementById('hora-inicio').value;
+        var horaFinal = this.value;
+        
+        if (horaFinal <= horaInicio) {
+            alert('La hora de finalización debe ser posterior a la hora de inicio.');
+            this.value = ''; // Limpiar el campo de hora final si no es válido
+        }
+    });
+        // Función para mostrar/ocultar los campos de "Monto/Mes"
+        function toggleMonto(checkboxId, inputLabelId) {
+            const checkbox = document.getElementById(checkboxId);
+            const inputLabel = document.getElementById(inputLabelId);
+            
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    inputLabel.style.display = 'block';
+                } else {
+                    inputLabel.style.display = 'none';
+                }
+            });
+        }
+    
+        // Llamamos a la función para cada checkbox y su respectivo campo de texto
+        toggleMonto('combustible-checkbox', 'combustible-monto-label');
+        toggleMonto('viaticos-checkbox', 'viaticos-monto-label');
+        toggleMonto('depreciacion-checkbox', 'depreciacion-monto-label');
+        toggleMonto('comision-checkbox', 'comision-monto-label');
+        toggleMonto('bono-checkbox', 'bono-monto-label');
+        toggleMonto('recarga-checkbox', 'recarga-monto-label');
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Función para inicializar el comportamiento de selección personalizada
+            function initializeCustomSelect(selectWrapperId, optionsWrapperId) {
+                const selectWrapper = document.getElementById(selectWrapperId);
+                const optionsWrapper = document.getElementById(optionsWrapperId);
+                const checkboxes = optionsWrapper.querySelectorAll('input[type="checkbox"]');
+                const dropdownIcon = document.createElement('i');
+                dropdownIcon.className = 'dropdown-icon fas fa-chevron-down';
+                let selectedText = 'Seleccione uno o más puestos';
+        
+                // Función para actualizar el texto del select
+                function updateSelectedText() {
+                    const selectedValues = Array.from(checkboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.parentElement.textContent.trim());
+        
+                    selectWrapper.textContent = selectedValues.length > 0 ? selectedValues.join(', ') : selectedText;
+                    selectWrapper.appendChild(dropdownIcon); // Volvemos a añadir el icono
+                }
+            
+                // Evento para abrir/cerrar el select personalizado
+                selectWrapper.addEventListener('click', function(event) {
+                    event.stopPropagation();  // Prevenir la propagación del evento
+                    event.preventDefault();  // Prevenir el comportamiento predeterminado
+                    selectWrapper.classList.toggle('active');
+                    optionsWrapper.classList.toggle('active'); // Mostrar las opciones
+                    
+                    // Asegurar que el primer checkbox no se seleccione automáticamente
+                    setTimeout(() => {
+                        if (checkboxes[0]) {
+                            checkboxes[0].blur(); // Quitar el foco del primer checkbox
+                        }
+                    }, 0);
+                });
+            
+                // Evento para actualizar el texto al seleccionar/desseleccionar opciones
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateSelectedText);
+                });
+            
+                // Cerrar el select personalizado al hacer clic fuera de él
+                document.addEventListener('click', function(event) {
+                    if (!selectWrapper.contains(event.target) && !optionsWrapper.contains(event.target)) {
+                        selectWrapper.classList.remove('active');
+                        optionsWrapper.classList.remove('active');
+                    }
+                });
+                
+                // Añadir el icono de dropdown al select personalizado
+                selectWrapper.appendChild(dropdownIcon);
+            }
+            
+            // Inicializar para todos los selectores personalizados
+            initializeCustomSelect('select-categorias-ferreteros', 'options-categorias-ferreteros');
+            initializeCustomSelect('select-categorias-informaticas', 'options-categorias-informaticas');
+            initializeCustomSelect('select-categorias-interpersonales', 'options-categorias-interpersonales');
+            initializeCustomSelect('select-categorias-analiticas', 'options-categorias-analiticas');
+        });
+        
+    </script>
+    <script>
+        document.getElementById("registrar_requisa").onclick = function(event) {
+            event.preventDefault(); 
+        
+            const formData = new FormData();
+            const id = document.getElementById('requisaid').value;
+        
+            const salario_base = document.getElementById("salario_base").value;
+            formData.append('salario_base',salario_base);
+        
+        
+            const plan_de_compensacion = document.querySelectorAll('input[name="compensacion[]"]:checked'); // Solo los seleccionados
+            let plancompensacion = [];
+        
+            plan_de_compensacion.forEach((funcionInput) => {
+                plancompensacion.push(funcionInput.value); 
+            });
+        
+            formData.append('plan_de_compensacion', JSON.stringify(plancompensacion));
+        
+            const combustible = document.getElementById('combustible-monto').value;
+            const viaticos = document.getElementById('viaticos-monto').value;
+            const depreciacion = document.getElementById('depreciacion-monto').value;
+            const comision = document.getElementById('comision-monto').value;
+            const bono = document.getElementById('bono-monto').value;
+            const recarga = document.getElementById('recarga-monto').value;
+        
+            let montos = {};
+        
+            if (combustible) montos["combustible"] = combustible;
+            if (viaticos) montos["viaticos"] = viaticos;
+            if (depreciacion) montos["depreciacion"] = depreciacion;
+            if (comision) montos["comision"] = comision;
+            if (bono) montos["bono"] = bono;
+            if (recarga) montos["recarga"] = recarga;
+        
+            formData.append('montos', JSON.stringify(montos));
+        
+            const puesto = document.getElementById('inputpuesto').value;
+            formData.append('puesto', puesto);
+        
+            const sucursal = document.getElementById('sucursal_select').value;
+            formData.append('sucursal', sucursal);
+        
+            const departamento = document.getElementById('departamento_select').value;
+            formData.append('departamento', departamento);
+        
+            const horaInicio = document.getElementById('hora-inicio').value;
+            const horaFinal = document.getElementById('hora-final').value;
+            formData.append('hora_inicio', horaInicio);
+            formData.append('hora_fin', horaFinal);
+        
+            const centrocostos = document.getElementById('centrocostos').value;
+            formData.append('centrocostos',centrocostos)
+        
+            const puestonuevo = document.getElementById('puestonuevo_checkbox').checked ? 1 : 0;
+            formData.append('puestonuevo', puestonuevo);
+        
+            const incapacidad = document.getElementById('incapacidad').checked ? 1 : 0;
+            formData.append('incapacidad', incapacidad);
+            
+            const reemplazo = document.getElementById('reemplazo').checked ? 1 : 0;
+            formData.append('reemplazo', reemplazo);
+            
+            const tiempoprimercontrato = document.getElementById('tiempoprimercontrato').value;
+            formData.append('tiempoprimercontrato', tiempoprimercontrato);
+        
+            const tipo_contrato = document.getElementById('tipo_contrato').value;
+            formData.append('tipo_contrato', tipo_contrato);
+        
+            const motivo = document.getElementById('motivo').value;
+            formData.append('motivo',motivo);
+        
+            const nombrereemplazar = document.getElementById('nombrereemplazar').value;
+            formData.append('nombrereemplazar',nombrereemplazar);
+        
+            const formacionacademica = document.getElementById('formacionacademica').value;
+            formData.append('formacionacademica',formacionacademica);
+        
+            // Habilidades Ferreteros
+            const habilidadesferreteras = document.querySelectorAll('input[name="ferreteros[]"]:checked'); // Solo seleccionados
+            let habilidadesfer = [];
+        
+            habilidadesferreteras.forEach((funcionInput) => {
+                const habilidadesferre = funcionInput.value;
+                if (habilidadesferre) {
+                    habilidadesfer.push(habilidadesferre);
+                }
+            });
+            formData.append('habilidadesferreteras', JSON.stringify(habilidadesfer));
+        
+            // Habilidades Informáticas
+            const habilidadesinformaticas = document.querySelectorAll('input[name="informatica[]"]:checked'); // Corregido a 'informatica[]'
+            let habilidadesinf = [];
+        
+            habilidadesinformaticas.forEach((funcionInput) => {
+                const habilidadesinfor = funcionInput.value;
+                if (habilidadesinfor) {
+                    habilidadesinf.push(habilidadesinfor);
+                }
+            });
+            formData.append('habilidadesinformaticas', JSON.stringify(habilidadesinf));
+        
+            // Habilidades Personales
+            const habilidadespersonales = document.querySelectorAll('input[name="personales[]"]:checked'); // Solo seleccionados
+            let habilidadesper = [];
+        
+            habilidadespersonales.forEach((funcionInput) => {
+                const habilidadesperso = funcionInput.value;
+                if (habilidadesperso) {
+                    habilidadesper.push(habilidadesperso);
+                }
+            });
+            formData.append('habilidadespersonales', JSON.stringify(habilidadesper));
+        
+            // Habilidades Analíticas
+            const habilidadesanaliticas = document.querySelectorAll('input[name="analiticas[]"]:checked'); // Solo seleccionados
+            let habilidadesana = [];
+        
+            habilidadesanaliticas.forEach((funcionInput) => {
+                const habilidadeanali = funcionInput.value;
+                if (habilidadeanali) {
+                    habilidadesana.push(habilidadeanali);
+                }
+            });
+            formData.append('habilidadesanaliticas', JSON.stringify(habilidadesana));
+        
+            // Materiales
+            const checkboxmateriales = document.querySelectorAll('input[name="materiales[]"]:checked');
+            let materiales = [];
+        
+            checkboxmateriales.forEach((checkbox) => {
+                materiales.push(checkbox.value);
+            });
+            formData.append('materialesequipo', JSON.stringify(materiales));
+        
+        
+            const funciones_cargo = document.getElementById('funciones_cargo').value;
+            formData.append('funciones_cargo',funciones_cargo);
+        
+            
+            formData.append('materialesequipo', JSON.stringify(materiales));
+        
+            fetch(`/PerfilesPuestos/Requisa/RegistrarRequisaPerfil/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'warning',
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-alertas-button'
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: 'Requisa registrada correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-alertas-button'
+                        }
+                    }).then(() => {
+                        window.location.href = "/Requisa/";
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                });
+            });
+        }    
+        
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+    </script>
+</body>
+
+</html>

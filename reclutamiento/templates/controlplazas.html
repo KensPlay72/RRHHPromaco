@@ -1,0 +1,964 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Control de Plazas{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/controlplazas.css' %}">
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+<form method="GET" action="{% url 'controlplazas' %}" id="filterForm">
+
+<div class="encabezado">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    <h1 class="titulo-encabezado">Control de Plazas</h1>
+    {% if request.session.plazas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Plaza</button>
+    {% endif %}  
+</div>
+
+  <div class="botones-container">
+    {% if request.session.plazas_escribir %}
+    <button id="controlTiempoButton" type="button" class="btn classbotones botonesinferioresdiv"><a style="color: white;" href="{% url 'controltiempo' %}">Control de Tiempo</a></button>
+    {% endif %}  
+    <button class="btn classbotones botonesinferioresdiv"><a href="{% url 'exportar_excel' %}" style="color:white;"><i class="fas fa-file-excel"></i> Exportar a Excel</a></button>
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>
+                    Sucursal
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-sucursal')"></ion-icon>
+                    <div id="filtro-sucursal" class="filter-popup" style="display: none;">
+                        {% for sucursal in sucursales %}
+                            <label>
+                                <input type="checkbox" name="sucursal" value="{{ sucursal.id }}" 
+                                    {% if sucursal.id|stringformat:"i" in sucursal_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ sucursal.nombre_sucursal }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                
+                <th>
+                    Empresa
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-empresa')"></ion-icon>
+                    <div id="filtro-empresa" class="filter-popup" style="display: none;">
+                        {% for empresa in empresas %}
+                            <label>
+                                <input type="checkbox" name="empresa" value="{{ empresa.id }}" 
+                                    {% if empresa.id|stringformat:"i" in empresa_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ empresa.nombre_empresa }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                
+                <th>
+                    Año
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-año')"></ion-icon>
+                    <div id="filtro-año" class="filter-popup" style="display: none;">
+                        {% for año in año_options %}
+                            <label>
+                                <input type="checkbox" name="año" value="{{ año }}" 
+                                    {% if año|stringformat:"i" in año_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ año }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Mes de Corte
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-mes-corte')"></ion-icon>
+                    <div id="filtro-mes-corte" class="filter-popup" style="display: none;">
+                        {% for mes in mes_corte_options %}
+                            <label>
+                                <input type="checkbox" name="mes_corte" value="{{ mes }}" 
+                                    {% if mes in mes_corte_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ mes }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Mes de Solicitud
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-mes-solicitud')"></ion-icon>
+                    <div id="filtro-mes-solicitud" class="filter-popup" style="display: none;">
+                        {% for mes in mes_solicitud_options %}
+                            <label>
+                                <input type="checkbox" name="mes_solicitud" value="{{ mes }}" 
+                                    {% if mes in mes_solicitud_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ mes }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Puesto
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-puesto')"></ion-icon>
+                    <div id="filtro-puesto" class="filter-popup" style="display: none;">
+                        {% for puesto in puestos %}
+                            <label>
+                                <input type="checkbox" name="puesto" value="{{ puesto.id }}" 
+                                    {% if puesto.id|stringformat:"i" in puesto_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ puesto.nombre_puestos }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                
+                <th>
+                    Departamento
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-departamento')"></ion-icon>
+                    <div id="filtro-departamento" class="filter-popup" style="display: none;">
+                        {% for departamento in departamentos %}
+                            <label>
+                                <input type="checkbox" name="departamento" value="{{ departamento.id }}" 
+                                    {% if departamento.id|stringformat:"i" in departamento_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ departamento.nombre_departamento }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                
+                <th>
+                    Estatus
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-estatus')"></ion-icon>
+                    <div id="filtro-estatus" class="filter-popup" style="display: none;">
+                        {% for estatus in estatus_options %}
+                            <label>
+                                <input type="checkbox" name="estatus" value="{{ estatus }}" 
+                                    {% if estatus in estatus_filter %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ estatus }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                {% if request.session.plazas_escribir %}
+                <th>Acciones</th>
+                {% endif %}  
+            </tr>
+        </thead>
+        
+        
+        <tbody>
+            {% for item in controlDePlazas %}
+                <tr data-id="{{ item.id }}" data-estatus="{{ item.estatus }}">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.sucursal.nombre_sucursal|default:'' }}</td>
+                    <td>{{ item.empresa.nombre_empresa|default:'' }}</td>
+                    <td>{{ item.año|default:'' }}</td>
+                    <td>{{ item.mes_corte|default:'' }}</td>
+                    <td>{{ item.mes_solicitud|default:'' }}</td>
+                    <td>{{ item.puestos.nombre_puestos|default:'' }}</td>
+                    <td>{{ item.departamento.nombre_departamento|default:'' }}</td>
+                    <td>{{ item.estatus }}</td>
+                    {% if request.session.plazas_escribir %}
+                    <td>
+                        <div class="btn-grid">
+                            <div>
+                                <button type="button" class="btn btn classbotones" id="botoneditar-{{ item.id }}" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                                    <ion-icon name="create-outline" class="icon"></ion-icon>
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="eliminacion({{ item.id }})">
+                                    <ion-icon name="trash-outline" class="icon"></ion-icon>
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaldetalles" data-id="{{ item.id }}" onclick="mostrarDetallesControlPlazas(this)">
+                                    <ion-icon name="information-circle-outline" class="icon"></ion-icon>
+                                </button>                                
+                                <button type="button" class="btn btn-secondary" id="botoncancelar-{{ item.id }}" onclick="cancelarPlaza({{ item.id }})" data-id="{{ item.id }}">
+                                    <ion-icon name="close-outline" class="icon"></ion-icon>
+                                </button>                     
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}  
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+</div>
+</form>
+
+
+<script type="application/json" id="control-plazas-data">
+    [
+        {% for item in controlDePlazas %}
+            {
+                "id": "{{ item.id|default:''|escapejs }}",
+                "sucursal_id": "{{ item.sucursal.id|default:''|escapejs }}",
+                "sucursal_nombre": "{{ item.sucursal.nombre_sucursal|default:''|escapejs }}",
+                "empresa_id": "{{ item.empresa.id|default:''|escapejs }}",
+                "empresa_nombre": "{{ item.empresa.nombre_empresa|default:''|escapejs }}",
+                "unidad_negocio_id": "{{ item.unidad_de_negocio.id|default:''|escapejs }}",
+                "unidad_negocio_nombre": "{{ item.unidad_de_negocio.nombre_unidad_de_negocio|default:''|escapejs }}",
+                "ano": "{{ item.año|default:''|escapejs }}",
+                "mes_corte": "{{ item.mes_corte|default:''|escapejs }}",
+                "mes_solicitud": "{{ item.mes_solicitud|default:''|escapejs }}",
+                "modo_id": "{{ item.modo.id|default:''|escapejs }}",
+                "modo_nombre": "{{ item.modo.nombre_modo|default:''|escapejs }}",
+                "motivo_ingreso_id": "{{ item.motivo_ingreso.id|default:''|escapejs }}",
+                "motivo_ingreso_nombre": "{{ item.motivo_ingreso.nombre_motivo|default:''|escapejs }}",
+                "nombre_reemplazo": "{{ item.nombre_reemplazo|default:''|escapejs }}",
+                "puestos_id": "{{ item.puestos.id|default:''|escapejs }}",
+                "puestos_nombre": "{{ item.puestos.nombre_puestos|default:''|escapejs }}",
+                "departamento_id": "{{ item.departamento.id|default:''|escapejs }}",
+                "departamento_nombre": "{{ item.departamento.nombre_departamento|default:''|escapejs }}",
+                "prioridad_id": "{{ item.prioridad.id|default:''|escapejs }}",
+                "prioridad_nombre": "{{ item.prioridad.nombre_prioridad|default:''|escapejs }}",
+                "fecha_solicitud": "{{ item.fecha_solicitud|default:''|escapejs }}",
+                "fecha_inicio_busqueda": "{{ item.fecha_inicio_busqueda|default:''|escapejs }}",
+                "fecha_cobertura": "{{ item.fecha_cobertura|default:''|escapejs }}",
+                "fecha_ingreso": "{{ item.fecha_ingreso|default:''|escapejs }}",
+                "fuente_reclutamiento": "{{ item.fuente_reclutamiento|default:''|escapejs }}",
+                "nombre_contratado": "{{ item.nombre_contratado|default:''|escapejs }}",
+                "dni": "{{ item.dni|default:''|escapejs }}",
+                "genero": "{{ item.genero|default:''|escapejs }}",
+                "edad": "{{ item.edad|default:''|escapejs }}",
+                "fecha_nacimiento": "{{ item.fecha_nacimiento|default:''|escapejs }}",
+                "medio_reclutamiento_id": "{{ item.medio_reclutamiento.id|default:''|escapejs }}",
+                "medio_reclutamiento_nombre": "{{ item.medio_reclutamiento.nombre_medio_de_reclutamiento|default:''|escapejs }}",
+                "salario": "{{ item.salario|default:''|escapejs }}",
+                "combustible": "{{ item.combustible|default:''|escapejs }}",
+                "depreciacion": "{{ item.depreciacion|default:''|escapejs }}",
+                "comision": "{{ item.comision|default:''|escapejs }}",
+                "bono": "{{ item.bono|default:''|escapejs }}",
+                "hospedaje": "{{ item.hospedaje|default:''|escapejs }}",
+                "tipo_contrato_id": "{{ item.tipo_contrato.id|default:''|escapejs }}",
+                "tipo_contrato_nombre": "{{ item.tipo_contrato.nombre_tipo_de_contrato|default:''|escapejs }}",
+                "nombreimagen": "{{ item.nombreimagen|default:''|escapejs }}",
+                "nombreimagen1": "{{ item.nombreimagen1|default:''|escapejs }}"
+
+            }
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if controlDePlazas.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ controlDePlazas.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if sucursal_filter %}{% for sucursal in sucursal_filter %}&sucursal={{ sucursal }}{% endfor %}{% endif %}{% if empresa_filter %}{% for empresa in empresa_filter %}&empresa={{ empresa }}{% endfor %}{% endif %}{% if año_filter %}{% for año in año_filter %}&año={{ año }}{% endfor %}{% endif %}{% if mes_corte_filter %}{% for mes in mes_corte_filter %}&mes_corte={{ mes }}{% endfor %}{% endif %}{% if mes_solicitud_filter %}{% for solicitud in mes_solicitud_filter %}&mes_solicitud={{ solicitud }}{% endfor %}{% endif %}{% if puesto_filter %}{% for puesto in puesto_filter %}&puesto={{ puesto }}{% endfor %}{% endif %}{% if departamento_filter %}{% for departamento in departamento_filter %}&departamento={{ departamento }}{% endfor %}{% endif %}{% if estatus_filter %}{% for estatus in estatus_filter %}&estatus={{ estatus }}{% endfor %}{% endif %}">
+                    Anterior
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        {% for page_num in page_range %}
+            <li class="page-item {% if controlDePlazas.number == page_num %}active{% endif %}">
+                <a class="page-link" href="?page={{ page_num }}{% if search %}&search={{ search }}{% endif %}{% if sucursal_filter %}{% for sucursal in sucursal_filter %}&sucursal={{ sucursal }}{% endfor %}{% endif %}{% if empresa_filter %}{% for empresa in empresa_filter %}&empresa={{ empresa }}{% endfor %}{% endif %}{% if año_filter %}{% for año in año_filter %}&año={{ año }}{% endfor %}{% endif %}{% if mes_corte_filter %}{% for mes in mes_corte_filter %}&mes_corte={{ mes }}{% endfor %}{% endif %}{% if mes_solicitud_filter %}{% for solicitud in mes_solicitud_filter %}&mes_solicitud={{ solicitud }}{% endfor %}{% endif %}{% if puesto_filter %}{% for puesto in puesto_filter %}&puesto={{ puesto }}{% endfor %}{% endif %}{% if departamento_filter %}{% for departamento in departamento_filter %}&departamento={{ departamento }}{% endfor %}{% endif %}{% if estatus_filter %}{% for estatus in estatus_filter %}&estatus={{ estatus }}{% endfor %}{% endif %}">
+                    {{ page_num }}
+                </a>
+            </li>
+        {% endfor %}
+
+        {% if controlDePlazas.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ controlDePlazas.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if sucursal_filter %}{% for sucursal in sucursal_filter %}&sucursal={{ sucursal }}{% endfor %}{% endif %}{% if empresa_filter %}{% for empresa in empresa_filter %}&empresa={{ empresa }}{% endfor %}{% endif %}{% if año_filter %}{% for año in año_filter %}&año={{ año }}{% endfor %}{% endif %}{% if mes_corte_filter %}{% for mes in mes_corte_filter %}&mes_corte={{ mes }}{% endfor %}{% endif %}{% if mes_solicitud_filter %}{% for solicitud in mes_solicitud_filter %}&mes_solicitud={{ solicitud }}{% endfor %}{% endif %}{% if puesto_filter %}{% for puesto in puesto_filter %}&puesto={{ puesto }}{% endfor %}{% endif %}{% if departamento_filter %}{% for departamento in departamento_filter %}&departamento={{ departamento }}{% endfor %}{% endif %}{% if estatus_filter %}{% for estatus in estatus_filter %}&estatus={{ estatus }}{% endfor %}{% endif %}">
+                    Siguiente
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+<br>
+
+
+  <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Plaza</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-plazas" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Analista</label>
+                        <input type="text" name="analista" id="analista" value="{{ request.session.username }}" disabled class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursal" id="sucursal" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                                <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresa" id="empresa" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                                <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocio" id="unidadnegocio" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Año</label>
+                        <select name="ano" id="ano" class="form-control">
+                            <option value="" selected disabled>Seleccione un Año</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Mes de Corte</label>
+                        <select name="mescorte" id="mescorte" class="form-control">
+                            <option value="" selected disabled>Seleccione un Mes de Corte</option>
+                            <option value="ENERO">ENERO</option>
+                            <option value="FEBRERO">FEBRERO</option>
+                            <option value="MARZO">MARZO</option>
+                            <option value="ABRIL">ABRIL</option>
+                            <option value="MAYO">MAYO</option>
+                            <option value="JUNIO">JUNIO</option>
+                            <option value="JULIO">JULIO</option>
+                            <option value="AGOSTO">AGOSTO</option>
+                            <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                            <option value="OCTUBRE">OCTUBRE</option>
+                            <option value="NOVIEMBRE">NOVIEMBRE</option>
+                            <option value="DICIEMBRE">DICIEMBRE</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Mes de Solicitud</label>
+                        <select name="messolicitud" id="messolicitud" class="form-control">
+                            <option value="" selected disabled>Seleccione un Mes de Solicitud</option>
+                            <option value="ENERO">ENERO</option>
+                            <option value="FEBRERO">FEBRERO</option>
+                            <option value="MARZO">MARZO</option>
+                            <option value="ABRIL">ABRIL</option>
+                            <option value="MAYO">MAYO</option>
+                            <option value="JUNIO">JUNIO</option>
+                            <option value="JULIO">JULIO</option>
+                            <option value="AGOSTO">AGOSTO</option>
+                            <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                            <option value="OCTUBRE">OCTUBRE</option>
+                            <option value="NOVIEMBRE">NOVIEMBRE</option>
+                            <option value="DICIEMBRE">DICIEMBRE</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Modo</label>
+                        <select name="modo" id="modo" class="form-control">
+                            <option value="" selected disabled>Seleccione un Modo</option>
+                            {% for item in modos %}
+                                <option value="{{ item.id }}">{{ item.nombre_modo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Motivo de Ingreso</label>
+                        <select name="motivoingreso" id="motivoingreso" class="form-control">
+                            <option value="" selected disabled>Seleccione un Motivo de Ingreso</option>
+                            {% for item in motivos %}
+                                <option value="{{ item.id }}">{{ item.nombre_motivo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre de Personal a Reemplazar</label>
+                        <input type="text" name="personalreemplazar" id="personalreemplazar" class="form-control" placeholder="Nombre de Personal a Reemplazar">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Puesto</label>
+                        <select name="puesto" id="puesto" class="form-control">
+                            <option value="" selected disabled>Seleccione un Puesto</option>
+                            {% for item in all_puestos %}
+                                <option value="{{ item.id }}">{{ item.nombre_puestos }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamento" id="departamento" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select name="prioridad" id="prioridad" class="form-control">
+                            <option value="" selected disabled>Seleccione una Prioridad</option>
+                            {% for item in prioridades %}
+                                <option value="{{ item.id }}">{{ item.nombre_prioridad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Solicitud</label>
+                        <input type="date" name="fechasolicitud" id="fechasolicitud" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Inicio de Búsqueda</label>
+                        <input type="date" name="fechainiciobusqueda" id="fechainiciobusqueda" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Cobertura</label>
+                        <input type="date" name="fechacobertura" id="fechacobertura" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Ingreso</label>
+                        <input type="date" name="fechaingreso" id="fechaingreso" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fuente de Reclutamiento</label>
+                        <select name="fuentereclutamiento" id="fuentereclutamiento" class="form-control">
+                            <option value="" selected disabled>Seleccione una Fuente de Reclutamiento</option>
+                            <option value="INTERNO">INTERNO</option>
+                            <option value="EXTERNO">EXTERNO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del Contratado</label>
+                        <input type="text" name="nombrecontratado" id="nombrecontratado" class="form-control" placeholder="Nombre del Contratado">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" name="dni" id="dni" class="form-control" maxlength="13" oninput="validateNumber(this)" placeholder="DNI">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Género</label>
+                        <select name="genero" id="genero" class="form-control">
+                            <option value="" selected disabled>Seleccione un Género</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Edad</label>
+                        <input type="text" name="edad" id="edad" class="form-control" maxlength="2" placeholder="Edad" readonly disabled>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" name="fechanacimiento" id="fechanacimiento" class="form-control" onchange="calculateAge()">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Medio de Reclutamiento</label>
+                        <select name="medioreclutamiento" id="medioreclutamiento" class="form-control">
+                            <option value="" selected disabled>Seleccione un Medio de Reclutamiento</option>
+                            {% for item in mediosReclutamiento %}
+                                <option value="{{ item.id }}">{{ item.nombre_medio_de_reclutamiento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <br>
+                    <div class="form-group">
+                        <label>Salario</label>
+                        <input type="text" name="salario" id="salario" class="form-control" oninput="validateNumbe1(this)" placeholder="Salario">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Combustible</label>
+                        <input type="text" name="combustible" id="combustible" class="form-control" oninput="validateNumbe1(this)" placeholder="Combustible">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Depreciación</label>
+                        <input type="text" name="depreciacion" id="depreciacion" class="form-control" oninput="validateNumbe1(this)" placeholder="Depreciación">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Comisión</label>
+                        <input type="text" name="comision" id="comision" class="form-control" oninput="validateNumbe1(this)" placeholder="Comisión">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Bono</label>
+                        <input type="text" name="bono" id="bono" class="form-control" oninput="validateNumbe1(this)" placeholder="Bono">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Hospedaje</label>
+                        <input type="text" name="hospedaje" id="hospedaje" class="form-control" oninput="validateNumbe1(this)" placeholder="Hospedaje">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Tipo de Contrato</label>
+                        <select name="tipocontrato" id="tipocontrato" class="form-control">
+                            <option value="" selected disabled>Seleccione un Tipo de Contrato</option>
+                            {% for item in tipos_contrato %}
+                                <option value="{{ item.id }}">{{ item.nombre_tipo_de_contrato }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Imagen del DNI Frontal</label>
+                        <div class="file-drop-area">
+                            <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                            <input type="file" id="imagendni" class="file form-control" accept=".jpg,.png">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Imagen del DNI Reverso</label>
+                        <div class="file-drop-area">
+                            <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                            <input type="file" id="imagendni1" class="file form-control" accept=".jpg,.png">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Plaza</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-plazas" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="ID">ID</label>
+                        <input type="text" name="ideditar" id="ideditar" disabled class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Analista</label>
+                        <input type="text" name="analistaeditar" id="analistaeditar" value="{{ request.session.username }}" disabled class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursaleditar" id="sucursaleditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                                <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresaeditar" id="empresaeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                                <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocioeditar" id="unidadnegocioeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Año</label>
+                        <select name="anoeditar" id="anoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Año</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Mes de Corte</label>
+                        <select name="mescorteeditar" id="mescorteeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Mes de Corte</option>
+                            <option value="ENERO">ENERO</option>
+                            <option value="FEBRERO">FEBRERO</option>
+                            <option value="MARZO">MARZO</option>
+                            <option value="ABRIL">ABRIL</option>
+                            <option value="MAYO">MAYO</option>
+                            <option value="JUNIO">JUNIO</option>
+                            <option value="JULIO">JULIO</option>
+                            <option value="AGOSTO">AGOSTO</option>
+                            <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                            <option value="OCTUBRE">OCTUBRE</option>
+                            <option value="NOVIEMBRE">NOVIEMBRE</option>
+                            <option value="DICIEMBRE">DICIEMBRE</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Mes de Solicitud</label>
+                        <select name="messolicitudeditar" id="messolicitudeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Mes de Solicitud</option>
+                            <option value="ENERO">ENERO</option>
+                            <option value="FEBRERO">FEBRERO</option>
+                            <option value="MARZO">MARZO</option>
+                            <option value="ABRIL">ABRIL</option>
+                            <option value="MAYO">MAYO</option>
+                            <option value="JUNIO">JUNIO</option>
+                            <option value="JULIO">JULIO</option>
+                            <option value="AGOSTO">AGOSTO</option>
+                            <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                            <option value="OCTUBRE">OCTUBRE</option>
+                            <option value="NOVIEMBRE">NOVIEMBRE</option>
+                            <option value="DICIEMBRE">DICIEMBRE</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Modo</label>
+                        <select name="modoeditar" id="modoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Modo</option>
+                            {% for item in modos %}
+                                <option value="{{ item.id }}">{{ item.nombre_modo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Motivo de Ingreso</label>
+                        <select name="motivoingresoeditar" id="motivoingresoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Motivo de Ingreso</option>
+                            {% for item in motivos %}
+                                <option value="{{ item.id }}">{{ item.nombre_motivo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre de Personal a Reemplazar</label>
+                        <input type="text" name="personalreemplazareditar" id="personalreemplazareditar" class="form-control" placeholder="Nombre de Personal a Reemplazar">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Puesto</label>
+                        <select name="puestoeditar" id="puestoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Puesto</option>
+                            {% for item in all_puestos %}
+                                <option value="{{ item.id }}">{{ item.nombre_puestos }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamentoeditar" id="departamentoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select name="prioridadeditar" id="prioridadeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Prioridad</option>
+                            {% for item in prioridades %}
+                                <option value="{{ item.id }}">{{ item.nombre_prioridad }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Solicitud</label>
+                        <input type="date" name="fechasolicitudeditar" id="fechasolicitudeditar" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Inicio de Busqueda</label>
+                        <input type="date" name="fechainiciobusquedaeditar" id="fechainiciobusquedaeditar" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Cobertura</label>
+                        <input type="date" name="fechacoberturaeditar" id="fechacoberturaeditar" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Ingreso</label>
+                        <input type="date" name="fechaingresoeditar" id="fechaingresoeditar" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fuente de Reclutamiento</label>
+                        <select name="fuentereclutamientoeditar" id="fuentereclutamientoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Fuente de Reclutamiento</option>
+                            <option value="INTERNO">INTERNO</option>
+                            <option value="EXTERNO">EXTERNO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del Contratado</label>
+                        <input type="text" name="nombrecontratadoeditar" id="nombrecontratadoeditar" class="form-control" placeholder="Nombre del Contratado">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" name="dnieditar" id="dnieditar" class="form-control" maxlength="13" oninput="validateNumber(this)" placeholder="DNI">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Genero</label>
+                        <select name="generoeditar" id="generoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Genero</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Edad</label>
+                        <input type="text" name="edadeditar" id="edadeditar" class="form-control" maxlength="2" placeholder="Edad" readonly disabled>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" name="fechanacimientoeditar" id="fechanacimientoeditar" class="form-control" onchange="calculateAge()">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Medio de Reclutamiento</label>
+                        <select name="medioreclutamientoeditar" id="medioreclutamientoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Medio de Reclutamiento</option>
+                            {% for item in mediosReclutamiento %}
+                                <option value="{{ item.id }}">{{ item.nombre_medio_de_reclutamiento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Salario</label>
+                        <input type="text" name="salarioeditar" id="salarioeditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Salario">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Combustible</label>
+                        <input type="text" name="combustibleeditar" id="combustibleeditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Combustible">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Depreciación</label>
+                        <input type="text" name="depreciacioneditar" id="depreciacioneditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Depreciación">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Comisión</label>
+                        <input type="text" name="comisioneditar" id="comisioneditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Comisión">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Bono</label>
+                        <input type="text" name="bonoeditar" id="bonoeditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Bono">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Hospedaje</label>
+                        <input type="text" name="hospedajeeditar" id="hospedajeeditar" class="form-control" oninput="validateNumbe1(this)" placeholder="Hospedaje">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Tipo de Contrato</label>
+                        <select name="tipocontratoeditar" id="tipocontratoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Tipo de Contrato</option>
+                            {% for item in tipos_contrato %}
+                                <option value="{{ item.id }}">{{ item.nombre_tipo_de_contrato }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Imagen de NDI Frotal</label>
+                        <div class="file-drop-area">
+                            <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                            <input type="file" id="imagendnieditar" class="file form-control" accept=".jpg,.png">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Imagen del DNI Reverso</label>
+                        <div class="file-drop-area">
+                            <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                            <input type="file" id="imagendni1editar" class="file form-control" accept=".jpg,.png">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaldetalles" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Detalles de Control de Plazas</h5>
+                <button id="btn-descargar-imagen" class="btn btn classbotones" style="display: none; margin-left: 50px;" onclick="descargarImagen()">
+                    <ion-icon name="image-outline" style="color: white;" class="icon"></ion-icon>
+                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>            
+            <div class="modal-body">
+                <p><strong>ID: </strong><span id="detalles-id"></span></p>
+                <hr>
+                <p><strong>Sucursal ID:</strong> <span id="detalles-sucursal"></span></p>
+                <hr>
+                <p><strong>Empresa ID:</strong> <span id="detalles-empresa"></span></p>
+                <hr>
+                <p><strong>Unidad de Negocio ID:</strong> <span id="detalles-unidad-negocio"></span></p>
+                <hr>
+                <p><strong>Año:</strong> <span id="detalles-ano"></span></p>
+                <hr>
+                <p><strong>Mes de Corte:</strong> <span id="detalles-mes-corte"></span></p>
+                <hr>
+                <p><strong>Mes de Solicitud:</strong> <span id="detalles-mes-solicitud"></span></p>
+                <hr>
+                <p><strong>Modo ID:</strong> <span id="detalles-modo"></span></p>
+                <hr>
+                <p><strong>Motivo de Ingreso ID:</strong> <span id="detalles-motivo-ingreso"></span></p>
+                <hr>
+                <p><strong>Nombre de Reemplazo:</strong> <span id="detalles-nombre-reemplazo"></span></p>
+                <hr>
+                <p><strong>Puestos ID:</strong> <span id="detalles-puestos"></span></p>
+                <hr>
+                <p><strong>Departamento ID:</strong> <span id="detalles-departamento"></span></p>
+                <hr>
+                <p><strong>Prioridad ID:</strong> <span id="detalles-prioridad"></span></p>
+                <hr>
+                <p><strong>Fecha de Solicitud:</strong> <span id="detalles-fecha-solicitud"></span></p>
+                <hr>
+                <p><strong>Fecha de Inicio de Búsqueda:</strong> <span id="detalles-fecha-inicio-busqueda"></span></p>
+                <hr>
+                <p><strong>Fecha de Cobertura:</strong> <span id="detalles-fecha-cobertura"></span></p>
+                <hr>
+                <p><strong>Fecha de Ingreso:</strong> <span id="detalles-fecha-ingreso"></span></p>
+                <hr>
+                <p><strong>Fuente de Reclutamiento:</strong> <span id="detalles-fuente-reclutamiento"></span></p>
+                <hr>
+                <p><strong>Nombre Contratado:</strong> <span id="detalles-nombre-contratado"></span></p>
+                <hr>
+                <p><strong>DNI:</strong> <span id="detalles-dni"></span></p>
+                <hr>
+                <p><strong>Género:</strong> <span id="detalles-genero"></span></p>
+                <hr>
+                <p><strong>Edad:</strong> <span id="detalles-edad"></span></p>
+                <hr>
+                <p><strong>Fecha de Nacimiento:</strong> <span id="detalles-fecha-nacimiento"></span></p>
+                <hr>
+                <p><strong>Medio de Reclutamiento ID:</strong> <span id="detalles-medio-reclutamiento"></span></p>
+                <hr>
+                <p><strong>Salario: </strong> L. <span id="detalles-salario"></span></p>
+                <hr>
+                <p><strong>Combustible:</strong> L. <span id="detalles-combustible"></span></p>
+                <hr>
+                <p><strong>Depreciación:</strong> L. <span id="detalles-depreciacion"></span></p>
+                <hr>
+                <p><strong>Comisión:</strong> L. <span id="detalles-comision"></span></p>
+                <hr>
+                <p><strong>Bono:</strong> L. <span id="detalles-bono"></span></p>
+                <hr>
+                <p><strong>Hospedaje:</strong> L. <span id="detalles-hospedaje"></span></p>
+                <hr>
+                <p><strong>Tipo de Contrato ID:</strong> <span id="detalles-tipo-contrato"></span></p>
+                <hr>
+                <p><strong>Imagen DNI Frotal:</strong></p>
+                <center>
+                    <img id="imagendnifrontal" src="" alt="Imagen de Control de Plazas" style="width: 80%; height: auto; display: none;">
+                </center>
+                <hr>
+                <p><strong>Imagen DNI Reverso:</strong></p>
+                <center>
+                    <img id="imagendnireverso" src="" alt="Imagen de Control de Plazas" style="width: 80%; height: auto; display: none;">
+                </center>
+            </div>
+            <div class="modal-footer" style="max-height: 70px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/controlplazas.js' %}"></script>
+
+{% endblock %}

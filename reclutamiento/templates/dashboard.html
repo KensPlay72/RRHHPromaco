@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% include 'menu.html' %}
+
+
+
+{% include 'cerrarsesion.html' %}
+
+
+<div class="linea1">
+    <div class="cuadros4">
+        <form method="GET" action="{% url 'dashboard' %}" style="margin-top:15px;">
+            <label for="empresa">Empresa:</label>
+            <select name="empresa" class="form-control" style="width: 80%;"  id="empresa">
+                <option value="">Seleccione</option>
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.empresa__nombre_empresa }}"
+                        {% if request.GET.empresa == empresa.empresa__nombre_empresa %}selected{% endif %}>
+                        {{ empresa.empresa__nombre_empresa }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <!-- Filtro de Año -->
+            <label for="año">Año:</label>
+            <select name="año" class="form-control" style="width: 80%;"  id="año">
+                <option value="">Seleccione</option>
+                {% for año in años %}
+                    <option value="{{ año.año }}"
+                        {% if request.GET.año == año.año|stringformat:"s" %}selected{% endif %}>
+                        {{ año.año }}
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="mes_corte">Mes de Corte:</label>
+            <select name="mes_corte" class="form-control" style="width: 80%;" id="mes_corte">
+                <option value="">Seleccione</option>
+                {% for mes in meses_corte %}
+                    <option value="{{ mes.mes_corte }}"
+                        {% if request.GET.mes_corte == mes.mes_corte %}selected{% endif %}>
+                        {{ mes.mes_corte }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <label for="sucursal">Sucursal:</label>
+            <select name="sucursal" class="form-control" style="width: 80%;" id="sucursal">
+                <option value="">Seleccione</option>
+                {% for sucursal in sucursales %}
+                    <option value="{{ sucursal.sucursal__nombre_sucursal }}"
+                        {% if request.GET.sucursal == sucursal.sucursal__nombre_sucursal %}selected{% endif %}>
+                        {{ sucursal.sucursal__nombre_sucursal }}
+                    </option>
+                {% endfor %}
+            </select>
+            <br>
+            <div class="botones">       
+                <button type="submit" class="btn btn classbotones">Aplicar</button>
+                <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'dashboard' %}'">Borrar</button>
+            </div>  
+    </form>
+      </div>
+  <div class="cuadros2">
+    <div class=""><p>PLAZAS CERRADAS VS PROCESO</p></div>
+    <div class="canvas1">
+        <canvas id="procesoCerradaChart"></canvas>
+    </div>
+  </div>
+
+  <div class="cuadros1">
+    <div class="icon">
+      <i class="fas fa-stopwatch"></i> <!-- Ícono con FontAwesome -->
+    </div>
+    <div class="info">
+      <h2> {% if promedio_tiempo_efectivo_cobertura %}
+        {{ promedio_tiempo_efectivo_cobertura|floatformat:0 }} días
+    {% else %}
+        No disponible
+    {% endif %}
+    </h2> <!-- Cantidad -->
+      <p>Promedio de Tiempo Efectivo de Cobertura</p> <!-- Título -->
+    </div>
+    <div class="waves">
+      <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+        <path d="M0 25 Q 20 5, 40 25 T 80 25 T 100 15 V 40 H 0 Z" fill="#6C63FF" stroke="#6C63FF" stroke-width="2" />
+      </svg>            
+    </div>
+  </div>
+
+  <div class="cuadros1">
+    <div class="icon">
+      <i class="fas fa-user"></i> <!-- Ícono con FontAwesome -->
+    </div>
+    <div class="info">
+      <h2> {{ promedio_edad|floatformat:0 }}</h2>
+      <p>Promedio de Edad</p> <!-- Título -->
+    </div>
+    <div class="waves">
+        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0 30 Q 10 25, 20 30 T 40 20 T 60 20 T 90 10 T 100 30 V 40 H 0 Z" fill="#efa019" stroke="#efa019" stroke-width="2" />
+        </svg>                       
+    </div>
+  </div>
+
+  <div class="cuadros1">
+    <div class="icon">
+      <i class="fas fa-users"></i> <!-- Ícono con FontAwesome -->
+    </div>
+    <div class="info">
+      <h4>Femenino: {{ total_femenino }}</h4>
+      <h4>Masculino: {{ total_masculino }}</h4>
+      <p>Plazas Cerradas por Género</p>
+    </div>
+    <div class="waves">
+        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0 30 Q 10 25, 20 30 T 40 20 T 60 20 T 90 20 T 100 30 V 40 H 0 Z" fill="#07de54" stroke="#07de54" stroke-width="2" />
+          </svg>                                    
+    </div>
+  </div>
+
+</div>
+<br>
+  <div class="linea1">
+      <div class="cuadros">
+        <div class="canvas2">
+            <canvas id="estadoCandidatosChart"></canvas>
+        </div>
+      </div>
+      <div class="cuadros">
+        <div class=""><p>Estado de Pagos de Cesantías</p></div>
+        <div class="canvas1">
+            <canvas id="estadoPagoChart"></canvas>
+        </div>
+    </div>
+    <div class="cuadros">
+        <h2 id="monthName"></h2> <!-- Título para el mes -->
+        <div id="calendar"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      // Configurar Day.js para usar el idioma español
+      dayjs.locale('es');
+  
+      var calendarContainer = document.getElementById('calendar');
+      var monthNameContainer = document.getElementById('monthName');
+  
+      // Función para generar el calendario del mes actual
+      function generateCalendar(month, year, currentDay, currentMonth, currentYear) {
+          var startOfMonth = dayjs(`${year}-${month}-01`);
+          var daysInMonth = startOfMonth.daysInMonth();
+          var firstDayOfWeek = startOfMonth.day(); // Día de la semana (0: domingo, 6: sábado)
+  
+          var previousMonth = startOfMonth.subtract(1, 'month');
+          var nextMonth = startOfMonth.add(1, 'month');
+          var daysInPreviousMonth = previousMonth.daysInMonth(); // Días del mes anterior
+  
+          // Mostrar el nombre del mes en español
+          monthNameContainer.textContent = startOfMonth.format('MMMM YYYY');
+  
+          // Crear la tabla
+          var table = document.createElement('table');
+          var thead = document.createElement('thead');
+          var tbody = document.createElement('tbody');
+  
+          // Añadir días de la semana en el encabezado (en español)
+          var daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+          var trHead = document.createElement('tr');
+          daysOfWeek.forEach(function (day) {
+              var th = document.createElement('th');
+              th.textContent = day;
+              trHead.appendChild(th);
+          });
+          thead.appendChild(trHead);
+  
+          // Crear las filas y celdas del calendario
+          var tr = document.createElement('tr');
+          var day = 1;
+  
+          // Primer fila: rellenar los días del mes anterior
+          for (var i = 0; i < firstDayOfWeek; i++) {
+              var td = document.createElement('td');
+              var prevDay = daysInPreviousMonth - (firstDayOfWeek - 1 - i);
+              td.textContent = prevDay;
+              td.style.color = '#ccc'; // Estilo para los días de otros meses
+              tr.appendChild(td);
+          }
+  
+          // Rellenar los días del mes actual
+          for (var i = firstDayOfWeek; i < 7; i++) {
+              var td = document.createElement('td');
+              td.textContent = day;
+  
+              // Resaltar solo el día actual del mes actual
+              if (day == currentDay && month == currentMonth && year == currentYear) {
+                  td.style.backgroundColor = 'rgb(252, 252, 154)'; // Resaltar el día actual
+              }
+  
+              tr.appendChild(td);
+              day++;
+          }
+          tbody.appendChild(tr);
+  
+          // Continuar rellenando las semanas
+          while (day <= daysInMonth) {
+              tr = document.createElement('tr');
+              for (var i = 0; i < 7; i++) {
+                  if (day > daysInMonth) {
+                      // Rellenar con días del siguiente mes
+                      var td = document.createElement('td');
+                      var nextDay = i - (daysInMonth % 7) + 1; // Días del próximo mes
+                      td.textContent = nextDay;
+                      td.style.color = '#ccc'; // Estilo para los días de otros meses
+                      tr.appendChild(td);
+                  } else {
+                      var td = document.createElement('td');
+                      td.textContent = day;
+  
+                      // Resaltar solo el día actual del mes actual
+                      if (day == currentDay && month == currentMonth && year == currentYear) {
+                          td.style.backgroundColor = 'rgb(252, 252, 154)'; // Resaltar el día actual
+                      }
+  
+                      tr.appendChild(td);
+                      day++;
+                  }
+              }
+              tbody.appendChild(tr);
+          }
+  
+          // Limpiar y añadir la tabla al contenedor
+          calendarContainer.innerHTML = '';
+          table.appendChild(thead);
+          table.appendChild(tbody);
+          calendarContainer.appendChild(table);
+      }
+  
+      // Obtener la fecha actual desde el backend (pasada como una variable de Django)
+      var fechaActual = "{{ fecha_actual|date:'Y-m-d' }}"; // Formato: YYYY-MM-DD
+      var currentDate = dayjs(fechaActual);
+      var currentMonth = currentDate.format('MM');
+      var currentYear = currentDate.format('YYYY');
+      var currentDay = currentDate.format('D');
+  
+      // Generar el calendario para el mes actual
+      generateCalendar(currentMonth, currentYear, currentDay, currentMonth, currentYear);
+  });
+  </script>
+  
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gráfica: Solo En Proceso y Cerradas
+        const ctx2 = document.getElementById('procesoCerradaChart').getContext('2d');
+    
+        // Datos dinámicos para la gráfica de En Proceso y Cerradas
+        const labels2 = ['En Proceso', 'Cerradas'];
+        const data2 = [{{ en_proceso_count }}, {{ cerradas_count }}];
+        const backgroundColors2 = ['#36A2EB', '#4BC0C0'];
+    
+        // Crear la gráfica de En Proceso y Cerradas
+        const procesoCerradaChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: labels2, // Usar etiquetas completas
+                datasets: [{
+                    data: data2, // Usar datos completos
+                    backgroundColor: backgroundColors2, // Usar colores completos
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            // Mostrar solo si el valor es mayor que 0
+                            return value > 0 ? `${context.chart.data.labels[context.dataIndex]}: ${value}` : '';
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gráfica: Estado de Pagos de Cesantías
+        const ctx1 = document.getElementById('estadoPagoChart').getContext('2d');
+    
+        // Datos dinámicos para la gráfica de Estado de Pagos
+        const labels1 = {{ estado_pago_labels|safe }}; // Etiquetas para el gráfico
+        const data1 = {{ estado_pago_values|safe }}; // Valores para el gráfico
+        const backgroundColors1 = ['#FF6384', '#36A2EB', '#FFCE56']; // Cambia los colores según tu preferencia
+    
+        // Crear la gráfica de Estado de Pagos de Cesantías
+        const estadoPagoChart = new Chart(ctx1, {
+            type: 'pie', // Gráfico de pastel
+            data: {
+                labels: labels1, // Usar etiquetas completas
+                datasets: [{
+                    data: data1, // Usar datos completos
+                    backgroundColor: backgroundColors1, // Usar colores completos
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            return value > 0 ? `${context.chart.data.labels[context.dataIndex]}: ${value}` : '';
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    
+        // Gráfica: Estado de Candidatos
+        const ctx2 = document.getElementById('estadoCandidatosChart').getContext('2d');
+    
+        // Datos dinámicos para la gráfica de Estado de Candidatos
+        const labels2 = {{ bolsa_estado_labels|safe }}; // Etiquetas para el gráfico
+        const data2 = {{ bolsa_estado_values|safe }}; // Valores para el gráfico
+        const backgroundColors2 = ['#4BC0C0', '#FFA07A', '#FF9F40', '#36A2EB']; // Cambia los colores según tu preferencia
+    
+        // Crear la gráfica de Estado de Candidatos
+        const estadoCandidatosChart = new Chart(ctx2, {
+            type: 'bar', // Cambiado a gráfico de barras
+            data: {
+                labels: labels2, // Usar etiquetas completas
+                datasets: [{
+                    label: 'Candidatos por Estado',
+                    data: data2, // Usar datos completos
+                    backgroundColor: backgroundColors2, // Usar colores completos
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            return value > 0 ? `${value}` : ''; // Muestra el valor
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    });
+    
+    
+</script>
+
+{% endblock %}

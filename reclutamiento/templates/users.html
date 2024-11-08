@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Usuarios
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+  <div class="encabezado">
+    <form action="{% url 'users' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Usuarios</h1>
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Usuario</button>
+  </div>
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>DNI</th>
+                <th>Estado</th>
+                <th>Plazas</th>
+                <th>Usuarios</th>
+                <th>Bolsa de Empleo</th>
+                <th>Contrataciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.dni }}</td>
+                    <td>
+                        {% if user.estado == 'ACTIVO' %}
+                            <b style="color: green;">{{ user.estado }}</b>
+                        {% else %}
+                            <b style="color: red;">{{ user.estado }}</b>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.plazas|yesno:"Sí,No" }}</td>
+                    <td>{{ user.users|yesno:"Sí,No" }}</td>
+                    <td>{{ user.bolsaempleo|yesno:"Sí,No" }}</td>
+                    <td>{{ user.contrataciones|yesno:"Sí,No" }}</td>
+                    <td>
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ user.id }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="restablecer({{ user.id }})">
+                            <ion-icon name="refresh-outline" class="icon"></ion-icon>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script type="application/json" id="users-data">
+        [
+            {% for user in users %}
+                {
+                    "id": "{{ user.id }}",
+                    "username": "{{ user.username|escapejs }}",
+                    "dni": "{{ user.dni|escapejs }}",
+                    "estado": "{{ user.estado|escapejs }}",
+                    "plazas": {{ user.plazas|yesno:"true,false" }},
+                    "plazas_ver": {{ user.plazas_ver|yesno:"true,false" }},
+                    "plazas_escribir": {{ user.plazas_escribir|yesno:"true,false" }},
+                    "users": {{ user.users|yesno:"true,false" }},
+                    "roles": {{ user.roles|yesno:"true,false" }},
+                    "bolsaempleo": {{ user.bolsaempleo|yesno:"true,false" }},
+                    "bolsaempleo_ver": {{ user.bolsaempleo_ver|yesno:"true,false" }},
+                    "bolsaempleo_escribir": {{ user.bolsaempleo_escribir|yesno:"true,false" }},
+                    "contrataciones": {{ user.contrataciones|yesno:"true,false" }},
+                    "contrataciones_ver": {{ user.contrataciones_ver|yesno:"true,false" }},
+                    "contrataciones_escribir": {{ user.contrataciones_escribir|yesno:"true,false" }},
+                    "listas": {{ user.listas|yesno:"true,false" }},
+                    "listas_ver": {{ user.listas_ver|yesno:"true,false" }},
+                    "listas_escribir": {{ user.listas_escribir|yesno:"true,false" }},
+                    "contrataciones_multi": {{ user.contrataciones_multi|yesno:"true,false" }},
+                    "contrataciones_multi_ver": {{ user.contrataciones_multi_ver|yesno:"true,false" }},
+                    "contrataciones_multi_escribir": {{ user.contrataciones_multi_escribir|yesno:"true,false" }},
+                    "cesantias": {{ user.cesantias|yesno:"true,false" }},
+                    "cesantias_ver": {{ user.cesantias_ver|yesno:"true,false" }},
+                    "cesantias_escribir": {{ user.cesantias_escribir|yesno:"true,false" }},
+                    "perfilpuesto": {{ user.perfilpuesto|yesno:"true,false" }}, 
+                    "perfilpuesto_ver": {{ user.perfilpuesto_ver|yesno:"true,false" }},  
+                    "perfilpuesto_escribir": {{ user.perfilpuesto_escribir|yesno:"true,false" }},
+
+                    "requisa": {{ user.requisa|yesno:"true,false" }}, 
+                    "requisa_ver": {{ user.requisa_ver|yesno:"true,false" }},  
+                    "requisa_escribir": {{ user.requisa_escribir|yesno:"true,false" }},
+
+                    "inventario": {{ user.inventario|yesno:"true,false" }}, 
+                    "inventario_ver": {{ user.inventario_ver|yesno:"true,false" }},  
+                    "inventario_escribir": {{ user.inventario_escribir|yesno:"true,false" }} 
+                }
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+        
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <!-- Botón "Anterior" -->
+            {% if users.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ users.previous_page_number }}&search={{ search }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+    
+            <!-- Mostrar un rango reducido de páginas -->
+            {% for num in page_range %}
+                {% if users.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+    
+            <!-- Botón "Siguiente" -->
+            {% if users.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ users.next_page_number }}&search={{ search }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Siguiente</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+</div>
+
+<!-- Modal Registro -->
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-user">
+                    <div class="form-group">
+                        <label for="Nombre">Nombre del Usuario</label>
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Nombre de usuario" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">DNI del Usuario</label>
+                        <input type="text" name="dni" id="dni" class="form-control" placeholder="DNI" required maxlength="13" pattern="\d{13}"
+                        title="El número de identidad debe tener exactamente 13 dígitos" oninput="validateNumber(this)" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Contraseña</label>
+                        <input type="text" name="password" id="password" value="12345678" disabled class="form-control" placeholder="Contraseña" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estado" id="estado" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Permisos Promaco</label>
+                        <div>
+                            <input type="checkbox" name="users" id="users" />
+                            <label class="form-check-label" for="users">Usuarios</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="roles" id="roles" />
+                            <label class="form-check-label" for="roles">Roles</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="plazas" id="plazas" />
+                            <label class="form-check-label" for="plazas">Control Plaza</label>
+                
+                            <!-- Radios ocultos para "plazas" -->
+                            <div id="plazas_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="plaza_permiso" id="plaza_ver" value="ver">
+                                <label for="plaza_ver">Solo ver</label>
+                
+                                <input type="radio" name="plaza_permiso" id="plaza_escribir" value="escribir">
+                                <label for="plaza_escribir">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="bolsaempleo" id="bolsaempleo" />
+                            <label class="form-check-label" for="bolsaempleo">Bolsa Empleo</label>
+                
+                            <!-- Radios ocultos para "bolsaempleo" -->
+                            <div id="bolsaempleo_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="bolsa_permiso" id="bolsa_ver" value="ver">
+                                <label for="bolsa_ver">Solo ver</label>
+                
+                                <input type="radio" name="bolsa_permiso" id="bolsa_escribir" value="escribir">
+                                <label for="bolsa_escribir">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="contrataciones" id="contrataciones" />
+                            <label class="form-check-label" for="contrataciones">Contrataciones</label>
+                
+                            <!-- Radios ocultos para "contrataciones" -->
+                            <div id="contrataciones_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="contrataciones_permiso" id="contrataciones_ver" value="ver">
+                                <label for="contrataciones_ver">Solo ver</label>
+                
+                                <input type="radio" name="contrataciones_permiso" id="contrataciones_escribir" value="escribir">
+                                <label for="contrataciones_escribir">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="cesantias" id="cesantias" />
+                            <label class="form-check-label" for="cesantias">Cesantias</label>
+                
+                            <!-- Radios ocultos para "cesantias" -->
+                            <div id="cesantias_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="cesantias_permiso" id="cesantias_ver" value="ver">
+                                <label for="cesantias_ver">Solo ver</label>
+                
+                                <input type="radio" name="cesantias_permiso" id="cesantias_escribir" value="escribir">
+                                <label for="cesantias_escribir">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="perfilpuesto" id="perfilpuesto" />
+                            <label class="form-check-label" for="perfilpuesto">Perfiles de Puesto</label>
+                        
+                            <!-- Radios ocultos para "perfilpuesto" -->
+                            <div id="perfilpuesto_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="perfilpuesto_permiso" id="perfilpuesto_ver" value="ver">
+                                <label for="perfilpuesto_ver">Solo ver</label>
+                        
+                                <input type="radio" name="perfilpuesto_permiso" id="perfilpuesto_escribir" value="escribir">
+                                <label for="perfilpuesto_escribir">Escribir</label>
+                            </div>
+                        </div> 
+                        <div>
+                            <input type="checkbox" name="requisas" id="requisas" />
+                            <label class="form-check-label" for="requisas">Requisas</label>
+                        
+                            <!-- Radios ocultos para "Requisas" -->
+                            <div id="requisas_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="requisas_permiso" id="requisas_ver" value="ver">
+                                <label for="requisas_ver">Solo ver</label>
+                        
+                                <input type="radio" name="requisas_permiso" id="requisas_escribir" value="escribir">
+                                <label for="requisas_escribir">Escribir</label>
+                            </div>
+                        </div>    
+                        <div>
+                            <input type="checkbox" name="inventario" id="inventario" />
+                            <label class="form-check-label" for="inventario">Inventario</label>
+                        
+                            <!-- Radios ocultos para "Inventario" -->
+                            <div id="inventario_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="inventario_permiso" id="inventario_ver" value="ver">
+                                <label for="inventario_ver">Solo ver</label>
+                        
+                                <input type="radio" name="inventario_permiso" id="inventario_escribir" value="escribir">
+                                <label for="inventario_escribir">Escribir</label>
+                            </div>
+                        </div>                           
+                        <div>
+                            <input type="checkbox" name="listas" id="listas" />
+                            <label class="form-check-label" for="listas">Listas</label>
+                
+                            <!-- Radios ocultos para "listas" -->
+                            <div id="listas_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="listas_permiso" id="listas_ver" value="ver">
+                                <label for="listas_ver">Solo ver</label>
+                
+                                <input type="radio" name="listas_permiso" id="listas_escribir" value="escribir">
+                                <label for="listas_escribir">Escribir</label>
+                            </div>
+                        </div>
+                        <br>
+                        <label>Permisos Multiservicios</label>
+                        <div>
+                            <input type="checkbox" name="contrataciones_multi" id="contrataciones_multi" />
+                            <label class="form-check-label" for="contrataciones_multi">Contrataciones Multiservicios</label>
+                        
+                            <!-- Radios ocultos para "Contrataciones Multiservicios" -->
+                            <div id="contrataciones_multi_options" style="display:none; margin-left:15px;">
+                                <input type="radio" name="contrataciones_multi_permiso" id="contrataciones_multi_ver" value="ver">
+                                <label for="contrataciones_multi_ver">Solo ver</label>
+                        
+                                <input type="radio" name="contrataciones_multi_permiso" id="contrataciones_multi_escribir" value="escribir">
+                                <label for="contrataciones_multi_escribir">Escribir</label>
+                            </div>
+                        </div>                        
+                    </div>
+                    <br>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edición -->
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-user">
+                    <div class="form-group">
+                        <label for="id_user_editar">ID</label>
+                        <input type="text" name="id_user_editar" id="id_user_editar" class="form-control" disabled />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="username_editar">Nombre del Usuario</label>
+                        <input type="text" name="username_editar" id="username_editar" class="form-control" placeholder="Nombre de usuario" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="dni_editar">DNI</label>
+                        <input type="text" name="dni_editar" id="dni_editar" class="form-control" placeholder="DNI" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado_editar">Estado</label>
+                        <select class="form-control" name="estado_editar" id="estado_editar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Permisos Promaco</label>
+                        
+                        <!-- Permisos para Control Plaza -->
+                        <div>
+                            <input type="checkbox" name="plazas_editar" id="plazas_editar" />
+                            <label class="form-check-label" for="plazas_editar">Control Plaza</label>
+                            <div id="plazas_options_editar" style="display: none; margin-left:15px;">
+                                <input type="radio" name="plazas_permiso_editar" id="plazas_ver_editar" value="ver">
+                                <label for="plazas_ver_editar">Solo ver</label>
+                                <input type="radio" name="plazas_permiso_editar" id="plazas_escribir_editar" value="escribir">
+                                <label for="plazas_escribir_editar">Escribir</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Permisos para Usuarios -->
+                        <div>
+                            <input type="checkbox" name="users_editar" id="users_editar" />
+                            <label class="form-check-label" for="users_editar">Usuarios</label>
+                        </div>
+
+                        <div>
+                            <input type="checkbox" name="roleseditar" id="roleseditar" />
+                            <label class="form-check-label" for="roleseditar">Roles</label>
+                        </div>
+                        
+                        <!-- Permisos para Bolsa de Empleo -->
+                        <div>
+                            <input type="checkbox" name="bolsaempleo_editar" id="bolsaempleo_editar" />
+                            <label class="form-check-label" for="bolsaempleo_editar">Bolsa de Empleo</label>
+                            <div id="bolsaempleo_options_editar" style="display: none; margin-left:15px;">
+                                <input type="radio" name="bolsaempleo_permiso_editar" id="bolsaempleo_ver_editar" value="ver">
+                                <label for="bolsaempleo_ver_editar">Solo ver</label>
+                                <input type="radio" name="bolsaempleo_permiso_editar" id="bolsaempleo_escribir_editar" value="escribir">
+                                <label for="bolsaempleo_escribir_editar">Escribir</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Permisos para Contrataciones -->
+                        <div>
+                            <input type="checkbox" name="contrataciones_editar" id="contrataciones_editar" />
+                            <label class="form-check-label" for="contrataciones_editar">Contrataciones</label>
+                            <div id="contrataciones_options_editar" style="display: none; margin-left:15px;">
+                                <input type="radio" name="contrataciones_permiso_editar" id="contrataciones_ver_editar" value="ver">
+                                <label for="contrataciones_ver_editar">Solo ver</label>
+                                <input type="radio" name="contrataciones_permiso_editar" id="contrataciones_escribir_editar" value="escribir">
+                                <label for="contrataciones_escribir_editar">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="cesantias_editar" id="cesantias_editar" />
+                            <label class="form-check-label" for="cesantias_editar">Cesantias</label>
+                        
+                            <!-- Radios ocultos para "cesantias" -->
+                            <div id="cesantias_options_editar" style="display:none; margin-left:15px;">
+                                <input type="radio" name="cesantias_permiso_editar" id="cesantias_ver_editar" value="ver">
+                                <label for="cesantias_ver_editar">Solo ver</label>
+                        
+                                <input type="radio" name="cesantias_permiso_editar" id="cesantias_escribir_editar" value="escribir">
+                                <label for="cesantias_escribir_editar">Escribir</label>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="perfilpuesto_editar" id="perfilpuesto_editar" />
+                            <label class="form-check-label" for="perfilpuesto_editar">Perfiles de Puesto</label>
+                        
+                            <!-- Radios ocultos para "perfilpuesto" -->
+                            <div id="perfilpuesto_options_editar" style="display:none; margin-left:15px;">
+                                <input type="radio" name="perfilpuesto_permiso_editar" id="perfilpuesto_ver_editar" value="ver">
+                                <label for="perfilpuesto_ver_editar">Solo ver</label>
+                        
+                                <input type="radio" name="perfilpuesto_permiso_editar" id="perfilpuesto_escribir_editar" value="escribir">
+                                <label for="perfilpuesto_escribir_editar">Escribir</label>
+                            </div>
+                        </div> 
+                        <div>
+                            <input type="checkbox" name="requisas_editar" id="requisas_editar" />
+                            <label class="form-check-label" for="requisas_editar">Requisas</label>
+                        
+                            <!-- Radios ocultos para "Requisas" -->
+                            <div id="requisas_options_editar" style="display:none; margin-left:15px;">
+                                <input type="radio" name="requisas_permiso_editar" id="requisas_ver_editar" value="ver">
+                                <label for="requisas_ver_editar">Solo ver</label>
+                        
+                                <input type="radio" name="requisas_permiso_editar" id="requisas_escribir_editar" value="escribir">
+                                <label for="requisas_escribir_editar">Escribir</label>
+                            </div>
+                        </div>    
+                        <div>
+                            <input type="checkbox" name="inventario_editar" id="inventario_editar" />
+                            <label class="form-check-label" for="inventario_editar">Inventario</label>
+                        
+                            <!-- Radios ocultos para "Inventario" -->
+                            <div id="inventario_options_editar" style="display:none; margin-left:15px;">
+                                <input type="radio" name="inventario_permiso_editar" id="inventario_ver_editar" value="ver">
+                                <label for="inventario_ver_editar">Solo ver</label>
+                        
+                                <input type="radio" name="inventario_permiso_editar" id="inventario_escribir_editar" value="escribir">
+                                <label for="inventario_escribir_editar">Escribir</label>
+                            </div>
+                        </div> 
+                        <!-- Permisos para Listas -->
+                        <div>
+                            <input type="checkbox" name="listas_editar" id="listas_editar" />
+                            <label class="form-check-label" for="listas_editar">Listas</label>
+                            <div id="listas_options_editar" style="display: none; margin-left:15px;">
+                                <input type="radio" name="listas_permiso_editar" id="listas_ver_editar" value="ver">
+                                <label for="listas_ver_editar">Solo ver</label>
+                                <input type="radio" name="listas_permiso_editar" id="listas_escribir_editar" value="escribir">
+                                <label for="listas_escribir_editar">Escribir</label>
+                            </div>
+                        </div>
+                        <br>
+                        <label>Permisos Multiservicios</label>
+                        <div>
+                            <input type="checkbox" name="contrataciones_multi_editar" id="contrataciones_multi_editar" />
+                            <label class="form-check-label" for="contrataciones_multi_editar">Contrataciones Multiservicios</label>
+                        
+                            <!-- Radios ocultos para "Contrataciones Multiservicios" -->
+                            <div id="contrataciones_multi_options_editar" style="display:none; margin-left:15px;">
+                                <input type="radio" name="contrataciones_multi_permiso_editar" id="contrataciones_multi_ver_editar" value="ver">
+                                <label for="contrataciones_multi_ver_editar">Solo ver</label>
+                        
+                                <input type="radio" name="contrataciones_multi_permiso_editar" id="contrataciones_multi_escribir_editar" value="escribir">
+                                <label for="contrataciones_multi_escribir_editar">Escribir</label>
+                            </div>
+                        </div>  
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}

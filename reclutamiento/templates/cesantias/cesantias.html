@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Cesantias
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+
+  <form method="GET" action="{% url 'cesantias' %}" id="filterForm">
+
+  <div class="encabezado">
+    <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+    </div>
+    <input type="text" class="form-control" placeholder="Buscar" id="buscar" name="search" value="{{ search }}" autocomplete="off" />
+  </div>
+  <h1 class="titulo-encabezado">Cesantias</h1>
+  {% if request.session.cesantias_escribir %}
+  <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro" onclick="generarCorrelativo()">Registrar Cesantía</button>
+  {% endif %}
+</div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+              <th>Correlativo</th>
+              <th>
+                Nombre Autorizador
+                <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-autorizador')"></ion-icon>
+                <div id="filtro-autorizador" class="filter-popup" style="display: none;">
+                  {% for autorizador in all_autorizadores %}
+                    <label>
+                      <input type="checkbox" name="nombre_autoriza" value="{{ autorizador }}" 
+                        {% if autorizador in autorizadores %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                      {{ autorizador }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </th>
+              <th>Nombre Empleado</th>
+              <th>
+                Año
+                <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-año')"></ion-icon>
+                <div id="filtro-año" class="filter-popup" style="display: none;">
+                    {% for año in all_años %}
+                        <label>
+                            <input type="checkbox" name="año" value="{{ año }}" 
+                                {% if año|stringformat:"i" in años %}checked{% endif %} 
+                                onchange="document.getElementById('filterForm').submit();">
+                            {{ año }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </th>
+            <th>
+                Fecha Extensión
+                <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-fecha')"></ion-icon>
+                <div id="filtro-fecha" class="filter-popup" style="display: none;">
+                    {% for fecha in all_fechas_extencion %}
+                        <label>
+                            <input type="checkbox" name="fecha_extencion" value="{{ fecha|date:'d/m/Y' }}" 
+                                {% if fecha|date:'d/m/Y' in fechas_extencion %}checked{% endif %} 
+                                onchange="document.getElementById('filterForm').submit();">
+                            {{ fecha|date:'d/m/Y' }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </th>
+            
+              <th>
+                Estado Pago
+                <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-estado-pago')"></ion-icon>
+                <div id="filtro-estado-pago" class="filter-popup" style="display: none;">
+                  {% for estado in all_estados_pago %}
+                    <label>
+                      <input type="checkbox" name="estado_pago" value="{{ estado }}" 
+                        {% if estado in estados_pago %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                      {{ estado }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </th>
+              <th>
+                Estado Empleado
+                <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-estado-empleado')"></ion-icon>
+                <div id="filtro-estado-empleado" class="filter-popup" style="display: none;">
+                  {% for estado in all_estados_empleado %}
+                    <label>
+                      <input type="checkbox" name="estado_empleado" value="{{ estado }}" 
+                        {% if estado in estados_empleado %}checked{% endif %} onchange="document.getElementById('filterForm').submit();">
+                      {{ estado }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </th>
+              {% if request.session.cesantias_escribir %}
+              <th>Acciones</th>
+              {% endif %}
+            </tr>
+          </thead>
+        <tbody>
+            {% for item in cesantias %}
+                <tr>
+                    <td>{{ item.correlativo }}</td>
+                    <td>{{ item.nombre_autoriza }}</td>
+                    <td>{{ item.nombre_empleado }}</td>
+                    <td>{{ item.año }}</td>
+                    <td>{{ item.fecha_extencion|date:"d/m/Y" }}</td> <!-- Formato de fecha -->
+                    <td>{{ item.estado_pago }}</td>
+                    <td>{{ item.estado_empleado }}</td>
+                    {% if request.session.cesantias_escribir %}
+                    <td>
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-correlativo="{{ item.correlativo }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>                                                
+                        <button type="button" class="btn btn classbotones" 
+                        onclick="window.location.href='{% url 'imprimir_cesantias' item.id %}'">
+                            <ion-icon name="print-outline" class="icon"></ion-icon>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8">No hay registros de cesantías.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </form>
+
+    
+
+    <script type="application/json" id="control-cesantias-data">
+        [
+            {% for item in cesantias %}
+                {
+                    "id": "{{ item.id|default:''|escapejs }}",
+                    "correlativo": "{{ item.correlativo|default:''|escapejs }}",
+                    "nombre_autoriza": "{{ item.nombre_autoriza|default:''|escapejs }}",
+                    "dni_autoriza": "{{ item.dni_autoriza|default:''|escapejs }}",
+                    "cargo_autoriza": "{{ item.cargo_autoriza|default:''|escapejs }}",
+                    "empresa_id": "{{ item.empresa.id|default:''|escapejs }}",
+                    "sucursal_id": "{{ item.sucursal.id|default:''|escapejs }}",
+                    "departamento_id": "{{ item.departamento.id|default:''|escapejs }}",
+                    "nombre_empleado": "{{ item.nombre_empleado|default:''|escapejs }}",
+                    "dni_empleado": "{{ item.dni_empleado|default:''|escapejs }}",
+                    "fecha_inicial": "{{ item.fecha_inicial|date:'Y-m-d'|default:''|escapejs }}",
+                    "fecha_final": "{{ item.fecha_final|date:'Y-m-d'|default:''|escapejs }}",
+                    "sueldo_actual": "{{ item.sueldo_actual|default:''|escapejs }}",
+                    "porcentaje": "{{ item.porcentaje|default:''|escapejs }}",
+                    "ano": "{{ item.año|default:''|escapejs }}",
+                    "fecha_extencion": "{{ item.fecha_extencion|date:'Y-m-d'|default:''|escapejs }}",
+                    "estado_empleado": "{{ item.estado_empleado|default:''|escapejs }}",
+                    "estado_pago": "{{ item.estado_pago|default:''|escapejs }}",
+                    "n_cheke": "{{ item.n_cheke|default:''|escapejs }}"
+                }
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+    
+    
+    <!-- Paginación -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <!-- Botón "Anterior" -->
+            {% if cesantias.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ cesantias.previous_page_number }}&search={{ search }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+    
+            <!-- Mostrar un rango reducido de páginas -->
+            {% for num in page_range %}
+                {% if cesantias.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+    
+            <!-- Botón "Siguiente" -->
+            {% if cesantias.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ cesantias.next_page_number }}&search={{ search }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Siguiente</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+</div>
+
+<div class="botones-container">
+    <a href="{% url 'exportar_cesantias' %}" id="bolsaempleoexcel" class="btn classbotones botonesinferioresdiv">
+        <i class="fas fa-file-excel"></i> Exportar a Excel
+    </a>
+</div>
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Cesantia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Correlativo</label>
+                        <input type="text" name="correlativo" id="correlativo" class="form-control" disabled readonly />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="autorizador">Quien autoriza</label>
+                        <select name="autorizador" id="autorizador" class="form-control" onchange="actualizarDatosAutorizador()">
+                            <option value="" disabled selected>Seleccione una Opción</option>
+                            <option value="VIOLETA SUYAPA GUILLEN">VIOLETA SUYAPA GUILLEN</option>
+                            <option value="MARIA LEONOR ZELAYA">MARIA LEONOR ZELAYA</option>
+                        </select>
+                        <input type="hidden" name="dni_autoriza" id="dni_autoriza" />
+                        <input type="hidden" name="cargo_autoriza" id="cargo_autoriza" />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursal" id="sucursal" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                                <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresa" id="empresa" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                                <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamento" id="departamento" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del Empleado</label>
+                        <input type="text" name="nombre_empleado" autocomplete="off"  id="nombre_empleado" class="form-control" placeholder="Nombre de la ciudad" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>DNI del Empleado</label>
+                        <input type="text" name="dni" id="dni" class="form-control" maxlength="13"
+                            oninput="validateNumber(this)"
+                            title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                            placeholder="DNI">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Fechas">Fechas</label>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <label for="fechainicio">DEL</label>
+                        <input type="date" name="fechainicio" id="fechainicio" class="form-control">
+                        
+                        <label for="fechafinal">AL</label>
+                        <input type="date" name="fechafinal" id="fechafinal" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sueldo Actual</label>
+                        <input type="text" name="sueldoactuali" id="sueldoactual" class="form-control"
+                            oninput="validateNumber(this)"
+                            placeholder="SUELDO ACTUAL">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Porcentaje %</label>
+                        <input type="text" name="porcentaje" id="porcentaje" class="form-control"
+                            oninput="validateNumber(this)"
+                            placeholder="SUELDO ACTUAL">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Año</label>
+                        <select name="ano" id="ano" class="form-control">
+                            <option value="" selected disabled>Seleccione un Año</option>
+                            <option value="2010">2010</option>
+                            <option value="2011">2011</option>
+                            <option value="2012">2012</option>
+                            <option value="2013">2013</option>
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="fechaextension">Fecha de Extensión</label>
+                        <input type="date" name="fechaextension" id="fechaextension" class="form-control">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado del Empleado</label>
+                        <select class="form-control" name="estado" id="estado" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado del Pago</label>
+                        <select class="form-control" name="estadopago" id="estadopago" required onchange="mostrarCheque()">
+                            <option value="" disabled selected>SELECIONE UNA OPTIÓN</option>
+                            <option value="CALCULADO">CALCULADO</option>
+                            <option value="AUTORIZADO">AUTORIZADO</option>
+                            <option value="PAGADO">PAGADO</option>
+                        </select>
+                    </div>
+                    <br>
+                    
+                    <div class="form-group" id="n_cheke_div" style="display: none;">
+                        <label for="n_cheke">N. cheque</label>
+                        <input type="text" name="n_cheke" autocomplete="off" id="n_cheke" class="form-control" placeholder="N. CHEKE" />
+                    </div>
+                    <br>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" id="btn-register-cesantias" class="btn classbotones">Guardar</button>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Cesantía</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data">
+                    <!-- Correlativo -->
+                    <div class="form-group">
+                        <label>ID</label>
+                        <input type="text" name="ideditar" id="ideditar" class="form-control" disabled />
+                    </div>
+                    <br>
+
+                    <div class="form-group">
+                        <label>Correlativo</label>
+                        <input type="text" name="correlativoeditar" id="correlativoeditar" class="form-control" disabled readonly />
+                    </div>
+                    <br>
+
+                    <!-- Autorizador -->
+                    <div class="form-group">
+                        <label for="autorizadoreditar">Quien autoriza</label>
+                        <select name="autorizadoreditar" id="autorizadoreditar" class="form-control" onchange="actualizarDatosAutorizador()">
+                            <option value="" disabled selected>Seleccione una Opción</option>
+                            <option value="VIOLETA SUYAPA GUILLEN">VIOLETA SUYAPA GUILLEN</option>
+                            <option value="MARIA LEONOR ZELAYA">MARIA LEONOR ZELAYA</option>
+                        </select>
+                        <input type="hidden" name="dni_autoriza" id="dni_autoriza" />
+                        <input type="hidden" name="cargo_autoriza" id="cargo_autoriza" />
+                    </div>
+                    <br>
+
+                    <!-- Sucursal -->
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursaleditar" id="sucursaleditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                                <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Empresa -->
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresaeditar" id="empresaeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                                <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Departamento -->
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamentoeditar" id="departamentoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Nombre del Empleado -->
+                    <div class="form-group">
+                        <label>Nombre del Empleado</label>
+                        <input type="text" name="nombre_empleadoeditar" autocomplete="off" id="nombre_empleadoeditar" class="form-control" required />
+                    </div>
+                    <br>
+
+                    <!-- DNI del Empleado -->
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" name="dnieditar" id="dnieditar" class="form-control" maxlength="13"
+                            oninput="validateNumber(this)"
+                            title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                            placeholder="DNI">
+                    </div>
+                    <br>
+
+                    <!-- Fechas -->
+                    <div class="form-group">
+                        <label for="Fechas">Fechas</label>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <label for="fechainicioeditar">DEL</label>
+                        <input type="date" name="fechainicioeditar" id="fechainicioeditar" class="form-control">
+                        
+                        <label for="fechafinaleditar">AL</label>
+                        <input type="date" name="fechafinaleditar" id="fechafinaleditar" class="form-control">
+                    </div>
+                    <br>
+
+                    <!-- Sueldo Actual -->
+                    <div class="form-group">
+                        <label>Sueldo Actual</label>
+                        <input type="text" name="sueldoactualeditar" id="sueldoactualeditar" class="form-control"
+                            oninput="validateNumber(this)"
+                            placeholder="Sueldo Actual">
+                    </div>
+                    <br>
+
+                    <!-- Porcentaje -->
+                    <div class="form-group">
+                        <label>Porcentaje %</label>
+                        <input type="text" name="porcentajeeditar" id="porcentajeeditar" class="form-control"
+                            oninput="validateNumber(this)"
+                            placeholder="Porcentaje">
+                    </div>
+                    <br>
+
+                    <!-- Año -->
+                    <div class="form-group">
+                        <label>Año</label>
+                        <select name="anoeditar" id="anoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Año</option>
+                            <option value="2010">2010</option>
+                            <option value="2011">2011</option>
+                            <option value="2012">2012</option>
+                            <option value="2013">2013</option>
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Fecha de Extensión -->
+                    <div class="form-group">
+                        <label for="fechaextensioneditar">Fecha de Extensión</label>
+                        <input type="date" name="fechaextensioneditar" id="fechaextensioneditar" class="form-control">
+                    </div>
+                    <br>
+
+                    <!-- Estado del Empleado -->
+                    <div class="form-group">
+                        <label for="estadoeditar">Estado del Empleado</label>
+                        <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Estado del Pago -->
+                    <div class="form-group">
+                        <label for="estadopagoeditar">Estado del Pago</label>
+                        <select class="form-control" name="estadopagoeditar" id="estadopagoeditar" required onchange="mostrarChequeeditar()">
+                            <option value="" disabled selected>Seleccione una Opción</option>
+                            <option value="CALCULADO">CALCULADO</option>
+                            <option value="AUTORIZADO">AUTORIZADO</option>
+                            <option value="PAGADO">PAGADO</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <!-- Número de Cheque -->
+                    <div class="form-group" id="n_cheke_diveditar" style="display: none;">
+                        <label for="n_chekeeditar">N. cheque</label>
+                        <input type="text" name="n_chekeeditar" autocomplete="off" id="n_chekeeditar" class="form-control" placeholder="N. CHEQUE" />
+                    </div>
+                    <br>
+
+                    <!-- Botones del Modal -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" id="btn-editar-cesantias" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <script src="{% static 'js/cesantias.js' %}"></script>
+{% endblock %}

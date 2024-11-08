@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Modos
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+  <div class="encabezado">
+    <form action="{% url 'modos' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Modos</h1>
+    {% if request.session.listas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar modo</button>
+    {% endif %}
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Modo</th>
+          <th>Estado</th>
+          {% if request.session.listas_escribir %}
+          <th>Acciones</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in modos %}
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.nombre_modo }}</td>
+            <td>
+              {% if item.estado == 'ACTIVO' %}
+                <b style="color: green;">{{ item.estado }}</b>
+              {% else %}
+                <b style="color: red;">{{ item.estado }}</b>
+              {% endif %}
+            </td>
+            {% if request.session.listas_escribir %}
+            <td>
+              <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)"><ion-icon name="create-outline" class="icon"></ion-icon></button>
+            </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <script type="application/json" id="modos-data">
+      [
+          {% for item in modos %}
+              {
+                  "id": "{{ item.id }}",
+                  "nombre_modo": "{{ item.nombre_modo|escapejs }}",
+                  "estado": "{{ item.estado|escapejs }}"
+              }
+              {% if not forloop.last %},{% endif %}
+          {% endfor %}
+      ]
+  </script>
+  
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if modos.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ modos.previous_page_number }}&search={{ search }}">Anterior</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">Anterior</span>
+          </li>
+        {% endif %}
+
+        {% for num in page_range %}
+          {% if modos.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if modos.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ modos.next_page_number }}&search={{ search }}">Siguiente</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">Siguiente</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Registrar Modo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="register-form-modo" enctype="multipart/form-data">
+            <div class="form-group">
+              <input type="text" name="nombre_modo" id="nombre_modo" class="form-control" placeholder="Nombre del modo" required />
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select class="form-control" name="estado" id="estado" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Editar Modo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="update-form-modo">
+            <div class="form-group">
+              <input type="text" name="id_modo_editar" id="id_modo_editar" class="form-control" disabled />
+            </div>
+            <br />
+            <div class="form-group">
+              <input type="text" class="form-control" id="nombre_modo_editar" name="nombre_modo_editar" required />
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="estadoeditar">Estado</label>
+              <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/modulos/modo.js' %}"></script>
+{% endblock %}

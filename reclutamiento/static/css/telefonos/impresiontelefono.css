@@ -1,0 +1,145 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+img{
+    width: 100px;
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    /* Flex para la tabla y el div de la imagen */
+}
+
+table.header-table {
+    width: 100%;
+    /* Reduce el ancho de la tabla */
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.header-table td {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.header-logo {
+    text-align: center;
+    width: 30%;
+    vertical-align: middle;
+}
+
+.header-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    width: 40%;
+    vertical-align: middle;
+}
+
+.header-info {
+    width: 30%;
+    font-size: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.footer p {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.header{
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.observacion{
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.cuerpo{
+    width: 100%;
+    height: auto;
+    text-align: justify;
+    font-size: 22px;
+    line-height: 2;
+}
+@media print {
+    body {
+        width: 240mm;
+        height: 297mm;
+        margin: 0;
+        background-color: transparent;
+    }
+    @page {
+        margin: 5mm 10mm;
+        size: A4;
+    }
+
+    .container {
+        box-shadow: none;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .print-button {
+        display: none;
+    }
+
+    .row {
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    fieldset {
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+
+    .footer {
+        page-break-inside: avoid;
+        margin-top: 20px;
+    }
+}
+
+
+.custom-alertas-button {
+    background-color: #0F034E !important;
+    color: white !important;
+  }
+
+

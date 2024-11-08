@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Programación de Roles{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/asistencia.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Programación de Roles</h1>
+
+        <div class="form-group">
+            <label for="identidad_input">Buscar por Identidad:</label>
+            <input type="text" id="identidad_input" placeholder="Ingrese la identidad del jefe" autocomplete="off"  maxlength="13" class="input-field">
+            <button id="buscar_jefe" type="button" class="btn">Buscar</button>
+        </div>
+
+        <div id="jefe_info" class="jefe-info" style="display: none;">
+            <div class="form-group">
+                <label for="codigo">Código del Jefe:</label>
+                <input type="text" id="codigo" class="input-field" disabled>
+            </div>
+            <div class="form-group">
+                <label for="nombre">Nombre del Jefe:</label>
+                <input type="text" id="nombre" class="input-field" disabled>
+            </div>
+            <input type="hidden" id="jefe_id">
+        </div>
+
+        <div class="form-group">
+            <label for="select_mes">Seleccionar Mes:</label>
+            <select id="select_mes" class="input-field" style="text-transform: uppercase;" disabled>
+                <option value="">Seleccionar Mes</option>
+                {% for numero, nombre in meses.items %}
+                    <option value="{{ numero }}">{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="select_año">Seleccionar Año:</label>
+            <select id="select_año" class="input-field" disabled>
+                <option value="">Seleccionar Año</option>
+                {% for year in años %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+    </div>
+    
+    <div id="tabla_asistencia_container">
+        <table id="tabla_asistencia" border="1">
+            <!-- La tabla se llenará dinámicamente con JavaScript -->
+        </table>
+    </div>
+    <br>
+
+    <button class="print-button1" onclick="window.location.href='{% url 'rolesregistrados' %}'">Roles Registrados</button>
+
+    <!-- Cargar el script al final del body -->
+    <script src="{% static 'js/roles/asistencia.js' %}"></script>
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+</body>
+</html>

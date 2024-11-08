@@ -1,0 +1,155 @@
+.tabla {
+    transition: 0.5s;
+    margin-left: 0.1%;
+    width: 99%;
+}
+
+.styled-table {
+    width: 100%;
+}
+.encabezado {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.input-group {
+    flex: 0 0 300px; /* Cambia 200px por el ancho deseado */
+}
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Estilo del select personalizado */
+.custom-select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.custom-select:focus {
+    box-shadow: none;
+    border-color: #000;
+}
+.custom-options {
+    display: none;
+    /* Oculto por defecto */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    /* Elimina el espacio adicional */
+}
+
+.custom-options label {
+    display: flex;
+    /* Flexbox para alinear el checkbox y el texto */
+    align-items: center;
+    padding: 3px 10px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.custom-options label:hover {
+    background-color: #f0f0f0;
+}
+
+.custom-options input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+
+.custom-select.active+.custom-options {
+    display: block;
+}
+
+.dropdown-icon {
+    margin-left: 10px;
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+
+.custom-select.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+#btndescargar, #btninfo{
+    margin-top: 5px;
+}
+
+th {
+    position: relative;
+}
+
+th .filter-icon {
+    position: absolute;
+    margin-left: 3%;
+    cursor: pointer;
+}
+
+.filter-popup label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.filter-popup label input {
+    margin-right: 10px;
+}
+
+.filter-popup {
+    background-color: white;
+    border: 1px solid #ccc;
+    position: absolute;
+    z-index: 100;
+    color: black;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 350px;
+    padding: 10px;
+    display: none;
+}
+.filter-popup1 label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.filter-popup1 label input {
+    margin-right: 10px;
+}
+
+.filter-popup1 {
+    background-color: white;
+    border: 1px solid #ccc;
+    position: absolute;
+    z-index: 100;
+    color: black;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 150px;
+    padding: 10px;
+    display: none;
+}
+
+.modal-footer{
+    max-height: 40px;
+}
+

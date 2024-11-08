@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}
+  Inventario telefonos
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/controltiempo.css' %}">
+
+<div class="encabezadocontroltiempo">
+    <a href="{% url 'dashboard' %}">
+        <img src="{% static 'img/logoblanco.png' %}" alt="img">
+    </a>
+    <div class="dropdown2">
+        <button class="dropbtn" style="display: flex; align-items: center; color:white; margin-right: 20px;">
+            <i class="fas fa-user" style="margin-right: 5px;"></i>
+            {{ request.session.username }} 
+            <span style="margin: 0 10px;">|</span>
+            <span class="glow"></span>
+            {% comment %} <span style="margin-left: 10px" id="sesiones-activas">{{ sesiones_activas }}</span> {% endcomment %}
+            <i class="fas fa-chevron-down" style="margin-left: 10px;"></i>
+        </button>
+        <div class="dropdown2-content">
+            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        </div>
+    </div>
+</div>
+<div class="encabezadocontroltiempo2">
+    <h4>INVENTARIO DE TELEFONOS</h4>
+</div>
+<form id="filterForm" action="{% url 'inventariotelefonos' %}" method="GET">
+    <div class="encabezado">
+      <div class="input-group" style="margin-top:10px;" >
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    <button style="margin-top:15px;" type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Telefonos</button>
+</div>
+
+<div class="botones-container">
+    <button id="controlTiempoButton" type="button" class="btn classbotones botonesinferioresdiv" onclick="window.location.href='{% url 'telefonos' %}'">Telefonos</button>
+    <a href="{% url 'exportar_inventario_telefonos' %}" id="bolsaempleoexcel" class="btn classbotones botonesinferioresdiv">
+        <i class="fas fa-file-excel"></i> Exportar a Excel
+    </a>
+</div>
+
+<div class="tabla">
+    <table class="styled-table" style="width: 90%; margin-left: 5%;">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <td>Correlativo del Telefono</td>
+                <th>
+                    Nombre del Teléfono
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-nombre-telefono')"></ion-icon>
+                    <div id="filtro-nombre-telefono" class="filter-popup" style="display: none;">
+                        {% for nombre in all_nombres_telefono %}
+                            <label>
+                                <input type="checkbox" name="nombretelefono" value="{{ nombre }}" 
+                                    {% if nombre in nombres_telefono %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ nombre }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>Valor Total</th>
+                <th>Estado del Telefono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventarios %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.correlativo|default:'' }}</td>
+                    <td>{{ item.nombretelefono|default:'' }}</td>
+                    <td>L. {{ item.valortotal_formateado }}</td>
+                    <td>{{ item.estadotelefono }}</td>
+                    <td>{{ item.estado|default:'' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="eliminacion({{ item.id }})" style="margin-top:5px">
+                            <ion-icon name="trash-outline" class="icon"></ion-icon>
+                        </button>
+                        {% if item.estado == "ASIGNADO" or item.estado == "REGISTRADO" or item.estado == "REASIGNADO" %}
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>
+                        
+                    {% endif %}
+                    
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No hay registros de inventario de teléfonos.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+</div>
+
+<script type="application/json" id="inventario-telefonos-data">
+    [
+        {% for item in inventarios %}
+            {
+                "id": "{{ item.id }}",
+                "correlativo": "{{ item.correlativo|escapejs }}",
+                "nombretelefono": "{{ item.nombretelefono|escapejs }}",
+                "valortotal": "{{ item.valortotal|escapejs }}",
+                "estadotelefono": "{{ item.estadotelefono|escapejs }}",
+                "estado": "{{ item.estado|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if inventarios.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ inventarios.previous_page_number }}&search={{ search }}{% for nombre in nombres_telefono %}&nombretelefono={{ nombre }}{% endfor %}">
+                    Anterior
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+            </li>
+        {% endif %}
+
+        {% for num in page_range %}
+            {% if inventarios.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&search={{ search }}{% for nombre in nombres_telefono %}&nombretelefono={{ nombre }}{% endfor %}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if inventarios.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ inventarios.next_page_number }}&search={{ search }}{% for nombre in nombres_telefono %}&nombretelefono={{ nombre }}{% endfor %}">
+                    Siguiente
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Siguiente</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+<br>
+
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Telefonos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-inventariotelefonos" enctype="multipart/form-data" autocomplete='off'>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Nombre del Telefono</label>
+                        <input type="text" name="nombretelefono" class="form-control" id="nombretelefono" placeholder="Nombre del telefono" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Valor del Telefono</label>
+                        <input type="text" name="valortelefono" id="valortelefono" class="form-control" oninput="validateNumber(this)" placeholder="Valor total del Telefono" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Cantidad</label>
+                        <input type="text" name="cantidad" id="cantidad" class="form-control" oninput="validateNumber(this)" placeholder="Cantidad de teléfonos" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado del Telefono</label>
+                        <select name="estadotelefono" id="estadotelefono" class="form-control">
+                            <option value="" selected disabled>SELECIONE UN ESTADO</option>
+                            <option value="NUEVO">NUEVO</option>
+                            <option value="USADO">USADO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <input type="text" name="estado" id="estado" class="form-control" disabled value="REGISTRADO" >
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Telefono</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-inventariotelefono">
+                    <div class="form-group">
+                        <label for="ID">ID</label>
+                        <input type="text" name="idtelefono" id="idtelefonoeditar" class="form-control" disabled>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="">Valor del Telefono</label>
+                        <input type="text" name="valortelefono" id="valortelefonoeditar" class="form-control" oninput="validateNumber(this)" placeholder="Valor total del Telefono" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado del Telefono</label>
+                        <select name="estadotelefono" id="estadotelefonoeditar" class="form-control">
+                            <option value="" selected disabled>SELECIONE UN ESTADO</option>
+                            <option value="NUEVO">NUEVO</option>
+                            <option value="USADO">USADO</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select name="estadotelefono" id="estadoeditar" class="form-control">
+                            <option value="" selected disabled>SELECIONE UN ESTADO</option>
+                            <option value="REASIGNADO">REASIGNADO</option>
+                            <option value="REGISTRADO">REGISTRADO</option>
+                            <option value="ASIGNADO">ASIGNADO</option>
+                        </select>                    
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/telefonos/inventariotelefono.js' %}"></script>
+
+{% endblock %}

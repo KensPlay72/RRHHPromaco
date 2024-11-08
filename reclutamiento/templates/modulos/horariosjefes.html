@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Hoarios de Jefes
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+
+  <div class="encabezado">
+    <form action="{% url 'horariosjefes' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Horario Jefes</h1>
+    {% if request.session.listas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Horarios</button>
+    {% endif %} 
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+      <thead>
+          <tr>
+              <th>Id</th>
+              <th>Jefe</th>
+              <th>Hora de Inicio</th>
+              <th>Hora de Fin</th>
+              <th>Estado</th>
+              {% if request.session.listas_escribir %}
+              <th>Acciones</th>
+              {% endif %}
+          </tr>
+      </thead>
+      <tbody>
+          {% for item in horarios %}
+              <tr>
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.jefe.codigo}} - {{ item.jefe.nombrejefe }}</td>
+                  <td>{{ item.hora_inicio }}</td>
+                  <td>{{ item.hora_fin }}</td>
+                  <td>
+                      {% if item.estado == 'ACTIVO' %}
+                          <b style="color: green;">{{ item.estado }}</b>
+                      {% else %}
+                          <b style="color: red;">{{ item.estado }}</b>
+                      {% endif %}
+                  </td>
+                  {% if request.session.listas_escribir %}
+                  <td>
+                      <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalEditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                          <ion-icon name="create-outline" class="icon"></ion-icon>
+                      </button>
+                  </td>
+                  {% endif %}
+              </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+    
+</div>
+
+<script type="application/json" id="horarios-data">
+  [
+      {% for item in horarios %}
+          {
+              "id": "{{ item.id }}",
+              "jefe_id": "{{ item.jefe.id }}",
+              "hora_inicio": "{{ item.hora_inicio }}",
+              "hora_fin": "{{ item.hora_fin }}",
+              "estado": "{{ item.estado }}",
+              "fechacreacion": "{{ item.fechacreacion|date:'d/m/Y H:i' }}",
+              "fechaactualizacion": "{{ item.fechaactualizacion|date:'d/m/Y H:i' }}"
+          }
+          {% if not forloop.last %},{% endif %}
+      {% endfor %}
+  ]
+</script>
+
+
+
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      <!-- Botón "Anterior" -->
+      {% if horarios.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ horarios.previous_page_number }}&search={{ search }}">Anterior</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Anterior</span>
+          </li>
+      {% endif %}
+
+      <!-- Rango de páginas -->
+      {% for num in page_range %}
+          {% if horarios.number == num %}
+              <!-- Página actual, marcada como activa -->
+              <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+              </li>
+          {% else %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+              </li>
+          {% endif %}
+      {% endfor %}
+
+      <!-- Botón "Siguiente" -->
+      {% if horarios.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ horarios.next_page_number }}&search={{ search }}">Siguiente</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Siguiente</span>
+          </li>
+      {% endif %}
+  </ul>
+</nav>
+
+
+
+  <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Registrar Horario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Jefe</label>
+                <select name="jefes" id="jefes" class="form-control">
+                    <option value="" selected disabled>Seleccione un Jefe</option>
+                    {% for item in all_jefes %}
+                        <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="horainicio">Hora de Inicio</label>
+                <input type="time" name="horainicio" id="horainicio" class="form-control">
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="horasalida">Hora de Salida</label>
+                <input type="time" name="horasalida" id="horasalida" class="form-control">
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select class="form-control" name="estado" id="estado" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" id="registrarhorario" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Editar Jefe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <label>ID</label>
+            <input type="text" name="idhorario" id="idhorario" autocomplete="off" class="form-control" disabled required />
+          </div>
+          <br>
+            <div class="form-group">
+                <label>Jefe</label>
+                <select name="jefes" id="jefeseditar" class="form-control">
+                    <option value="" selected disabled>Seleccione un Jefe</option>
+                    {% for item in all_jefes %}
+                        <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="horainicio">Hora de Inicio</label>
+                <input type="time" name="horainicio" id="horainicioeditar" class="form-control">
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="horasalida">Hora de Salida</label>
+                <input type="time" name="horasalida" id="horasalidaeditar" class="form-control">
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select class="form-control" name="estado" id="estadoeditar" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" id="updatehorarios" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/modulos/horariosjefes.js' %}"></script>
+{% endblock %}

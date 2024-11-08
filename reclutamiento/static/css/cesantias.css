@@ -1,0 +1,148 @@
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+
+.header{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.header img{
+    width: 250px;
+}
+.infor{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.infoizquierdo{
+    width: 30%;
+    margin-left: 20%;
+}
+
+.infoderecho{
+    width: 50%;
+}
+
+.textos {
+    max-width: 90%; 
+    text-align: justify;
+}
+
+
+.divtextos {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.footerizquierdo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+@media print {
+    body {
+        width: 216mm; /* Ancho carta */
+        height: 279mm; /* Alto carta */
+        margin: 0;
+    }
+
+    @page {
+        margin: 2mm; /* Margen para la página */
+        size: 216mm 279mm; /* Tamaño carta */
+    }
+
+    .container {
+        box-shadow: none;
+        padding: 10px;
+        width: 100%;
+        height: auto;
+    }
+    p{
+        text-align: justify;
+    }
+}
+
+
+.header2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header2 img{
+    width: 250px;
+}
+
+.textos1{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.texto2{
+    width: 80%;
+    text-align: justify;
+}
+
+
+th {
+    position: relative;
+}
+
+th .filter-icon {
+    position: absolute;
+    margin-left: 3%;
+    cursor: pointer;
+}
+
+.filter-popup label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.filter-popup label input {
+    margin-right: 10px;
+}
+
+.filter-popup {
+    background-color: white;
+    border: 1px solid #ccc;
+    position: absolute;
+    z-index: 100;
+    color: black;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 350px;
+    padding: 10px;
+    display: none;
+}

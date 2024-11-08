@@ -1,0 +1,1245 @@
+{% load static %}
+{% load humanize %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Editar Perfil de Puesto{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/perfilpuesto/perfilpuesto.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container1">   
+        <br><br>
+        <div class="cinta1div">
+            <div class="cinta"></div>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div class="imgdiv">
+            <h1 style="font-size: 50px">ACTUALIZAR PERFIL {{ perfil_puesto.id }}</h1>
+            <input type="hidden" id="perfil_puesto_id" value="{{ perfil_puesto.id }}">
+        </div>
+        <div class="imgdiv">
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO">
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div class="cinta2div">
+        <div class="cinta2"></div>
+        </div>
+        <br><br>
+    </div>
+    <br><br>
+    <div class="container2">
+<form enctype="multipart/form-data" autocomplete="off">
+        <div class="encabezado">
+            <h3>1.  IDENTIFICACION DEL CARGO</h3>
+            <h5 id="text">{{ perfil_puesto.tipo_perfil }}</h5>
+            <button type="button" id="toggleButton" class="btn classbotones" onclick="toggleTextAndField()">Puesto Nuevo</button>
+        </div>
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EMPRESA</strong></td>
+                <td class="selectpuesto">
+                    <select name="empresa" id="empresa_select" >
+                        <option value="" disabled>Seleccione una Empresa</option>
+                        {% for item in all_empresas %}
+                            <option value="{{ item.nombre_empresa }}" {% if item.nombre_empresa == perfil_puesto.empresa %}selected{% endif %}>
+                                {{ item.nombre_empresa }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>                
+            </tr>            
+            <tr>
+                <td><strong>NOMBRE DEL CARGO</strong></td>
+                <td class="selectpuesto" id="dynamicField" data-nombre-cargo="{{ perfil_puesto.nombre_cargo }}">
+                    <select name="puesto" id="puesto_select">
+                        <option value="" selected disabled>Seleccione un Puesto</option>
+                        {% for item in all_puestos %}
+                            <option value="{{ item.nombre_puestos }}" {% if item.nombre_puestos == perfil_puesto.nombre_cargo %}selected{% endif %}>
+                                {{ item.nombre_puestos }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>                
+            </tr>
+            <tr>
+                <td><strong>DEPARTAMENTO</strong></td>
+                <td class="selectpuesto">                        
+                    <select name="departamento" id="departamento_select" >
+                    <option value="" selected disabled>Seleccione un Departamento</option>
+                    {% for item in all_departamentos %}
+                        <option value="{{ item.nombre_departamento }}" {% if item.nombre_departamento == perfil_puesto.departamento %}selected{% endif %}>
+                            {{ item.nombre_departamento }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            </tr>
+            <tr>
+                <td><strong>CARGO AL QUE REPORTA</strong></td>
+                <td class="selectpuesto">
+                    <select name="puesto_reporta" id="puesto_reporta_select" >
+                        <option value="" selected disabled>Seleccione un Puesto</option>
+                        {% for item in all_puestos %}
+                            <option value="{{ item.nombre_puestos }}" {% if item.nombre_puestos == perfil_puesto.cargo_al_que_reporta %}selected{% endif %}>
+                                {{ item.nombre_puestos }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>CARGOS QUE LE REPORTAN</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" name="cargosreportan" id="cargosreportan" class="inputpuesto" value="{{ perfil_puesto.cargo_que_le_reportan }}" placeholder="Ingrese los cargos que le reportan">
+                </td>
+            </tr>
+        </table>     
+        
+        <br>
+        <h4>2.  REQUISITOS Y CONDICIONES DEL PERFIL  </h4>
+
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EDUCACIÓN UNIVERSITARIA</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" name="educacion" id="educacion_input" class="inputpuesto" value="{{ perfil_puesto.educacion_universitario }}" placeholder="Ingrese la educación">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>POSTGRADOS / ESPECIALIZACIONES </strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" name="postgrado_especialidades" id="postgrado_especialidades" class="inputpuesto" value="{{ perfil_puesto.postgrado_especializaciones }}" placeholder="Ingrese los postgrado y especializaciones">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>FORMACIÓN COMPLEMENTARIA</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" name="formacion_complementaria" id="formacion_complementaria" class="inputpuesto" value="{{ perfil_puesto.formacion_complementaria }}" placeholder="Formación complementaria">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>IDIOMAS (ESPECIFICAR NIVEL)</strong></td>
+                <td class="selectpuesto1" style="display: flex; width: 100%;">                        
+                    <input type="text" name="idioma" id="idioma_input" class="inputpuesto1" value="{{ perfil_puesto.idiomas }}" placeholder="Ingrese el idioma">
+                    <p>|</p>
+                    <select name="nivel_idioma" id="nivel_idioma_select">
+                        <option value="" disabled>Seleccione el nivel</option>
+                        <option value="PRINCIPIANTE" {% if perfil_puesto.nivel_idioma == "PRINCIPIANTE" %}selected{% endif %}>PRINCIPIANTE</option>
+                        <option value="INTERMEDIO" {% if perfil_puesto.nivel_idioma == "INTERMEDIO" %}selected{% endif %}>INTERMEDIO</option>
+                        <option value="AVANZADO" {% if perfil_puesto.nivel_idioma == "AVANZADO" %}selected{% endif %}>AVANZADO</option>
+                        <option value="NATIVO" {% if perfil_puesto.nivel_idioma == "NATIVO" %}selected{% endif %}>NATIVO</option>
+                    </select>                    
+                </td>             
+            </tr>            
+        </table>    
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td colspan="3" style="text-align:center; padding: 10px;"><strong>COMPETENCIAS DEL CARGO</strong></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;"><strong>TÉCNICAS</strong></td>
+            </tr>            
+            <tr>
+                <td><strong>AÑOS DE EXPERIENCIA</strong></td>
+                <td colspan="2" class="selectpuesto">                        
+                    <input type="text" name="anosexperiencia" id="anosexperiencia_input" class="inputpuesto" value="{{ perfil_puesto.anos_experiencia }}" placeholder="Ingrese la cantidad de años de experiencia que desea">
+                </td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;"><strong>CONDUCTUALES</strong></td>
+                    <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">NIVEL REQURIDO</td>
+                </tr>  
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>PENSAMIENTO ESTRATEGICO</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                        Comprende rápidamente los cambios del entorno, las oportunidades del mercado, las amenazas competitivas y las fortalezas y debilidades de la organización a la hora de identificar la mejor respuesta estratégica. Posee la capacidad para detectar nuevas oportunidades de negocio, realizar alianzas estratégicas con clientes, proveedores y competidores. Puede adecuarse a los cambios de contexto e interpretar adecuadamente la información de la que dispone. Identificar a las personas que podrían ayudarlo alcanzar objetivos. Es capaz de leer al equipo e identificar la capacidad del mismo ante un desafío.
+                        </p>                 
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_pensamiento" id="nivel_pensamiento_select" class="selectcentrado">
+                            <option value="" disabled>Seleccione el nivel</option>
+                            <option value="Alto" {% if perfil_puesto.pensamiento_estrategico == "Alto" %}selected{% endif %}>Alto</option>
+                            <option value="Medio" {% if perfil_puesto.pensamiento_estrategico == "Medio" %}selected{% endif %}>Medio</option>
+                            <option value="Bajo" {% if perfil_puesto.pensamiento_estrategico == "Bajo" %}selected{% endif %}>Bajo</option>
+                        </select>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>ENFOQUE AL CLIENTE</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Identifica las necesidades del cliente, muestra deseo de ayudar, comprender y satisfacer su demanda. Implica esforzarse por conocer y resolver los problemas a través de la prestación eficaz de un servicio y la actitud positiva permanente que brindé valor agregado y superé toda expectativa. Incluye comunicación asertiva y sincera con el cliente.                        
+                        </p>                 
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_cliente" id="nivel_cliente_select" class="selectcentrado">
+                            <option value="" disabled>Seleccione el nivel</option>
+                            <option value="Alto" {% if perfil_puesto.enfoque_al_cliente == "Alto" %}selected{% endif %}>Alto</option>
+                            <option value="Medio" {% if perfil_puesto.enfoque_al_cliente == "Medio" %}selected{% endif %}>Medio</option>
+                            <option value="Bajo" {% if perfil_puesto.enfoque_al_cliente == "Bajo" %}selected{% endif %}>Bajo</option>
+                        </select>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>PLANIFICACION Y ORGANIZACIÓN</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Determina eficazmente las metas y prioridades de la tarea, área y/o proyecto, estipulando acciones y plazos requeridos. Desarrolla un plan de trabajo para optimizar los recursos y alcanzar los objetivos, incluye la instrumentación de mecanismos de seguimiento y verificación de información.                    
+                        </p>                    
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_planificacion" id="nivel_planificacion_select" class="selectcentrado">
+                            <option value="" disabled>Seleccione el nivel</option>
+                            <option value="Alto" {% if perfil_puesto.planificacion_y_organizacion == "Alto" %}selected{% endif %}>Alto</option>
+                            <option value="Medio" {% if perfil_puesto.planificacion_y_organizacion == "Medio" %}selected{% endif %}>Medio</option>
+                            <option value="Bajo" {% if perfil_puesto.planificacion_y_organizacion == "Bajo" %}selected{% endif %}>Bajo</option>
+                        </select>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>COMUNICACIÓN</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Escucha y expresa conceptos e ideas de forma efectiva y asertiva. Sabe cuándo y a quien debe dirigirse para llevar a cabo su propósito. Escucha activamente, incluye la capacidad de comunicarse con un lenguaje verbal y no verbal adecuado y su redacción clara y precisa.                    
+                        </p>
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_comunicacion" id="nivel_comunicacion_select" class="selectcentrado">
+                            <option value="" disabled>Seleccione el nivel</option>
+                            <option value="Alto" {% if perfil_puesto.comunicacion == "Alto" %}selected{% endif %}>Alto</option>
+                            <option value="Medio" {% if perfil_puesto.comunicacion == "Medio" %}selected{% endif %}>Medio</option>
+                            <option value="Bajo" {% if perfil_puesto.comunicacion == "Bajo" %}selected{% endif %}>Bajo</option>
+                        </select>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>ORIENTACION AL LOGRO</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Logra resultados actuando con diligencia, agilidad y sentido de urgencia ante las decisiones importantes, alineación de esfuerzos y monitoreando el progreso de sus objetivos. Tiene la capacidad de administrar los procesos establecidos, de forma tal que no interfieran con la consecución de metas, gestionando oportunamente estándares, mejorando y manteniendo altos niveles de rendimiento en el marco de las estrategias de la organización.                        
+                        </p>
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_logro" id="nivel_logro_select" class="selectcentrado">
+                            <option value="" disabled>Seleccione el nivel</option>
+                            <option value="Alto" {% if perfil_puesto.orientacion_al_logro == "Alto" %}selected{% endif %}>Alto</option>
+                            <option value="Medio" {% if perfil_puesto.orientacion_al_logro == "Medio" %}selected{% endif %}>Medio</option>
+                            <option value="Bajo" {% if perfil_puesto.orientacion_al_logro == "Bajo" %}selected{% endif %}>Bajo</option>
+                        </select>                        
+                    </td>
+                </tr>
+            </tr>
+        </table>
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td style="text-align:center; padding: 10px;"><strong>MISIÓN DEL CARGO Objetivo/ Propósito</strong></td>
+            </tr>
+            <tr>
+                <td style=" background-color:white;"><textarea name="" id="mision_cargo" placeholder="MISION DEL CARGO" class="inputpuesto" rows="3">{{ perfil_puesto.mision_cargo }}</textarea></td>
+            </tr>
+            <tr>
+                <td style="background-color:white; color:black;">
+                    <br>
+                    <p>Organigrama</p>
+                    <div class="file-drop-area">
+                        <input type="file" class="file-input" id="fileInput_org" accept="image/*" />
+                        <div class="file-message"></div>
+                        {% if perfil_puesto.ruta_organigrama %}
+                            <img id="previewImage_org" src="/static/img/organigrama/{{ perfil_puesto.nombre_organigrama }}" alt="Foto" />
+                        {% else %}
+                            Foto
+                        {% endif %}
+                    </div>                                            
+                    <br><br>
+                </td>
+            </tr>
+        </table>
+        <table class="tabla-informacion2" id="tablaFunciones">
+            <tr>
+                <td colspan="4" style="text-align:center; padding: 10px;">
+                    <strong>FUNCIONES DEL CARGO</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">N*</td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Función: Qué hace, sobre qué y con qué fines</td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Periodicidad</td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Importancia de la función para lograr el objetivo del cargo (A-B-C)</td>
+            </tr>
+            <!-- Primera fila cargada desde el servidor -->
+            <tr class="funcionRow">
+                <td class="numero-columna" style="text-align:center; background-color: white; color:black;">1</td>
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                    <input type="text" name="funcion[]" class="inputpuesto funcionInput" placeholder="Ingrese la Funcion" value="{{ perfil_puesto.funciones_cargo.0.funcion }}">
+                </td>
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 20%;">
+                    <select name="periodicidad[]" class="inputpuesto">
+                        <option value="" disabled {% if not perfil_puesto.funciones_cargo.0.periodicidad %}selected{% endif %}>Seleccione una Periodicidad</option>
+                        <option value="SEMANAL" {% if perfil_puesto.funciones_cargo.0.periodicidad == "SEMANAL" %}selected{% endif %}>SEMANAL</option>
+                        <option value="DIARIA" {% if perfil_puesto.funciones_cargo.0.periodicidad == "DIARIA" %}selected{% endif %}>DIARIA</option>
+                        <option value="MENSUAL" {% if perfil_puesto.funciones_cargo.0.periodicidad == "MENSUAL" %}selected{% endif %}>MENSUAL</option>
+                        <option value="SEMANAL Y MENSUAL" {% if perfil_puesto.funciones_cargo.0.periodicidad == "SEMANAL Y MENSUAL" %}selected{% endif %}>SEMANAL Y MENSUAL</option>
+                    </select>
+                </td>
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 20%;">
+                    <select name="importancia[]" class="inputpuesto">
+                        <option value="" disabled {% if not perfil_puesto.funciones_cargo.0.importancia %}selected{% endif %}>Seleccione la importancia</option>
+                        <option value="A" {% if perfil_puesto.funciones_cargo.0.importancia == "A" %}selected{% endif %}>A</option>
+                        <option value="B" {% if perfil_puesto.funciones_cargo.0.importancia == "B" %}selected{% endif %}>B</option>
+                        <option value="C" {% if perfil_puesto.funciones_cargo.0.importancia == "C" %}selected{% endif %}>C</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+                
+        <br>
+        <p>A: Muy importantes para lograr los objetivos marcados.</p>
+        <p>B: Medianamente importante para lograr los objetivos. </p>
+        <p>C: Prácticamente sin importancia para lograr los objetivos. </p>
+        <br>
+        <table class="tabla-informacion1" id="tablaDificultades">
+            <tr>
+                <td style="text-align:center; padding: 10px;">
+                    <strong>ALCANCE DE LAS DIFICULTADES (RETOS): Son las situaciones más complejas que el cargo podrá afrontar/resolver en el desarrollo de su trabajo o las que pueden generar retrasos.</strong>
+                </td>
+            </tr>
+            <!-- Primera fila cargada desde el servidor -->
+            <tr class="funcionRow">
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                    <input type="text" name="dificultad[]" class="inputpuesto funcionInput" placeholder="Ingrese la Dificultad"
+                           value="{{ perfil_puesto.retos.0 }}">
+                </td>
+            </tr>
+        </table>
+              
+        <br>
+        <table class="tabla-informacion1" id="tablaMateriales_equipos">
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;" colspan="3">
+                    <strong>Materiales y Equipos</strong>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding: 10px; background-color:white;">
+                    <div class="checkbox-container">
+                        <label class="custom-checkbox">
+                            Computador
+                            <input type="checkbox" name="material[]" value="COMPUTADOR" {% if "COMPUTADOR" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Celular
+                            <input type="checkbox" name="material[]" value="CELULAR" {% if "CELULAR" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Uniforme
+                            <input type="checkbox" name="material[]" value="UNIFORME" {% if "UNIFORME" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Escritorio
+                            <input type="checkbox" name="material[]" value="ESCRITORIO" {% if "ESCRITORIO" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Licencia SAP
+                            <input type="checkbox" name="material[]" value="LICENCIA SAP" {% if "LICENCIA SAP" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Licencia IVEND
+                            <input type="checkbox" name="material[]" value="LICENCIA IVEND" {% if "LICENCIA IVEND" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Silla
+                            <input type="checkbox" name="material[]" value="SILLA" {% if "SILLA" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Correo
+                            <input type="checkbox" name="material[]" value="CORREO" {% if "CORREO" in perfil_puesto.materiales_equipos %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <!-- Campo "Otros" -->
+                        <label class="custom-checkbox" id="otrosLabel" style="display: flex; align-items: center;">
+                            Otros
+                            <input type="checkbox" name="material[]" id="checkboxOtros_equipos" value="Otros" {% if otros_materiales %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                            <input type="text" id="inputOtros_equipos" name="material_otros" placeholder="Especifica otros" class="input-limpio" style="display: {% if otros_materiales %}inline-block{% else %}none{% endif %};" value="{% if otros_materiales %}{{ otros_materiales }}{% endif %}">
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        <br>
+        <table class="tabla-informacion1">
+            <tr>
+                <td colspan="3" style="text-align:center; padding: 10px;"><strong>CONDICIONES</strong></td>
+            </tr>
+            <tr>
+                <td rowspan="2" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Horarios, turnos y condiciones relacionadas</td>
+                <td colspan="2" class="selectpuesto" style=" background-color:white;">
+                    <label class="custom-checkbox" style="display:flex; justify-content:center; align-items:center; margin-top: 15px; margin-left: 10px;">
+                        Residir en el Área
+                        <input type="checkbox" id="recidirarea" value="Residir en el Area" {% if perfil_puesto.residir_en_area == "Residir en el Area" %}checked{% endif %}>
+                        <span class="checkmark"></span>
+                    </label>                    
+                </td>                
+            </tr>
+            <tr>
+                <td colspan="2" class="selectpuesto" style=" background-color:white;">
+                    <input type="text" name="turnoshorario" id="turnoshorario_input" value="{{ perfil_puesto.horario_turnos }}" class="inputpuesto" placeholder="Turno-Horario">
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Otros que se consideren importantes</td>
+                <td colspan="2" style=" background-color:white;"><textarea name="" id="otros_importantes_textarea" class="inputpuesto" rows="3">{{ perfil_puesto.otros }}</textarea></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Plan de compensación</td>
+                <td colspan="2" style="background-color:white; padding: 10px;">
+                    <div class="custom-checkbox-container">
+                        <!-- Primera parte: Plan de compensación -->
+                        <label class="custom-checkbox2">
+                            Salario Base
+                            <input type="checkbox" name="compensacion[]" value="SALARIO BASE" {% if "SALARIO BASE" in perfil_puesto.plan_de_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Comisión
+                            <input type="checkbox" name="compensacion[]" value="COMISION" {% if "COMISION" in perfil_puesto.plan_de_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Bono
+                            <input type="checkbox" name="compensacion[]" value="BONO" {% if "BONO" in perfil_puesto.plan_de_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Depreciación y Combustible
+                            <input type="checkbox" name="compensacion[]" value="DEPRECIACION Y COMBUSTIBLE" {% if "DEPRECIACION Y COMBUSTIBLE" in perfil_puesto.plan_de_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Hospedaje
+                            <input type="checkbox" name="compensacion[]" value="HOSPEDAJE" {% if "HOSPEDAJE" in perfil_puesto.plan_de_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Otros
+                            <input type="checkbox" id="otrosCheckboxCompensacion" name="compensacion[]" value="Otros" {% if otros_compensacion %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                            <input type="text" id="inputOtrosCompensacion" name="compensacion_otros" placeholder="Especifica otros" class="input-limpio"
+                                   style="display: {% if otros_compensacion %}inline-block{% else %}none{% endif %};"
+                                   value="{{ otros_compensacion }}">
+                        </label>
+            
+                        <!-- Separador: Beneficio Promaco -->
+                        <div style="width: 100%; text-align: left; padding: 10px 0;"><strong>Beneficio Promaco</strong></div>
+            
+                        <!-- Segunda parte: Beneficio Promaco -->
+                        <label class="custom-checkbox2">
+                            Seguro médico privado
+                            <input type="checkbox" name="beneficio[]" value="SEGURO MEDICO PRIVADO" {% if "SEGURO MEDICO PRIVADO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Seguro social
+                            <input type="checkbox" name="beneficio[]" value="SEGURO SOCIAL" {% if "SEGURO SOCIAL" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Permiso de estudio
+                            <input type="checkbox" name="beneficio[]" value="PERMISO DE ESTUDIO" {% if "PERMISO DE ESTUDIO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Bono supermercado
+                            <input type="checkbox" name="beneficio[]" value="BONO SUPERMERCADO" {% if "BONO SUPERMERCADO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Bono café Promaco
+                            <input type="checkbox" name="beneficio[]" value="BONO CAFE PROMACO" {% if "BONO CAFE PROMACO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Descuento en supermercado
+                            <input type="checkbox" name="beneficio[]" value="DESCUENTO EN SUPERMERCADO" {% if "DESCUENTO EN SUPERMERCADO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Descuento en clínicas y laboratorios
+                            <input type="checkbox" name="beneficio[]" value="DESCUENTO EN CLINICA Y LAVORATORIOS" {% if "DESCUENTO EN CLINICA Y LAVORATORIOS" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                        <label class="custom-checkbox2">
+                            Seguro de vehículo
+                            <input type="checkbox" name="beneficio[]" value="SEGURO DE VEHICULO" {% if "SEGURO DE VEHICULO" in perfil_puesto.beneficiospromaco %}checked{% endif %}>
+                            <span class="checkmark2"></span>
+                        </label>
+                    </div>
+                </td>
+            </tr>
+            
+        </table>
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td colspan="2" style="text-align:center; padding: 10px;"><strong>PRUEBAS PSICOMETRICAS</strong></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; padding: 10px;">Nivel de la Prueba</td>  
+                <td class="selectpuesto">
+                    <select name="nivel_psicosmart" id="nivel_psicosmart" class="selectcentrado">
+                        <option value="" selected disabled>Seleccione el nivel de la prueba</option>
+                        <option value="1" {% if perfil_puesto.nivel_prueba == "1" %}selected{% endif %}>1</option>
+                        <option value="2" {% if perfil_puesto.nivel_prueba == "2" %}selected{% endif %}>2</option>
+                        <option value="3" {% if perfil_puesto.nivel_prueba == "3" %}selected{% endif %}>3</option>
+                        <option value="4" {% if perfil_puesto.nivel_prueba == "4" %}selected{% endif %}>4</option>
+                    </select>
+                </td>              
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center; padding: 10px; display:none; width: 200%;" id="pruebas_td1"><strong>Nombres de las Pruebas</strong></td>
+            </tr>            
+            <tr>
+                <td style="text-align:center; background-color: white; color:black; padding: 10px; display:none; width: 200%;" id="pruebas_td"></td>
+            </tr>
+        </table>        
+
+        <br>
+        <table class="tabla-informacion1" id="tablaMateriales_pruebas">
+            <tr>
+                <td colspan="3" style="padding: 10px; background-color:white;">
+                    <div class="checkbox-container">
+                        <label class="custom-checkbox">
+                            Montacarga
+                            <input type="checkbox" name="otros[]" value="MONTACARGA" 
+                                   {% if perfil_puesto.montacargas == "MONTACARGA" %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="custom-checkbox">
+                            Equipo pesado
+                            <input type="checkbox" name="otros[]" value="EQUIPO PESADO" 
+                                   {% if perfil_puesto.esquipo_pegado == "EQUIPO PESADO" %}checked{% endif %}>
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </td>
+            </tr>
+        </table>        
+        <br>
+        <table class="tabla-informacion1" id="tablaIndicadores">
+            <tr>
+                <td style="text-align:center; padding: 10px;"><strong>Principales Indicadores</strong></td>
+            </tr>
+            <!-- Primer registro en HTML -->
+            <tr class="indicadorRow">
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                    <input type="text" name="indicador[]" class="inputpuesto indicadorInput" placeholder="Ingrese el Indicador" value="{{ perfil_puesto.principales_indicadores.0 }}">
+                </td>
+            </tr>
+        </table>
+        
+        <br><br>
+             <div style="width: 100%; display:flex; justify-content:center; aling-items: center;">
+                <button type="button" id="btn-update-perfilpuesto" class="btn classbotones">Actualizar</button>
+             </div>
+        <br>
+    </div>
+</form>
+<button class="print-button1" onclick="window.location.href='{% url 'perfilpuesto' %}'">Volver</button>
+
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tablaFunciones = document.getElementById('tablaFunciones');
+        
+            // Carga de funciones desde el servidor (omitiendo el primero)
+            const funcionesCargo = {{ perfil_puesto.funciones_cargo|safe }}.slice(1);  // Cargar desde el segundo elemento en adelante
+        
+            function agregarFilaFuncion(funcion = '', periodicidad = '', importancia = '') {
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.classList.add('funcionRow');
+        
+                // Obtener el número de la fila basado en el conteo actual de filas
+                const numeroFila = tablaFunciones.querySelectorAll('.funcionRow').length + 1;
+        
+                nuevaFila.innerHTML = `
+                    <td class="numero-columna" style="text-align:center; background-color: white; color:black;">${numeroFila}</td>
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <input type="text" name="funcion[]" class="inputpuesto funcionInput" placeholder="Ingrese la Funcion" value="${funcion}">
+                    </td>
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <select name="periodicidad[]" class="inputpuesto">
+                            <option value="" disabled ${periodicidad === '' ? 'selected' : ''}>Seleccione una Periodicidad</option>
+                            <option value="SEMANAL" ${periodicidad === 'SEMANAL' ? 'selected' : ''}>SEMANAL</option>
+                            <option value="DIARIA" ${periodicidad === 'DIARIA' ? 'selected' : ''}>DIARIA</option>
+                            <option value="MENSUAL" ${periodicidad === 'MENSUAL' ? 'selected' : ''}>MENSUAL</option>
+                            <option value="SEMANAL Y MENSUAL" ${periodicidad === 'SEMANAL Y MENSUAL' ? 'selected' : ''}>SEMANAL Y MENSUAL</option>
+                        </select>
+                    </td>
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <select name="importancia[]" class="inputpuesto">
+                            <option value="" disabled ${importancia === '' ? 'selected' : ''}>Seleccione la importancia</option>
+                            <option value="A" ${importancia === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${importancia === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${importancia === 'C' ? 'selected' : ''}>C</option>
+                        </select>
+                    </td>
+                `;
+        
+                tablaFunciones.appendChild(nuevaFila);
+                nuevaFila.querySelector('.funcionInput').addEventListener('input', detectarUltimaFilaFuncion);
+            }
+        
+            function detectarUltimaFilaFuncion() {
+                const filas = document.querySelectorAll('#tablaFunciones .funcionRow');
+        
+                // Revisar la última fila
+                const ultimaFila = filas[filas.length - 1];
+                const inputUltimaFila = ultimaFila.querySelector('.funcionInput');
+        
+                // Si el campo de la última fila tiene contenido, agregar una nueva fila vacía
+                if (inputUltimaFila.value.trim() !== "") {
+                    agregarFilaFuncion(); // Agregar una nueva fila vacía
+                }
+            }
+        
+            // Cargar las funciones existentes desde el JSON
+            if (funcionesCargo.length > 0) {
+                funcionesCargo.forEach(funcion => {
+                    agregarFilaFuncion(funcion.funcion, funcion.periodicidad, funcion.importancia);
+                });
+            }
+        
+            // Siempre agregar una fila vacía al final, para que el usuario pueda seguir agregando
+            agregarFilaFuncion();
+        });
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const tablaDificultades = document.getElementById('tablaDificultades');
+        
+            // Datos de retos cargados desde el servidor (omitiendo el primero)
+            const retos = {{ perfil_puesto.retos|safe }}.slice(1); // Omitir el primer reto que ya está en el HTML
+        
+            function agregarFilaDificultad(dificultad = '') {
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.classList.add('funcionRow');
+                
+                nuevaFila.innerHTML = `
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <input type="text" name="dificultad[]" class="inputpuesto funcionInput" placeholder="Ingrese la Dificultad" value="${dificultad}">
+                    </td>
+                `;
+        
+                tablaDificultades.appendChild(nuevaFila);
+                nuevaFila.querySelector('.funcionInput').addEventListener('input', detectarUltimaFilaDificultad);
+            }
+        
+            function detectarUltimaFilaDificultad() {
+                const filas = document.querySelectorAll('#tablaDificultades .funcionRow');
+        
+                const ultimaFila = filas[filas.length - 1];
+                const inputUltimaFila = ultimaFila.querySelector('.funcionInput');
+        
+                // Si el campo de la última fila tiene contenido, agregar una nueva fila vacía
+                if (inputUltimaFila.value.trim() !== "") {
+                    agregarFilaDificultad(); // Agregar una nueva fila vacía
+                }
+            }
+        
+            // Cargar los retos restantes desde el JSON (omitiendo el primero)
+            if (retos.length > 0) {
+                retos.forEach(dificultad => {
+                    agregarFilaDificultad(dificultad);
+                });
+            }
+        
+            // Agregar event listener a la primera fila para detectar si debe crecer la tabla
+            const inputPrimeraFilaDificultad = document.querySelector('#tablaDificultades .funcionInput');
+            inputPrimeraFilaDificultad.addEventListener('input', detectarUltimaFilaDificultad);
+        
+            // Asegurar que siempre haya una fila vacía al final
+            agregarFilaDificultad();
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            var nivelSelect = document.getElementById('nivel_psicosmart');
+            var pruebasTd = document.getElementById('pruebas_td');
+            var pruebasTd1 = document.getElementById('pruebas_td1');  
+        
+            // Función para realizar la consulta de las pruebas
+            function obtenerPruebasPorNivel(nivelSeleccionado) {
+                if (nivelSeleccionado) {
+                    fetch(`/obtener_pruebas_por_nivel/?nivel=${nivelSeleccionado}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Limpiar el contenido de td antes de agregar las nuevas pruebas
+                            pruebasTd.innerHTML = '';
+        
+                            // Si hay pruebas, mostrarlas
+                            if (data.pruebas.length > 0) {
+                                pruebasTd.style.display = "block";
+                                pruebasTd1.style.display = "block";
+        
+                                const container = document.createElement('div');
+                                container.style.display = "grid";
+                                container.style.gridTemplateColumns = "repeat(3, 1fr)";
+                                container.style.gap = "10px"; // Espacio entre las pruebas
+        
+                                data.pruebas.forEach(prueba => {
+                                    const pruebaText = document.createElement('p');
+                                    pruebaText.textContent = prueba.nombre_prueba;
+                                    container.appendChild(pruebaText);
+                                });
+        
+                                pruebasTd.appendChild(container);
+                            } else {
+                                pruebasTd.innerHTML = 'No hay pruebas para este nivel.';
+                                pruebasTd.style.display = "block";
+                                pruebasTd1.style.display = "block";
+                            }
+                        } else {
+                            pruebasTd.innerHTML = 'Hubo un error al obtener las pruebas.';
+                            pruebasTd.style.display = "block";
+                            pruebasTd1.style.display = "block";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener las pruebas:', error);
+                        pruebasTd.innerHTML = 'Hubo un error al obtener las pruebas.';
+                        pruebasTd.style.display = "block";
+                        pruebasTd1.style.display = "block";
+                    });
+                } else {
+                    pruebasTd.style.display = "none";
+                    pruebasTd1.style.display = "none";
+                }
+            }
+        
+            // Llamar a la función de obtener pruebas si el select ya tiene un valor seleccionado al cargar la página
+            if (nivelSelect.value) {
+                obtenerPruebasPorNivel(nivelSelect.value);
+            }
+        
+            // Escuchar el cambio en el select
+            nivelSelect.addEventListener('change', function () {
+                var nivelSeleccionado = this.value;
+                obtenerPruebasPorNivel(nivelSeleccionado);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tablaIndicadores = document.getElementById('tablaIndicadores');
+        
+            // Datos de indicadores cargados desde el servidor (omitiendo el primero)
+            const indicadores = {{ perfil_puesto.principales_indicadores|safe }}.slice(1); // Omitir el primer indicador que ya está en el HTML
+        
+            function agregarFilaIndicador(indicador = '') {
+                const nuevaFila = document.createElement('tr');
+                nuevaFila.classList.add('indicadorRow');
+                
+                nuevaFila.innerHTML = `
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <input type="text" name="indicador[]" class="inputpuesto indicadorInput" placeholder="Ingrese el Indicador" value="${indicador}">
+                    </td>
+                `;
+        
+                tablaIndicadores.appendChild(nuevaFila);
+                nuevaFila.querySelector('.indicadorInput').addEventListener('input', detectarUltimaFilaIndicador);
+            }
+        
+            function detectarUltimaFilaIndicador() {
+                const filas = document.querySelectorAll('#tablaIndicadores .indicadorRow');
+        
+                const ultimaFila = filas[filas.length - 1];
+                const inputUltimaFila = ultimaFila.querySelector('.indicadorInput');
+        
+                // Si el campo de la última fila tiene contenido, agregar una nueva fila vacía
+                if (inputUltimaFila.value.trim() !== "") {
+                    agregarFilaIndicador(); // Agregar una nueva fila vacía
+                }
+            }
+        
+            // Cargar los indicadores restantes desde el JSON (omitiendo el primero)
+            if (indicadores.length > 0) {
+                indicadores.forEach(indicador => {
+                    agregarFilaIndicador(indicador);
+                });
+            }
+        
+            // Agregar event listener a la primera fila para detectar si debe crecer la tabla
+            const inputPrimeraFilaIndicador = document.querySelector('#tablaIndicadores .indicadorInput');
+            inputPrimeraFilaIndicador.addEventListener('input', detectarUltimaFilaIndicador);
+        
+            // Asegurar que siempre haya una fila vacía al final
+            agregarFilaIndicador();
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var fileDropArea = document.querySelector('.file-drop-area');
+            var fileInput = fileDropArea.querySelector('input[type="file"]');
+            var fileMessage = fileDropArea.querySelector('.file-message');
+            var previewImage = fileDropArea.querySelector('#previewImage_org');  // Usar #previewImage_org en lugar de #previewImage
+        
+            if (fileInput && previewImage && fileMessage) {
+                // Evitar el comportamiento por defecto para eventos de arrastrar y soltar
+                fileDropArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.add('dragover');
+                });
+        
+                fileDropArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.remove('dragover');
+                });
+        
+                fileDropArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.remove('dragover');
+        
+                    var files = e.dataTransfer.files; // Obtener los archivos arrastrados
+                    if (files.length > 0) {
+                        fileInput.files = files; // Asignar archivos al input file
+                        displayImage(files[0]); // Mostrar la imagen
+                    }
+                });
+        
+                // Mostrar la imagen seleccionada manualmente
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length > 0) {
+                        displayImage(fileInput.files[0]); // Mostrar la imagen
+                    } else {
+                        resetFileArea(); // Resetear el área si no hay archivo
+                    }
+                });
+        
+                // Función para mostrar la imagen seleccionada o arrastrada
+                function displayImage(file) {
+                    if (file && file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImage.src = ''; // Limpiar la imagen previa
+                            previewImage.src = e.target.result; // Establecer la nueva fuente de la imagen
+                            previewImage.style.display = 'block'; // Mostrar la imagen
+                            fileMessage.style.display = 'none'; // Ocultar el mensaje de "arrastra o selecciona"
+                        };
+                        reader.readAsDataURL(file); // Leer el archivo como una URL
+                    } else {
+                        resetFileArea(); // Resetear el área si no es una imagen válida
+                    }
+                }
+        
+                function resetFileArea() {
+                    previewImage.style.display = 'none'; // Ocultar la imagen
+                    previewImage.src = '';  // Restablecer la fuente de la imagen
+                    fileMessage.style.display = 'block'; // Mostrar el mensaje de "arrastra o selecciona"
+                }
+            }
+        });
+
+        
+        
+        
+        document.getElementById("btn-update-perfilpuesto").onclick = function(event) {
+            event.preventDefault(); // Prevenir el envío por defecto del formulario
+        
+            const formData = new FormData();
+        
+            // Captura del valor de tipo_perfil
+            const tipoPerfil = document.getElementById('text').innerHTML === "PERFIL NUEVO" ? "PERFIL NUEVO" : "PERFIL EXISTENTE";
+            formData.append('tipo_perfil', tipoPerfil);
+        
+        
+            // 1. Captura del primer grupo de campos
+            const empresa = document.getElementById('empresa_select').value;
+            const departamento = document.getElementById('departamento_select').value;
+            const puesto_reporta = document.getElementById('puesto_reporta_select').value;
+            const cargos_reportan = document.getElementById('cargosreportan').value;
+        
+            formData.append('empresa', empresa);
+            formData.append('departamento', departamento);
+            formData.append('cargo_al_que_reporta', puesto_reporta);
+            formData.append('cargos_que_le_reportan', cargos_reportan);
+        
+            // 2. Captura del nombre del cargo (verifica si es un select o un input)
+            const isNuevoPerfil = document.getElementById('text').innerHTML === "PERFIL NUEVO";
+        
+            if (isNuevoPerfil) {
+                // Si es un perfil nuevo, obtener el valor del input de texto
+                const nuevoPuesto = document.getElementById('nuevo_puesto').value;
+                formData.append('nombre_cargo', nuevoPuesto);
+            } else {
+                // Si es un perfil existente, obtener el valor del select
+                const puesto = document.getElementById('puesto_select').value;
+                formData.append('nombre_cargo', puesto);
+            }
+        
+            // 3. Captura del segundo grupo de campos (educación, formación)
+            const educacion = document.getElementById('educacion_input').value;
+            const postgrado_especialidades = document.getElementById('postgrado_especialidades').value;
+            const formacion_complementaria = document.getElementById('formacion_complementaria').value;
+            const idioma = document.getElementById('idioma_input').value;
+            const nivel_idioma = document.getElementById('nivel_idioma_select').value;
+        
+            formData.append('educacion_universitario', educacion);
+            formData.append('postgrado_especializaciones', postgrado_especialidades);
+            formData.append('formacion_complementaria', formacion_complementaria);
+            formData.append('idiomas', idioma);
+            formData.append('nivel_idioma', nivel_idioma);
+        
+            // 4. Captura del tercer grupo de campos (competencias)
+            const anos_experiencia = document.getElementById('anosexperiencia_input').value;
+            const nivel_pensamiento = document.getElementById('nivel_pensamiento_select').value;
+            const nivel_cliente = document.getElementById('nivel_cliente_select').value;
+            const nivel_planificacion = document.getElementById('nivel_planificacion_select').value;
+            const nivel_comunicacion = document.getElementById('nivel_comunicacion_select').value;
+            const nivel_logro = document.getElementById('nivel_logro_select').value;
+        
+            formData.append('anos_experiencia', anos_experiencia);
+            formData.append('pensamiento_estrategico', nivel_pensamiento);
+            formData.append('enfoque_al_cliente', nivel_cliente);
+            formData.append('planificacion_y_organizacion', nivel_planificacion);
+            formData.append('comunicacion', nivel_comunicacion);
+            formData.append('orientacion_al_logro', nivel_logro);
+        
+            // 5. Captura de las funciones dinámicas (Función, Periodicidad, Importancia)
+            const funciones = document.querySelectorAll('input[name="funcion[]"]');
+            const periodicidades = document.querySelectorAll('select[name="periodicidad[]"]');
+            const importancias = document.querySelectorAll('select[name="importancia[]"]');
+        
+            let funcionesArray = [];
+        
+            funciones.forEach((funcionInput, index) => {
+                const funcion = funcionInput.value;
+                const periodicidad = periodicidades[index].value;
+                const importancia = importancias[index].value;
+        
+                if (funcion && periodicidad && importancia) {
+                    funcionesArray.push({
+                        funcion: funcion,
+                        periodicidad: periodicidad,
+                        importancia: importancia
+                    });
+                }
+            });
+        
+            formData.append('funciones_cargo', JSON.stringify(funcionesArray));
+        
+            // 6. Captura de la imagen (Organigrama)
+            const imagenInput = document.getElementById('fileInput_org');
+            if (imagenInput.files && imagenInput.files[0]) {
+                const fileExtension = imagenInput.files[0].name.split('.').pop().toLowerCase();
+                if (fileExtension === 'jpg' || fileExtension === 'png') {
+                    formData.append('ruta_organigrama', imagenInput.files[0]);
+                } else {
+                    Swal.fire({
+                        title: 'Archivo no válido',
+                        text: 'Por favor, sube una imagen en formato JPG o PNG.',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-alertas-button'
+                        }
+                    });
+                    return;
+                }
+            }
+        
+            const mision_cargo = document.getElementById('mision_cargo').value;
+            formData.append('mision_cargo', mision_cargo); 
+        
+        
+            // 7. Captura de las dificultades dinámicas
+            const dificultades = document.querySelectorAll('input[name="dificultad[]"]');
+            let dificultadesArray = [];
+        
+            dificultades.forEach((dificultadInput) => {
+                const dificultad = dificultadInput.value;
+                if (dificultad) {  // Solo agregar si hay valor
+                    dificultadesArray.push(dificultad);
+                }
+            });
+        
+            formData.append('retos', JSON.stringify(dificultadesArray));
+        
+            // 8. Captura de los materiales seleccionados
+            const materialesSeleccionados = [];
+            const checkboxesMateriales = document.querySelectorAll('input[name="material[]"]:checked');
+        
+            checkboxesMateriales.forEach((checkbox) => {
+                if (checkbox.value === 'Otros') {
+                    const valorOtros = document.getElementById('inputOtros_equipos').value.trim();
+                    if (valorOtros) {
+                        materialesSeleccionados.push(valorOtros);
+                    }
+                } else {
+                    materialesSeleccionados.push(checkbox.value);
+                }
+            });
+        
+            formData.append('materiales_equipos', JSON.stringify(materialesSeleccionados));
+        
+            // 9. Captura del checkbox "Residir en el Área" y el input "Turno-Horario"
+            const residirArea = document.getElementById('recidirarea').checked ? "Residir en el Area" : null;
+            const turnoHorario = document.getElementById('turnoshorario_input').value;
+        
+            formData.append('residir_en_area', residirArea);
+            formData.append('horario_turnos', turnoHorario);
+        
+            // 10. Captura del campo "Otros que se consideren importantes"
+            const otrosImportantes = document.getElementById('otros_importantes_textarea').value;
+            formData.append('otros', otrosImportantes);
+        
+            // 11. Captura del plan de compensación seleccionado
+            const compensacionesSeleccionadas = [];
+            const checkboxesCompensacion = document.querySelectorAll('input[name="compensacion[]"]:checked');
+        
+            checkboxesCompensacion.forEach((checkbox) => {
+                if (checkbox.value === 'Otros') {
+                    const valorOtrosCompensacion = document.getElementById('inputOtrosCompensacion').value.trim();
+                    if (valorOtrosCompensacion) {
+                        compensacionesSeleccionadas.push(valorOtrosCompensacion);
+                    }
+                } else {
+                    compensacionesSeleccionadas.push(checkbox.value);
+                }
+            });
+        
+            formData.append('plan_de_compensacion', JSON.stringify(compensacionesSeleccionadas));
+        
+            // 12. Captura de los beneficios Promaco seleccionados
+            const beneficiosSeleccionados = [];
+            const checkboxesBeneficio = document.querySelectorAll('input[name="beneficio[]"]:checked');
+        
+            checkboxesBeneficio.forEach((checkbox) => {
+                beneficiosSeleccionados.push(checkbox.value);
+            });
+        
+            formData.append('beneficiospromaco', JSON.stringify(beneficiosSeleccionados));
+        
+            // 13. Captura del Nivel de la Prueba (Psicosmart) y las pruebas mostradas
+            const nivelPrueba = document.getElementById('nivel_psicosmart').value;
+            formData.append('nivel_prueba', nivelPrueba);
+        
+            // Captura de las pruebas que están visibles en el `pruebas_td`
+            const pruebasTd = document.getElementById('pruebas_td');
+            const pruebas = [];
+            if (pruebasTd) {
+                const pruebasTextos = pruebasTd.querySelectorAll('p');
+                pruebasTextos.forEach(prueba => {
+                    pruebas.push(prueba.textContent.trim());
+                });
+            }
+            formData.append('psicometricas', JSON.stringify(pruebas));
+        
+            // 14. Captura de Montacargas y Equipo Pesado
+            const montacargas = document.querySelector('input[name="otros[]"][value="MONTACARGA"]:checked') ? "MONTACARGA" : null;
+            const equipoPesado = document.querySelector('input[name="otros[]"][value="EQUIPO PESADO"]:checked') ? "EQUIPO PESADO" : null;
+            
+            formData.append('montacargas', montacargas);
+            formData.append('esquipo_pegado', equipoPesado);
+        
+            // 15. Captura de los indicadores dinámicos
+            const indicadores = document.querySelectorAll('input[name="indicador[]"]');
+            let indicadoresArray = [];
+        
+            indicadores.forEach((indicadorInput) => {
+                const indicador = indicadorInput.value;
+                if (indicador) {
+                    indicadoresArray.push(indicador);
+                }
+            });
+        
+            formData.append('principales_indicadores', JSON.stringify(indicadoresArray));
+        
+            const perfilPuestoId = document.getElementById('perfil_puesto_id').value;
+        
+        
+            // Enviar los datos al servidor para la actualización
+            fetch(`/PerfilesPuestos/Update/${perfilPuestoId}/`, { 
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'warning',
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-alertas-button'
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: 'Perfil de puesto actualizado correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar',
+                        customClass: {
+                            confirmButton: 'custom-alertas-button'
+                        }
+                    }).then(() => {
+                        window.location.href = "/PerfilesPuestos/";
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                });
+            });
+        
+        };
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+    document.addEventListener('DOMContentLoaded', function() {
+        var dynamicField = document.getElementById("dynamicField");
+        var puestoSelect = document.getElementById("puesto_select");
+        var nombreCargo = dynamicField.getAttribute('data-nombre-cargo');  // El valor actual de perfil_puesto.nombre_cargo
+        var optionFound = false;  // Bandera para verificar si se encuentra el valor en las opciones
+
+        // Verificar si el valor de nombreCargo está en las opciones del select
+        for (var i = 0; i < puestoSelect.options.length; i++) {
+            if (puestoSelect.options[i].value === nombreCargo) {
+                optionFound = true;
+                break;
+            }
+        }
+
+        // Si no se encontró el valor en el select, mostrar el campo de texto
+        if (!optionFound) {
+            dynamicField.innerHTML = `
+                <input type="text" name="nuevo_puesto" id="nuevo_puesto" class="inputpuesto" placeholder="Ingrese un nuevo puesto" value="${nombreCargo}">
+            `;
+
+            // Aplicar la funcionalidad de transformación a mayúsculas al nuevo input
+            var nuevoInput = document.getElementById("nuevo_puesto");
+            nuevoInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var paragraph = document.getElementById("text");
+        var button = document.getElementById("toggleButton");
+        var tipoPerfil = "{{ perfil_puesto.tipo_perfil }}";  // Capturar el valor de tipo_perfil desde Django
+    
+        // Verificar el estado inicial de perfil_puesto.tipo_perfil y ajustar el botón y el texto
+        if (tipoPerfil === "PERFIL NUEVO") {
+            paragraph.innerHTML = "PERFIL NUEVO";
+            button.innerHTML = "PERFIL EXISTENTE";
+        } else {
+            paragraph.innerHTML = "PERFIL EXISTENTE";
+            button.innerHTML = "PERFIL NUEVO";
+        }
+    });
+    
+    // Función para alternar entre "PERFIL NUEVO" y "PERFIL EXISTENTE"
+    function toggleTextAndField() {
+        var paragraph = document.getElementById("text");
+        var button = document.getElementById("toggleButton");
+        var dynamicField = document.getElementById("dynamicField");
+    
+        if (paragraph.innerHTML === "PERFIL NUEVO") {
+            paragraph.innerHTML = "PERFIL EXISTENTE";
+            button.innerHTML = "PERFIL NUEVO";
+    
+            dynamicField.innerHTML = `
+                    <select name="puesto_select" id="puesto_select">
+                        <option value="" selected disabled>Seleccione un Puesto</option>
+                        {% for item in all_puestos %}
+                            <option value="{{ item.nombre_puestos }}">
+                                {{ item.nombre_puestos }}
+                            </option>
+                        {% endfor %}
+                    </select>
+            `;
+        } else {
+            paragraph.innerHTML = "PERFIL NUEVO";
+            button.innerHTML = "PERFIL EXISTENTE";
+    
+            dynamicField.innerHTML = `
+                <input type="text" name="nuevo_puesto" id="nuevo_puesto" class="inputpuesto" placeholder="Ingrese un nuevo puesto">
+            `;
+    
+            var nuevoInput = document.getElementById("nuevo_puesto");
+            nuevoInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+    }
+
+
+    </script>
+
+     {% comment %} <script>
+        window.onload = function() {
+            window.print();  
+        };
+    
+        window.onafterprint = function() {
+            window.location.href = "{% url 'cesantias' %}";  
+        };
+    </script> {% endcomment %}
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+
+</body>
+
+</html>

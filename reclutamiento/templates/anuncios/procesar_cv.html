@@ -1,0 +1,478 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Trabaja con nosotros{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Iconos -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Nerko+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <!-- Moment.js y Moment-Timezone -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+    <!-- CSS y JS de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    </head>
+<div id="menu" class="encabezadocv">
+    <div class="encabezadocvizquierda">
+        <img src="{% static "img/LOGOPRINCIPAL.png" %}" alt="">
+    </div>
+    <div class="encabezadocvderecha">
+        <h5><b><a href="#inicio" class="scroll-link">Inicio</a></b></h5>
+        <h5><b><a href="#sobrenosotros" class="scroll-link">Sobre nosotros</a></b></h5>
+        <h5><b><a href="#contactanos" class="scroll-link">Contactanos</a></b></h5>
+    </div>
+</div>
+<div id="inicio" class="foto">
+    <div class="espaciado">
+        <div class="textos">
+            <h1 style="margin-left:10%">¿Quieres trabajar con nosotros?</h1>
+            <h4 style="margin-left:15%">Envianos tu hoja de vida</h4>
+        </div>
+    </div>
+    <div class="formulario">
+        <form id="register-form-bolsaempleo" style="margin-top:20px" enctype="multipart/form-data">
+    
+            <!-- Grupo horizontal para DNI y Nombre Completo -->
+            <div class="form-horizontal-group">
+                <div class="form-group">
+                    <label>DNI</label>
+                    <input type="text" name="dni" id="dni" class="form-control" maxlength="13"
+                        oninput="validateNumber(this)"
+                        title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                        placeholder="DNI" >
+                </div>
+                <div class="form-group">
+                    <label for="nombre_candidato">Nombre Completo</label>
+                    <input type="text" name="nombre_candidato" id="nombre_candidato" class="form-control"
+                        placeholder="Nombre Completo">
+                </div>
+            </div>
+        
+            <!-- Grupo horizontal para Número de Teléfono y Fecha de Nacimiento -->
+            <div class="form-horizontal-group">
+                <div class="form-group">
+                    <label for="telefono">Número de Teléfono</label>
+                    <input type="text" name="telefono" id="telefono" class="form-control"
+                        placeholder="Número de teléfono" oninput="validateNumber(this)">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" name="fechanacimiento" id="fechanacimiento" class="form-control"
+                        onchange="calculateAge()">
+                </div>
+            </div>
+    
+            <div id="edaddiv" class="form-group">
+                <label>Edad</label>
+                <input type="text" name="edad" id="edad" class="form-control" placeholder="Edad"
+                    readonly disabled>
+            </div>
+    
+    
+            <div class="form-group">
+                <label for="puesto">Puesto al que Aspira</label>
+                <div class="custom-select-wrapper">
+                    <div id="select-puestos-aspira" class="custom-select">
+                        Seleccione uno o más puestos
+                    </div>
+                    <div class="custom-options" id="options-puestos-aspira">
+                        {% for item in puestos %}
+                            <label>
+                                <input type="checkbox" value="{{ item.id }}" name="puestoaspira[]">
+                                {{ item.nombre_puestos }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-horizontal-group">
+                <div class="form-group">
+                    <label for="ciudad">Ciudad</label>
+                    <select name="ciudad" id="ciudad" class="form-control">
+                        <option value="" selected disabled>Seleccione una Ciudad</option>
+                        {% for item in ciudades %}
+                        <option value="{{ item.id }}">{{ item.nombre_ciudades }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+        
+        
+                <div class="form-group">
+                    <label for="observacion">Aspiración Salarial</label>
+                    <input type="number" name="observacion" placeholder="Aspiracion Salarial" class="form-control" id="observacion">
+                </div>
+            </div>
+    
+            <div class="form-group">
+                <label for="experiencia">Experiencia</label>
+                <input type="text" name="experiencia" placeholder="Experiencia Laboral" id="experiencia" class="form-control">
+            </div>
+    
+    
+            <div class="form-group">
+                <label for="cv">CV</label>
+                <div class="file-drop-area" id="file-drop-area">
+                    <span class="file-message">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                    <input type="file" id="cv" name="cv" class="form-control" accept=".pdf">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn classbotones">Enviar</button>
+            </div>
+        </form>
+    </div>    
+</div>
+<div id="sobrenosotros" class="sobrenosotros">
+    <div class="titulosobrenotroso">
+        <h1>Sobre Nosotros</h1>
+    </div>
+    <div class="footersobrenosotros">
+        <div class="nosotros">
+            <h3><ion-icon name="location-outline" class="icon"></ion-icon><b>Sedes en Choluteca y Valle</b></h3>
+            <p>
+                Contamos con sucursales clave en Choluteca y Valle, lo que le permite cubrir una amplia área de distribución.
+            </p>
+        </div>
+        <div class="nosotros">
+            <h3><ion-icon name="star-outline" class="icon"></ion-icon><b>Compromiso con la Calidad</b></h3>
+            <p>
+                Comprometidos con la calidad y el servicio al cliente, en Promaco nos esforzamos por ser líderes en el mercado nacional
+            </p>
+        </div>
+        <div class="nosotros">
+            <h3><ion-icon name="trophy-outline" class="icon"></ion-icon><b>Trayectoria Sólida y Confiable</b></h3>
+            <p>Desde nuestra fundación en 1983, Promaco se ha consolidado como una empresa líder y confiable en el mercado hondureño</p>
+        </div>
+        <div class="nosotros">
+            <h3><ion-icon name="construct-outline" class="icon"></ion-icon><b>Construcción</b></h3>
+            <p>Promaco ofrece una gama completa de soluciones integrales para la industria de la construcción. Desde herramientas y materiales hasta asesoría personalizada. </p>
+        </div>
+    </div>
+</div>
+
+<div id="contactanos" class="contactanos">
+    <br>
+    <div class="titulosobrenotroso">
+        <h1 style="color: black;">Contactanos</h1>
+    </div>
+    <div class="bodycontactanos">
+        <ion-icon name="mail-outline" class="iconocorreo"></ion-icon>
+        <h4>reclutamiento@promacohn.com</h4>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menu = document.getElementById('menu');
+        const offsetTop = menu.offsetTop;
+
+        function stickyMenu() {
+            if (window.pageYOffset > offsetTop) {
+                menu.classList.add('sticky');
+                document.body.classList.add('sticky-offset'); 
+            } else {
+                menu.classList.remove('sticky');
+                document.body.classList.remove('sticky-offset');
+            }
+        }
+
+        window.addEventListener('scroll', stickyMenu);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para inicializar el comportamiento de selección personalizada
+        function initializeCustomSelect(selectWrapperId, optionsWrapperId) {
+            const selectWrapper = document.getElementById(selectWrapperId);
+            const optionsWrapper = document.getElementById(optionsWrapperId);
+            const checkboxes = optionsWrapper.querySelectorAll('input[type="checkbox"]');
+            const dropdownIcon = document.createElement('i');
+            dropdownIcon.className = 'dropdown-icon fas fa-chevron-down';
+            let selectedText = 'Seleccione uno o más puestos';
+            
+            // Función para actualizar el texto del select
+            function updateSelectedText() {
+                const selectedValues = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.parentElement.textContent.trim());
+        
+                selectWrapper.textContent = selectedValues.length > 0 ? selectedValues.join(', ') : selectedText;
+                selectWrapper.appendChild(dropdownIcon); // Volvemos a añadir el icono
+            }
+        
+            // Evento para abrir/cerrar el select personalizado
+            selectWrapper.addEventListener('click', function() {
+                selectWrapper.classList.toggle('active');
+            });
+        
+            // Evento para actualizar el texto al seleccionar/desseleccionar opciones
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedText);
+            });
+        
+            // Cerrar el select personalizado al hacer clic fuera de él
+            document.addEventListener('click', function(event) {
+                if (!selectWrapper.contains(event.target) && !optionsWrapper.contains(event.target)) {
+                    selectWrapper.classList.remove('active');
+                }
+            });
+            
+            // Añadir el icono de dropdown al select personalizado
+            selectWrapper.appendChild(dropdownIcon);
+        }
+        
+        // Inicializar para todos los selectores personalizados
+        initializeCustomSelect('select-puestos-aspira', 'options-puestos-aspira');
+    });
+
+
+    function calculateAge() {
+        const dobInput = document.getElementById('fechanacimiento').value;
+        if (!dobInput) return;
+        const dob = moment(dobInput);
+        const now = moment.tz('America/Tegucigalpa');
+        const age = now.diff(dob, 'years');
+        document.getElementById('edad').value = age;
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Selecciona todos los contenedores con clase 'file-drop-area'
+        var fileDropAreas = document.querySelectorAll('.file-drop-area');
+    
+        fileDropAreas.forEach(function(fileDropArea) {
+            var fileInput = fileDropArea.querySelector('input[type="file"]');
+            var fileMessage = fileDropArea.querySelector('.file-message');
+    
+            // Asegurarnos de que los eventos se aplican solo una vez
+            if (fileInput && fileMessage) {
+                // Evitar el comportamiento por defecto para eventos de arrastrar y soltar
+                fileDropArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.add('dragover');
+                });
+    
+                fileDropArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.remove('dragover');
+                });
+    
+                fileDropArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fileDropArea.classList.remove('dragover');
+    
+                    var files = e.dataTransfer.files; // Obtener los archivos arrastrados
+                    if (files.length > 0) {
+                        fileInput.files = files; // Asignar archivos al input file
+                        fileMessage.textContent = files[0]
+                            .name; // Mostrar el nombre del archivo
+                    }
+                });
+    
+                // Mostrar el nombre del archivo seleccionado manualmente
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length > 0) {
+                        fileMessage.textContent = fileInput.files[0].name;
+                    } else {
+                        fileMessage.textContent =
+                            "Arrastra tu archivo aquí o haz clic para seleccionar";
+                    }
+                });
+            }
+        });
+    });
+
+    function validateNumber(input) {
+        input.value = input.value.replace(/[^0-9.+]/g, '');
+      }
+    
+    document.getElementById('register-form-bolsaempleo').addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        // Intentar obtener los valores de los campos de forma segura
+        const dniElement = document.getElementById('dni');
+        const nombreCandidatoElement = document.getElementById('nombre_candidato');
+        const telefonoElement = document.getElementById('telefono');
+        const fechanacimientoElement = document.getElementById('fechanacimiento');
+        const observacionElement = document.getElementById('observacion');
+        const telefono2Element = document.getElementById('telefono2'); // Si este campo no es obligatorio
+    
+        // Si alguno de los campos obligatorios no existe, mostrar un error
+        if (!dniElement || !nombreCandidatoElement || !telefonoElement) {
+            console.error('Uno o más campos obligatorios no se encontraron en el DOM.');
+            return;
+        }
+    
+        // Obtener los valores de forma segura
+        const dni = dniElement.value.trim();
+        const nombreCandidato = nombreCandidatoElement.value.trim();
+        const telefono = telefonoElement.value.trim();
+        const fechaNacimiento = fechanacimientoElement ? fechanacimientoElement.value : null;
+        const observacion = observacionElement ? observacionElement.value.trim() : null;
+        const telefono2 = telefono2Element ? telefono2Element.value.trim() : null;
+    
+        const puestosaspira = Array.from(document.querySelectorAll('input[name="puestoaspira[]"]:checked')).map(el => el.value);
+    
+        // Validación de campos obligatorios
+        if (!nombreCandidato || !telefono || puestosaspira.length === 0) {
+            let camposFaltantes = [];
+            if (!nombreCandidato) camposFaltantes.push("Nombre del Candidato");
+            if (!telefono) camposFaltantes.push("Teléfono");
+            if (puestosaspira.length === 0) camposFaltantes.push("Puesto al que Aspira");
+    
+            Swal.fire({
+                title: 'Error',
+                text: 'Los siguientes campos son obligatorios: ' + camposFaltantes.join(', ') + '.',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    confirmButton: 'custom-alertas-button'
+                }
+            });
+            return;
+        }
+    
+        // Validar si se ha seleccionado un archivo y si es un PDF
+        const archivo = document.getElementById('cv').files[0];
+        if (archivo && archivo.type !== 'application/pdf') {
+            Swal.fire({
+                title: 'Error',
+                text: 'Solo se permiten documentos en formato PDF.',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    confirmButton: 'custom-alertas-button'
+                }
+            });
+            return;
+        }
+    
+        // Validar el formato de fecha de nacimiento si se ingresó
+        if (fechaNacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimiento)) {
+            Swal.fire({
+                title: 'Error',
+                text: 'La fecha de nacimiento debe estar en el formato YYYY-MM-DD.',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    confirmButton: 'custom-alertas-button'
+                }
+            });
+            return;
+        }
+    
+        // Añadir el texto "Aspiración Salarial: " al campo de observación
+        const aspiracionSalarial = observacion ? `Aspiración Salarial: ${observacion}` : null;
+    
+        // Crear objeto de datos
+        const data = {
+            dni: dni,
+            nombre_candidato: nombreCandidato,
+            puestoaspira: puestosaspira,
+            telefono: telefono,
+            telefono2: telefono2 || null,
+            estado: 'REGISTRADO',  // Enviar estado automáticamente como "REGISTRADO"
+            ciudad: document.getElementById('ciudad').value || null,
+            mediosReclutamiento: document.getElementById('mediosReclutamiento')?.value || null,
+            edad: document.getElementById('edad')?.value || null,
+            fechanacimiento: fechaNacimiento || null,
+            estadocivil: document.getElementById('estadocivil')?.value || null,
+            nhijos: document.getElementById('nhijos')?.value.trim() || null,
+            direccion: document.getElementById('direccion')?.value.trim() || null,
+            experiencia: document.getElementById('experiencia')?.value.trim() || null,
+            observacion: aspiracionSalarial,
+            mediomovilizacion: document.getElementById('mediomovilizacion')?.value || null
+        };
+    
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(data));
+        if (archivo) {
+            formData.append('cv', archivo); // Añadir archivo PDF si existe
+        }
+    
+        fetch('/TrabajaconNosotros/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken') // Asegúrate de que el token esté disponible
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Sus datos han sido recibidos y procesados correctamente. Agradecemos que haya completado la encuesta y que desee unirse al gran equipo de trabajo de Promaco.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                }).then(() => {
+                    location.reload(); // Recargar la página después de guardar exitosamente
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al registrar al candidato.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    confirmButton: 'custom-alertas-button'
+                }
+            });
+        });
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<script src="{% static 'js/sweetaler2.min.js' %}"></script>

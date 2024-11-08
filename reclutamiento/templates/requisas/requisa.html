@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Perfiles de Puesto
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+  <div class="dropdown">
+    <button class="dropbtn" style="display: flex; align-items: center;">
+        <i class="fas fa-user" style="margin-right: 5px;"></i>
+        {{ request.session.username }} 
+        <span style="margin: 0 10px;">|</span>
+        {% comment %} <span class="glow"></span>
+        <span style="margin-left: 10px" id="sesiones-activas">{{ sesiones_activas }}</span> {% endcomment %}
+      </button>
+    <div class="dropdown-content">
+        <a href="{% url 'logout' %}">Cerrar Sesión</a>
+    </div>
+  </div>
+  <form id="filterForm" action="{% url 'requisa' %}" method="GET">
+    <div class="encabezado">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+            </div>
+            <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+        </div>
+        <h1 class="titulo-encabezado">Requisas</h1>
+        {% if request.session.requisa_escribir %}
+        <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'requisaregistrar' %}'">Registrar Requisa</button>
+        {% endif %} 
+    </div>
+
+    <div class="tabla">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>
+                        Fecha Solicitud
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-fecha-solicitud')"></ion-icon>
+                        <div id="filtro-fecha-solicitud" class="filter-popup" style="display: none;">
+                            {% for fecha in all_fechas_creacion %}
+                                <label>
+                                    <input type="checkbox" name="fechacreacion" value="{{ fecha|date:'d/m/Y' }}" 
+                                        {% if fecha|date:'d/m/Y' in fechas_creacion %}checked{% endif %}
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ fecha|date:"d/m/Y" }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    
+                    <th>
+                        Fecha Recepción
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-fecha-recepcion')"></ion-icon>
+                        <div id="filtro-fecha-recepcion" class="filter-popup" style="display: none;">
+                            {% for fecha in all_fechas_recepcion %}
+                                <label>
+                                    <input type="checkbox" name="fecharecepcion" value="{{ fecha|date:'d/m/Y' }}" 
+                                        {% if fecha|date:'d/m/Y' in fechas_recepcion %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ fecha|date:"d/m/Y" }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Puesto
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-puesto')"></ion-icon>
+                        <div id="filtro-puesto" class="filter-popup" style="display: none;">
+                            {% for puesto in all_puestos %}
+                                <label>
+                                    <input type="checkbox" name="puesto" value="{{ puesto }}" 
+                                        {% if puesto in puestos %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ puesto }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Sucursal
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-sucursal')"></ion-icon>
+                        <div id="filtro-sucursal" class="filter-popup" style="display: none;">
+                            {% for sucursal in all_sucursales %}
+                                <label>
+                                    <input type="checkbox" name="sucursal" value="{{ sucursal }}" 
+                                        {% if sucursal in sucursales %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ sucursal }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Departamento
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-departamento')"></ion-icon>
+                        <div id="filtro-departamento" class="filter-popup" style="display: none;">
+                            {% for depto in all_departamentos %}
+                                <label>
+                                    <input type="checkbox" name="departamento" value="{{ depto }}" 
+                                        {% if depto in departamentos %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ depto }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Estado
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-estado')"></ion-icon>
+                        <div id="filtro-estado" class="filter-popup" style="display: none;">
+                            {% for estado in all_estados %}
+                                <label>
+                                    <input type="checkbox" name="estado" value="{{ estado }}" 
+                                        {% if estado in estados %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ estado }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    {% if request.session.requisa_escribir %}
+                    <th>Acciones</th>
+                    {% endif %} 
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in requisas %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.fechacreacion|date:"d/m/Y" }}</td>
+                        <td>{{ item.fechaRecepcion|date:"d/m/Y" }}</td>                        
+                        <td>{{ item.puesto }}</td>
+                        <td>{{ item.sucursal.nombre_sucursal }}</td> 
+                        <td>{{ item.departamento.nombre_departamento }}</td>
+                        <td style="
+                        {% if item.estado == 'EN PROCESO' %}
+                            color: orange;
+                        {% elif item.estado == 'APROBADO' %}
+                            color: green;
+                        {% elif item.estado == 'CANCELADA' %}
+                            color: red;
+                        {% endif %}
+                        ">
+                        {{ item.estado }}
+                        </td>
+                        {% if request.session.requisa_escribir %}
+                        <td>
+                            <div class="btn-grid">
+                                {% if item.estado == "EN PROCESO" %}
+                                    <div>
+                                        <button type="button" class="btn btn classbotones" 
+                                        onclick="window.location.href='{% url 'updaterequisa' item.id %}'">
+                                        <ion-icon name="create-outline" class="icon"></ion-icon>
+                                        </button>
+                                        <button type="button" class="btn btn-success" onclick="aprobarRequisa({{ item.id }})">
+                                            <ion-icon name="checkmark-circle-outline" class="icon"></ion-icon>
+                                        </button>
+                                    </div>
+                                    <div style="margin-top: 5px;">
+                                        <button type="button" class="btn btn-danger" onclick="cancelarRequisa({{ item.id }})">
+                                            <ion-icon name="close-circle-outline" class="icon"></ion-icon>
+                                        </button>
+                                        <button type="button" class="btn btn-info" onclick="duplicarRequisa({{ item.id }})">
+                                            <ion-icon name="copy-outline" class="icon"></ion-icon>
+                                        </button>  
+                                    </div>
+                                {% elif item.estado == "CANCELADA" or item.estado == "APROBADO" %}
+                                    <div>
+                                        <button type="button" class="btn btn-info" onclick="duplicarRequisa({{ item.id }})">
+                                            <ion-icon name="copy-outline" class="icon"></ion-icon>
+                                        </button>  
+                                    </div>
+                                {% endif %}
+                                <div style="margin-top: 5px;">
+                                    <button type="button" class="btn btn classbotones" 
+                                    onclick="window.location.href='{% url 'imprimirrequisa' item.id %}'">
+                                    <ion-icon name="print-outline" class="icon"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>                          
+                        </td>               
+                        {% endif %}          
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">No hay registros de requisiciones.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            
+        </table>
+    </div>
+</form>
+</div>
+<script type="application/json" id="requisas-data">
+    [
+        {% for item in requisas %}
+            {
+                "id": "{{ item.id }}"
+            }
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+  </script>
+  
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if requisas.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ requisas.previous_page_number }}&search={{ search }}{% for sucursal in sucursales %}&sucursal={{ sucursal }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for estado in estados %}&estado={{ estado }}{% endfor %}{% for puesto in puestos %}&puesto={{ puesto }}{% endfor %}{% for fecha in fechas_creacion %}&fechacreacion={{ fecha }}{% endfor %}{% for fecha in fechas_recepcion %}&fecharecepcion={{ fecha }}{% endfor %}">
+                    Anterior
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+            </li>
+        {% endif %}
+
+        {% for num in page_range %}
+            <li class="page-item {% if requisas.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&search={{ search }}{% for sucursal in sucursales %}&sucursal={{ sucursal }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for estado in estados %}&estado={{ estado }}{% endfor %}{% for puesto in puestos %}&puesto={{ puesto }}{% endfor %}{% for fecha in fechas_creacion %}&fechacreacion={{ fecha }}{% endfor %}{% for fecha in fechas_recepcion %}&fecharecepcion={{ fecha }}{% endfor %}">
+                    {{ num }}
+                </a>
+            </li>
+        {% endfor %}
+
+        {% if requisas.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ requisas.next_page_number }}&search={{ search }}{% for sucursal in sucursales %}&sucursal={{ sucursal }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for estado in estados %}&estado={{ estado }}{% endfor %}{% for puesto in puestos %}&puesto={{ puesto }}{% endfor %}{% for fecha in fechas_creacion %}&fechacreacion={{ fecha }}{% endfor %}{% for fecha in fechas_recepcion %}&fecharecepcion={{ fecha }}{% endfor %}">
+                    Siguiente
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Siguiente</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+<script src="{% static 'js/requisa.js' %}"></script>
+{% endblock %}

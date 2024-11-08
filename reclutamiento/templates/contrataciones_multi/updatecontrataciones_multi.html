@@ -1,0 +1,215 @@
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Registro de Contrataciones{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/contrataciones/contrataciones_multi.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container">
+        <form id="update-form-contratacion">
+            <input type="hidden" name="contratacion_id" value="{{ contratacion_multi.id }}">
+            <div class="header-section">
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo" rowspan="4">
+                            <img src="{% static 'img/logo_multi.png' %}" alt="img" width="120px">
+                        </td>
+                        <td class="header-title" rowspan="4">Registro de Contratación</td>
+                    </tr>
+                </table>
+        
+                <!-- Div para la imagen de la foto -->
+                <div class="photo-div" id="photoDiv">
+                    <div class="photo-placeholder" id="photoPlaceholder" style="cursor: pointer;">
+                        {% if contratacion_multi.ruta %}
+                            <img src="/static/img/contrataciones/contrataciones_multi/{{ contratacion_multi.nombreimagen }}" alt="Foto" class="uploaded-image" id="uploadedImage" style="width: 100px; height: 100%;" />
+                        {% else %}
+                            Foto
+                        {% endif %}
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                </div>
+
+            </div>
+            <br>
+        
+            <!-- Datos Generales -->
+            <fieldset>
+                <legend>Datos Generales</legend>
+                <div class="row1">
+                    <label>Primer Ingreso 
+                        <input type="radio" id="tipoIngresoPrimer" name="tipo_contratacion" value="PRIMER INGRESO" {% if contratacion_multi.tipo_contratacion == 'PRIMER INGRESO' %}checked{% endif %}>
+                    </label>
+                    <label>Reingreso 
+                        <input type="radio" id="tipoIngresoReingreso" name="tipo_contratacion" value="REINGRESO" {% if contratacion_multi.tipo_contratacion == 'REINGRESO' %}checked{% endif %}>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>1er. Nombre 
+                        <input type="text" id="nombre1" name="nombre1" value="{{ contratacion_multi.nombre1 }}">
+                    </label>
+                    <label>2do. Nombre 
+                        <input type="text" id="nombre2" name="nombre2" value="{{ contratacion_multi.nombre2 }}">
+                    </label>
+                    <label>1er. Apellido 
+                        <input type="text" id="apellido1" name="apellido1" value="{{ contratacion_multi.apellido1 }}">
+                    </label>
+                    <label>2do. Apellido 
+                        <input type="text" id="apellido2" name="apellido2" value="{{ contratacion_multi.apellido2 }}">
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Fecha de nacimiento <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="{{ contratacion_multi.fecha_nacimiento|date:'Y-m-d' }}" class="date-input"></label>
+                    <label>DNI
+                        <input type="text" maxlength="13" id="dni" name="dni" value="{{ contratacion_multi.dni }}">
+                    </label>                    
+                    <div class="row">
+                        <label>Género</label>
+                        <div class="radio-group">
+                            <label>Masculino 
+                                <input type="radio" id="generoMasculino" name="genero" value="M" {% if contratacion_multi.genero == 'M' %}checked{% endif %}>
+                            </label>
+                            <label>Femenino 
+                                <input type="radio" id="generoFemenino" name="genero" value="F" {% if contratacion_multi.genero == 'F' %}checked{% endif %}>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label>Dirección exacta 
+                        <input type="text" id="direccionexacta" name="direccionexacta" value="{{ contratacion_multi.direccionexacta }}">
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Municipio 
+                        <select id="municipio" name="municipio">
+                            <option value="" selected disabled></option>
+                            {% for item in all_municipios %}
+                            <option value="{{ item.id }}" {% if contratacion_multi.municipio_id == item.id %}selected{% endif %}>{{ item.nombre_municipio }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Departamento 
+                        <select id="departamento" name="departamento">
+                            <option value="" selected disabled></option>
+                            {% for item in all_departamentos %}
+                            <option value="{{ item.id }}" {% if contratacion_multi.departamento_id == item.id %}selected{% endif %}>{{ item.nombre_departamentohonduras }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Número de celular 
+                        <input type="text" id="telefono" name="telefono" value="{{ contratacion_multi.telefono }}">
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Estado Civil 
+                        <select id="estadoCivil" name="estado_civil">
+                            <option value="" selected disabled></option>
+                            <option value="SOLTERO" {% if contratacion_multi.estado_civil == 'SOLTERO' %}selected{% endif %}>SOLTERO</option>
+                            <option value="CASADO" {% if contratacion_multi.estado_civil == 'CASADO' %}selected{% endif %}>CASADO</option>
+                            <option value="DIVORCIADO" {% if contratacion_multi.estado_civil == 'DIVORCIADO' %}selected{% endif %}>DIVORCIADO</option>
+                            <option value="VIUDO" {% if contratacion_multi.estado_civil == 'VIUDO' %}selected{% endif %}>VIUDO</option>
+                            <option value="UNION LIBRE" {% if contratacion_multi.estado_civil == 'UNION LIBRE' %}selected{% endif %}>UNION LIBRE</option>
+                        </select>
+                    </label>
+                    <label>Profesión u oficio 
+                        <input type="text" id="profecion_oficio" name="profecion_oficio" value="{{ contratacion_multi.profecion_oficio }}">
+                    </label>
+                    <label>Último grado de estudio 
+                        <select id="ultimoGrado" name="ultimo_grado_estudio">
+                            <option value="" {% if not contratacion_multi.ultimo_grado_estudio %}selected{% endif %} disabled></option>
+                            <option value="PRIMARIA" {% if contratacion_multi.ultimo_grado_estudio == 'PRIMARIA' %}selected{% endif %}>PRIMARIA</option>
+                            <option value="SECUNDARIA" {% if contratacion_multi.ultimo_grado_estudio == 'SECUNDARIA' %}selected{% endif %}>SECUNDARIA</option>
+                            <option value="UNIVERSITARIA" {% if contratacion_multi.ultimo_grado_estudio == 'UNIVERSITARIA' %}selected{% endif %}>UNIVERSITARIA</option>
+                            <option value="MAESTRIA" {% if contratacion_multi.ultimo_grado_estudio == 'MAESTRIA' %}selected{% endif %}>MAESTRIA</option>
+                            <option value="DOCTORADO" {% if contratacion_multi.ultimo_grado_estudio == 'DOCTORADO' %}selected{% endif %}>DOCTORADO</option>
+                            <option value="SIN ESCOLARIDAD" {% if contratacion_multi.ultimo_grado_estudio == 'SIN ESCOLARIDAD' %}selected{% endif %}>SIN ESCOLARIDAD</option> <!-- Nueva opción añadida -->
+                        </select>
+                    </label>                    
+                </div>
+            </fieldset>
+
+            <!-- Datos Laborales -->
+            <fieldset>
+                <legend>Datos Laborales</legend>
+                <div class="row">
+                    <label>Puesto de trabajo 
+                        <input type="text" id="puestos" name="puestos" value="{{ contratacion_multi.puestos }}">
+                    </label>
+                    <label>Sucursal 
+                        <select id="sucursal" name="sucursal">
+                            <option value="" selected disabled></option>
+                            {% for item in all_sucursales %}
+                            <option value="{{ item.id }}" {% if contratacion_multi.sucursal_id == item.id %}selected{% endif %}>{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Fecha de ingreso <input type="date" id="fechaIngreso" name="fechaIngreso" value="{{ contratacion_multi.fecha_ingreso|date:'Y-m-d' }}" class="date-input"></label>
+                    <label>Salario 
+                        <input type="text" id="salario" name="salario" value="{{ contratacion_multi.salario }}">
+                    </label>
+                </div>
+            </fieldset>
+
+            <!-- En Caso de Emergencia -->
+            <fieldset>
+                <legend>En Caso de Emergencia Avisar a</legend>
+                <div class="row">
+                    <label>Nombre <input type="text" id="emergencia1" name="emergencia1" value="{{ contratacion_multi.nombre_emergencia }}"></label>
+                    <label>Parentesco <input type="text" id="parentesco1" name="parentesco1" value="{{ contratacion_multi.parentesco }}"></label>
+                </div>
+                <div class="row">
+                    <label>Teléfono <input type="text" id="telefonoEmergencia1" name="telefonoEmergencia1" value="{{ contratacion_multi.telefonoemergencia }}" oninput="validateNumber(this)"></label>
+                    <label>Enfermedad <input type="text" id="enfermedad" name="enfermedad" value="{{ contratacion_multi.enfermedad }}"></label>
+                </div>
+            </fieldset>
+
+            <!-- Autorización Beneficiario -->
+            <fieldset>
+                <legend>Autorizo como beneficiario en caso de fallecimiento a:</legend>
+                <div class="row">
+                    <label>Nombre 
+                        <input type="text" id="nombre_beneficiario" name="nombre_beneficiario" value="{{ contratacion_multi.nombre_beneficiario }}">
+                    </label>
+                    <label>DNI 
+                        <input type="text" maxlength="13" id="dni_beneficiario" name="dni_beneficiario" value="{{ contratacion_multi.dni_beneficiario }}">
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Parentesco 
+                        <input type="text" id="parentesco_beneficiario" name="parentesco_beneficiario" value="{{ contratacion_multi.parentesco_beneficiario }}">
+                    </label>
+                    <div id="porcentajeBeneficiario-container">
+                        <label>Porcentaje 
+                            <input type="text" autocomplete="nope" oninput="validateNumber(this)" value="{{ contratacion_multi.porcentaje }}" id="porcentajeBeneficiario" name="porcentajeBeneficiario">
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <br><br>
+            <div class="footer">
+                <hr style="width: 400px;">
+                <p>Firma o Huella Digital</p>
+            </div>
+
+            <div class="footer">
+                <button type="submit" class="print-button" id="guardarButton">Guardar</button>
+            </div>
+        </form>
+    </div>
+    <button class="print-button1" onclick="window.location.href='{% url 'contrataciones_multi' %}'">Volver</button>
+
+    <script src="{% static 'js/contrataciones/contrataciones_multi.js' %}"></script>
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+</body>
+
+</html>

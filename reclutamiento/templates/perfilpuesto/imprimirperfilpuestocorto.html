@@ -1,0 +1,270 @@
+{% load static %}
+{% load humanize %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Registrar Perfil de Puesto{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/perfilpuesto/perfilpuesto.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container1">   
+        <br><br>
+        <div class="cinta1div">
+            <div class="cinta"></div>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div class="imgdiv">
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO">
+        </div>
+        <div class="imgdiv">
+            <h1 style="font-size: 30px">PERFIL DE {{ perfil_puesto.nombre_cargo }}</h1>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <br><br>
+        <div class="cinta2div">
+        <div class="cinta2"></div>
+        </div>
+        <br><br>
+    </div>
+    <br>
+    <div class="container2">
+        <div class="encabezado">
+            <h3>1.  IDENTIFICACION DEL CARGO</h3>
+            <h5 id="text">Perfil Existente</h5>
+            <button type="button" id="toggleButton" class="btn classbotones" onclick="toggleTextAndField()">Puesto Nuevo</button>
+        </div>
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EMPRESA</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.empresa }}">
+                </td>                
+            </tr>
+            <tr>
+                <td><strong>NOMBRE DEL CARGO</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.nombre_cargo }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>DEPARTAMENTO</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.departamento }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>CARGO AL QUE REPORTA</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.cargo_al_que_reporta }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>CARGOS QUE LE REPORTAN</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.cargo_que_le_reportan }}">
+                </td>
+            </tr>
+        </table>     
+        
+        <br>
+        <h4>2.  REQUISITOS Y CONDICIONES DEL PERFIL  </h4>
+
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EDUCACIÓN UNIVERSITARIA</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.educacion_universitario }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>POSTGRADOS / ESPECIALIZACIONES </strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.postgrado_especializaciones }}">
+                </td>
+            </tr>     
+        </table>    
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td style="text-align:center; padding: 10px;">
+                    <strong>MISIÓN DEL CARGO Objetivo/ Propósito</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: white; color: black; font-weight: normal; padding:10px; text-align: justify;">
+                    {{ perfil_puesto.mision_cargo }}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table class="tabla-informacion2" id="tablaFunciones">
+            <tr>
+                <td colspan="4" style="text-align:center; padding: 10px;">
+                    <strong>FUNCIONES DEL CARGO</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">N*</td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+                    Función: Qué hace, sobre qué y con qué fines
+                </td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+                    Periodicidad
+                </td>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+                    Importancia de la función para lograr el objetivo del cargo (A-B-C)
+                </td>
+            </tr>
+        
+            <!-- Iteramos sobre las funciones cargadas desde el campo JSON -->
+            {% for funcion in perfil_puesto.funciones_cargo %}
+            <tr class="funcionRow">
+                <td class="numero-columna" style="text-align:center; background-color: white; color:black; width: 5%; font-size:12px;">
+                    {{ forloop.counter }}
+                </td>
+                <td class="selectpuesto" style="text-align:left; background-color: white; color:black; width: 60%; padding: 8px; text-align: justify; font-size:12px;">
+                    {{ funcion.funcion }}
+                </td>
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 20%; font-size:12px;">
+                    <select name="periodicidad[]" class="inputpuesto">
+                        <option value="" disabled>Seleccione una Periodicidad</option>
+                        <option value="SEMANAL" {% if funcion.periodicidad == "SEMANAL" %}selected{% endif %}>SEMANAL</option>
+                        <option value="DIARIA" {% if funcion.periodicidad == "DIARIA" %}selected{% endif %}>DIARIA</option>
+                        <option value="MENSUAL" {% if funcion.periodicidad == "MENSUAL" %}selected{% endif %}>MENSUAL</option>
+                        <option value="SEMANAL Y MENSUAL" {% if funcion.periodicidad == "SEMANAL Y MENSUAL" %}selected{% endif %}>SEMANAL Y MENSUAL</option>
+                    </select>
+                </td>
+                <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 10%; font-size:12px;">
+                    <select name="importancia[]" class="inputpuesto" id="importanciacargos">
+                        <option value="" disabled>Seleccione la importancia</option>
+                        <option value="A" {% if funcion.importancia == "A" %}selected{% endif %}>A</option>
+                        <option value="B" {% if funcion.importancia == "B" %}selected{% endif %}>B</option>
+                        <option value="C" {% if funcion.importancia == "C" %}selected{% endif %}>C</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <p>A: Muy importantes para lograr los objetivos marcados.</p>
+        <p>B: Medianamente importante para lograr los objetivos. </p>
+        <p>C: Prácticamente sin importancia para lograr los objetivos. </p>
+        <br>
+        <table class="tabla-informacion1" id="tablaIndicadores">
+            <tr>
+                <td style="text-align:center; padding: 10px;"><strong>Principales Indicadores</strong></td>
+            </tr>
+            {% if perfil_puesto.principales_indicadores %}
+                {% for indicador in perfil_puesto.principales_indicadores %}
+                <tr class="indicadorRow">
+                    <td class="selectpuesto" style="text-align:left; background-color: white; color:black; padding:10px;">
+                        {{ indicador }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        No hay indicadores disponibles.
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+        <div class="header" style="margin-top: 250px">
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>ELABORADO POR</p>
+            </div>
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>FIRMADO POR</p>
+            </div>
+        </div>
+        <div class="header-section">
+            <table class="header-table" id="table-encabezado">
+                <tr>
+                    <td class="header-logo" rowspan="4">
+                        <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO" style="width: 100px;">
+                        <p>Proveedora de Materiales de Construcción S de R.L.</p>
+                    </td>
+                    <td class="header-title" rowspan="4">PERFILES DE PUESTO</td>
+                    <td class="header-info">
+                        <p><strong>CÓDIGO:</strong> RRHH-RE-04</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>VERSIÓN:</strong> 02</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>FECHA DE ACTUALIZACIÓN:</strong> {{ perfil_puesto.fechaactualizacion|date:"d/m/Y H:i" }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>ELABORADO POR:</strong> DEPTO. PROCESO</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const textarea = document.getElementById('mision_cargo');
+        
+            function autoResizeTextarea() {
+                textarea.style.height = 'auto'; // Restablece la altura
+                textarea.style.height = (textarea.scrollHeight) + 'px'; // Ajusta la altura según el contenido
+            }
+        
+            autoResizeTextarea(); // Ajustar al cargar
+        
+            // Ajustar el textarea al imprimir
+            window.onbeforeprint = function () {
+                autoResizeTextarea();
+            };
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const textareas = document.querySelectorAll('.funcionInput');
+        
+            textareas.forEach(textarea => {
+                adjustHeight(textarea);
+                textarea.addEventListener('input', function () {
+                    adjustHeight(textarea);
+                });
+            });
+        
+            function adjustHeight(textarea) {
+                textarea.style.height = 'auto';
+                let scrollHeight = textarea.scrollHeight;
+        
+                // Añade un margen solo si el contenido parece cortado
+                if (textarea.scrollHeight > textarea.clientHeight) {
+                    scrollHeight += 7; // Ajusta este valor según el recorte que observes
+                }
+        
+                textarea.style.height = `${scrollHeight}px`;
+            }
+        });
+    </script>
+    <script>
+        window.onload = function() {
+            window.print();  
+        };
+    
+        window.onafterprint = function() {
+            window.location.href = "{% url 'perfilpuesto' %}";  
+        };
+    </script>
+</body>
+
+</html>

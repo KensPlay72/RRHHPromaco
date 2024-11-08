@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Perfiles de Puesto
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+{% include 'cerrarsesion.html' %}
+
+  <form id="filterForm" action="{% url 'perfilpuesto' %}" method="GET">
+    <div class="encabezado">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+        <h1 class="titulo-encabezado">Perfiles de Puesto</h1>
+        {% if request.session.perfilpuesto_escribir %}
+    <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'perfilpuestoregister' %}'">Registrar Candidato</button>
+    {% endif %}  
+</div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>
+                    Tipo Perfil
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-tipo-perfil')"></ion-icon>
+                    <div id="filtro-tipo-perfil" class="filter-popup" style="display: none;">
+                        {% for tipo in all_tipos_perfil %}
+                            <label>
+                                <input type="checkbox" name="tipo_perfil" value="{{ tipo }}" 
+                                    {% if tipo in tipos_perfil %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ tipo }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Empresa
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-empresa')"></ion-icon>
+                    <div id="filtro-empresa" class="filter-popup" style="display: none;">
+                        {% for empresa in all_empresas %}
+                            <label>
+                                <input type="checkbox" name="empresa" value="{{ empresa }}" 
+                                    {% if empresa in empresas %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ empresa }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Departamento
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-departamento')"></ion-icon>
+                    <div id="filtro-departamento" class="filter-popup" style="display: none;">
+                        {% for depto in all_departamentos %}
+                            <label>
+                                <input type="checkbox" name="departamento" value="{{ depto }}" 
+                                    {% if depto in departamentos %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ depto }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>
+                <th>
+                    Nombre Cargo
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-autorizador')"></ion-icon>
+                    <div id="filtro-autorizador" class="filter-popup" style="display: none;">
+                        {% for cargo in all_nombres_cargo %}
+                            <label>
+                                <input type="checkbox" name="nombre_cargo" value="{{ cargo }}" 
+                                    {% if cargo in nombres_cargo %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ cargo }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                  </th>
+                  <th>
+                    Fecha Actualización
+                    <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-fecha-actualizacion')"></ion-icon>
+                    <div id="filtro-fecha-actualizacion" class="filter-popup" style="display: none;">
+                        {% for fecha in all_fechas_actualizacion %}
+                            <label>
+                                <input type="checkbox" name="fecha_actualizacion" value="{{ fecha|date:'d/m/Y' }}" 
+                                    {% if fecha|date:'d/m/Y' in fechas_actualizacion %}checked{% endif %} 
+                                    onchange="document.getElementById('filterForm').submit();">
+                                {{ fecha|date:"d/m/Y" }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </th>     
+                {% if request.session.perfilpuesto_escribir %}           
+                <th>Acciones</th>
+                {% endif %} 
+            </tr>
+        </thead>        
+        <tbody>
+            {% for item in perfiles_puesto %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.tipo_perfil|default:'' }}</td>
+                    <td>{{ item.empresa|default:'' }}</td>
+                    <td>{{ item.departamento|default:'' }}</td>
+                    <td>{{ item.nombre_cargo|default:'' }}</td>
+                    <td>{{ item.fechaactualizacion|date:"d/m/Y h:i A" }}</td>
+                    {% if request.session.perfilpuesto_escribir %}
+                    <td>
+                        <div class="btn-grid">
+                            <div>
+                                <button type="button" class="btn btn classbotones" 
+                                onclick="window.location.href='{% url 'update_perfilpuesto' item.id %}'">
+                                <ion-icon name="create-outline" class="icon"></ion-icon>
+                                </button>
+                                <button type="button" class="btn btn classbotones" 
+                                onclick="window.location.href='{% url 'updatecompleto_perfilpuesto' item.id %}'">
+                                <ion-icon name="add-outline" class="icon"></ion-icon>
+                                </button>
+                            </div>
+                            <div style="margin-top: 5px;">
+                                {% if request.session.requisa_escribir %}
+                                <button type="button" class="btn btn classbotones" 
+                                onclick="window.location.href='{% url 'pefilrequisa' item.id %}'">
+                                <ion-icon name="document-outline" class="icon"></ion-icon>
+                                </button>
+                                {% endif %} 
+                                <button type="button" class="btn btn classbotones" 
+                                onclick="window.location.href='{% url 'imprimir_perfilpuesto' item.id %}'">
+                                    <ion-icon name="print-outline" class="icon"></ion-icon>
+                                </button>
+                            </div>
+                            <div style="margin-top: 5px;">
+                                <button type="button" class="btn btn classbotones" 
+                                onclick="window.location.href='{% url 'imprimir_perfilpuestocorto' item.id %}'">
+                                <i class="fas fa-print" class="icon"></i>
+                            </button>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %} 
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No hay registros de perfiles de puesto.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+</div>
+    <!-- Script para pasar los datos de departamentos al formulario de edición -->
+    <script type="application/json" id="departamentos-data">
+      [
+          {% for item in departamentos %}
+              {
+                  "id": "{{ item.id }}",
+                  "nombre_departamento": "{{ item.nombre_departamento|escapejs }}",
+                  "estado": "{{ item.estado|escapejs }}"
+              }
+              {% if not forloop.last %},{% endif %}
+          {% endfor %}
+      ]
+    </script>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if perfiles_puesto.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ perfiles_puesto.previous_page_number }}&search={{ search }}{% for tipo_perfil in tipos_perfil %}&tipo_perfil={{ tipo_perfil }}{% endfor %}{% for empresa in empresas %}&empresa={{ empresa }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for nombre_cargo in nombres_cargo %}&nombre_cargo={{ nombre_cargo }}{% endfor %}{% for fecha_actualizacion in fechas_actualizacion %}&fecha_actualizacion={{ fecha_actualizacion }}{% endfor %}">
+                        Anterior
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+    
+            {% for num in page_range %}
+                <li class="page-item {% if perfiles_puesto.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}&search={{ search }}{% for tipo_perfil in tipos_perfil %}&tipo_perfil={{ tipo_perfil }}{% endfor %}{% for empresa in empresas %}&empresa={{ empresa }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for nombre_cargo in nombres_cargo %}&nombre_cargo={{ nombre_cargo }}{% endfor %}{% for fecha_actualizacion in fechas_actualizacion %}&fecha_actualizacion={{ fecha_actualizacion }}{% endfor %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endfor %}
+    
+            {% if perfiles_puesto.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ perfiles_puesto.next_page_number }}&search={{ search }}{% for tipo_perfil in tipos_perfil %}&tipo_perfil={{ tipo_perfil }}{% endfor %}{% for empresa in empresas %}&empresa={{ empresa }}{% endfor %}{% for departamento in departamentos %}&departamento={{ departamento }}{% endfor %}{% for nombre_cargo in nombres_cargo %}&nombre_cargo={{ nombre_cargo }}{% endfor %}{% for fecha_actualizacion in fechas_actualizacion %}&fecha_actualizacion={{ fecha_actualizacion }}{% endfor %}">
+                        Siguiente
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Siguiente</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+
+{% endblock %}

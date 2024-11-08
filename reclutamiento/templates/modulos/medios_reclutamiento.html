@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Medios de Reclutamiento
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+
+  <div class="encabezado">
+    <form action="{% url 'medios_reclutamiento' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Medio de Reclutamiento</h1>
+    {% if request.session.listas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Medio de Reclutamiento</button>
+    {% endif %}
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Medio de Reclutamiento</th>
+                <th>Estado</th>
+                {% if request.session.listas_escribir %}
+                <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in medios_reclutamiento %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.nombre_medio_de_reclutamiento }}</td>
+                    <td>
+                        {% if item.estado == 'ACTIVO' %}
+                            <b style="color: green;">{{ item.estado }}</b>
+                        {% else %}
+                            <b style="color: red;">{{ item.estado }}</b>
+                        {% endif %}
+                    </td>
+                    {% if request.session.listas_escribir %}
+                    <td>
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaleditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Script para pasar los datos de medios al formulario de edición -->
+    <script type="application/json" id="medios-reclutamiento-data">
+      [
+          {% for item in medios_reclutamiento %}
+              {
+                  "id": "{{ item.id }}",
+                  "nombre_medio_de_reclutamiento": "{{ item.nombre_medio_de_reclutamiento|escapejs }}",
+                  "estado": "{{ item.estado|escapejs }}"
+              }
+              {% if not forloop.last %},{% endif %}
+          {% endfor %}
+      ]
+    </script>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <!-- Enlace a la página anterior -->
+            {% if medios_reclutamiento.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ medios_reclutamiento.previous_page_number }}&search={{ search }}&estado={{ estado }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+    
+            <!-- Rango de páginas -->
+            {% for num in page_range %}
+                {% if medios_reclutamiento.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}&estado={{ estado }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+    
+            <!-- Enlace a la página siguiente -->
+            {% if medios_reclutamiento.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ medios_reclutamiento.next_page_number }}&search={{ search }}&estado={{ estado }}">Siguiente</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Siguiente</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+</div>
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Medio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-medio-reclutamiento" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="text" name="nombre_medio_de_reclutamiento" id="nombre_medio_de_reclutamiento" class="form-control" placeholder="Nombre del medio de reclutamiento" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estado" id="estado" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Medio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-medio-reclutamiento">
+                    <div class="form-group">
+                        <input type="text" name="id_medio_reclutamiento_editar" id="id_medio_reclutamiento_editar" class="form-control" disabled />
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="nombre_medio_reclutamiento_editar" name="nombre_medio_reclutamiento_editar" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estadoeditar">Estado</label>
+                        <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/modulos/medio_reclutamiento.js' %}"></script>
+{% endblock %}

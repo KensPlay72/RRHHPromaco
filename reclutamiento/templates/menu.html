@@ -1,0 +1,118 @@
+<div class="l-navbar" id="navbar">
+  <nav class="nav">
+    <div>
+      <div class="nav__brand">
+        <ion-icon name="menu-outline" class="nav__toggle" id="nav-toggle"></ion-icon>
+        <a href="#" class="nav__logo">Promaco S.A</a>
+      </div>
+      <span>Promaco</span>
+      <hr>
+      <div class="nav__list">
+        <a href="{% url 'dashboard' %}" class="nav__link {% if request.path == '/Dashboard/' %}active{% endif %}">
+          <ion-icon name="home-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Dashboard</span>
+        </a>
+
+        {% if request.session.has_plazas_permission %}
+        <a href="{% url 'controlplazas' %}" class="nav__link {% if request.path == '/ControlPlazas/' %}active{% endif %}">
+          <ion-icon name="business-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Control de Plazas</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_users_permission %}
+        <a href="{% url 'users' %}" class="nav__link {% if request.path == '/Users/' %}active{% endif %}">
+          <ion-icon name="person-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Usuarios</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_bolsa_empleo_permission %}
+        <a href="{% url 'bolsaempleo' %}" class="nav__link {% if request.path == '/BolsaEmpleo/' %}active{% endif %}">
+          <ion-icon name="briefcase-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Bolsa de Empleo</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_contrataciones_permission %}
+        <a href="{% url 'contrataciones' %}" class="nav__link {% if request.path == '/Contrataciones/' %}active{% endif %}">
+          <ion-icon name="folder-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Contrataciones</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_cesantias_permission %}
+        <a href="{% url 'cesantias' %}" class="nav__link {% if request.path == '/Cesantias/' %}active{% endif %}">
+          <ion-icon name="cash-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Cesantias</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_perfilpuesto_permission %}
+        <a href="{% url 'perfilpuesto' %}" class="nav__link {% if request.path == '/PerfilesPuestos/' %}active{% endif %}">
+          <ion-icon name="document-text-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Perfil de Puesto</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_roles_permission %}
+        <a href="{% url 'consultarroles' %}" class="nav__link">
+          <ion-icon name="calendar-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Asistencia</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_requisa_permission %}
+        <a href="{% url 'requisa' %}" class="nav__link {% if request.path == '/Requisa/' %}active{% endif %}">
+          <ion-icon name="shield-checkmark-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Requisas</span>
+        </a>
+        {% endif %}
+
+        {% if request.session.has_inventario_permission %}
+        <a class="nav__link collapse__link {% if '/Inventario/' in request.path %}active{% endif %}">
+          <ion-icon name="arrow-down-outline" class="collapse__icon"></ion-icon>
+          <span class="nav__name">Inventario</span>
+        </a>
+        <div class="collapse__menu">
+          <a href="{% url 'telefonos' %}" class="collapse__sublink {% if request.path == '/Inventario/Telefonos/' %}active{% endif %}">Telefonos</a>
+        </div>
+        {% endif %}
+
+        {% if request.session.has_listas_permission %}
+        <a class="nav__link collapse__link {% if '/Listas/' in request.path %}active{% endif %}">
+          <ion-icon name="chevron-down-outline" class="collapse__icon"></ion-icon>
+          <span class="nav__name">Listas</span>
+        </a>
+        <div class="collapse__menu">
+          <a href="{% url 'jefes' %}" class="collapse__sublink {% if request.path == '/Listas/Jefes/' %}active{% endif %}">Jefes</a>
+          <a href="{% url 'colaboradores' %}" class="collapse__sublink {% if request.path == '/Listas/Colaboradores/' %}active{% endif %}">Colaboradores</a>
+          <a href="{% url 'horariosjefes' %}" class="collapse__sublink {% if request.path == '/Listas/Horarios/' %}active{% endif %}">Horarios de Jefes</a>
+          <a href="{% url 'sucursales' %}" class="collapse__sublink {% if request.path == '/Listas/Sucursales/' %}active{% endif %}">Sucursales</a>
+          <a href="{% url 'empresas' %}" class="collapse__sublink {% if request.path == '/Listas/Empresas/' %}active{% endif %}">Empresas</a>
+          <a href="{% url 'unidadnegocio' %}" class="collapse__sublink {% if request.path == '/Listas/Unidad_Negocio/' %}active{% endif %}">Unidad de Negocio</a>
+          <a href="{% url 'departamentos' %}" class="collapse__sublink {% if request.path == '/Listas/Departamentos/' %}active{% endif %}">Departamentos</a>
+          <a href="{% url 'ciudades' %}" class="collapse__sublink {% if request.path == '/Listas/Ciudades/' %}active{% endif %}">Ciudades</a>
+          <a href="{% url 'puestos' %}" class="collapse__sublink {% if request.path == '/Listas/Puestos/' %}active{% endif %}">Puestos</a>
+          <a href="{% url 'prioridades' %}" class="collapse__sublink {% if request.path == '/Listas/Prioridades/' %}active{% endif %}">Prioridad</a>
+          <a href="{% url 'modos' %}" class="collapse__sublink {% if request.path == '/Listas/Modos/' %}active{% endif %}">Modos</a>
+          <a href="{% url 'motivos' %}" class="collapse__sublink {% if request.path == '/Listas/Motivos/' %}active{% endif %}">Motivos</a>
+          <a href="{% url 'medios_reclutamiento' %}" class="collapse__sublink {% if request.path == '/Listas/MediosReclutamiento/' %}active{% endif %}">Medio de Reclutamiento</a>
+          <a href="{% url 'tipo_contrato' %}" class="collapse__sublink {% if request.path == '/Listas/TipoContrato/' %}active{% endif %}">Tipo de Contrato</a>
+          <a href="{% url 'psicosmart' %}" class="collapse__sublink {% if request.path == '/Listas/Psicosmart/' %}active{% endif %}">Psicosmart</a>
+        </div>
+        {% endif %}
+        
+
+        {% if request.session.has_contrataciones_multi_permission %}
+        <span>Multiservicio</span>
+        <hr>
+        <a href="{% url 'contrataciones_multi' %}" class="nav__link {% if request.path == '/Contrataciones_multi/' %}active{% endif %}">
+          <ion-icon name="folder-outline" class="nav__icon"></ion-icon>
+          <span class="nav__name">Contrataciones</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+</div>

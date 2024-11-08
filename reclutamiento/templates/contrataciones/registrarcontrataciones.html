@@ -1,0 +1,282 @@
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Registro de Contrataciones{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/contrataciones/contrataciones.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container">
+        <form id="register-form-contratacion">
+            <div class="header-section">
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo" rowspan="4">
+                            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="img" width="120px">
+                            <p>Proveedora de Materiales de Construcción S de R.L.</p>
+                        </td>
+                        <td class="header-title" rowspan="4">Registro de Contratación</td>
+                        <td class="header-info">
+                            <p><strong>CÓDIGO:</strong> RRHH-RE-10</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>VERSIÓN:</strong> 00</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>FECHA DE ACTUALIZACIÓN:</strong> 08/03/2024</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="header-info">
+                            <p><strong>ELABORADO POR:</strong> DEPTO. PROCESO</p>
+                        </td>
+                    </tr>
+                </table>
+        
+                <!-- Div para la imagen de la foto -->
+                <div class="photo-div" id="photoDiv">
+                    <div class="photo-placeholder" id="photoPlaceholder" style="cursor: pointer;">Foto</div>
+                    <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                </div>
+            </div>
+            <br>
+        
+            <!-- Datos Generales -->
+            <fieldset>
+                <legend>Datos Generales</legend>
+                <div class="row1">
+                    <label>Primer Ingreso <input type="radio" id="tipoIngresoPrimer" name="tipoIngreso" value="PRIMER INGRESO"></label>
+                    <label>Reingreso <input type="radio" id="tipoIngresoReingreso" name="tipoIngreso" value="REINGRESO"></label>
+                </div>
+                <div class="row">
+                    <label>1er. Nombre <input type="text" id="primerNombre" autocomplete="nope" name="primerNombre"></label>
+                    <label>2do. Nombre <input type="text" id="segundoNombre" autocomplete="nope" name="segundoNombre"></label>
+                    <label>1er. Apellido <input type="text" id="primerApellido" autocomplete="nope" name="primerApellido"></label>
+                    <label>2do. Apellido <input type="text" id="segundoApellido" autocomplete="nope" name="segundoApellido"></label>
+                </div>
+                <div class="row">
+                    <label>Fecha de nacimiento <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="date-input"></label>
+        
+                    <label>Municipio 
+                        <select id="municipio" name="municipio">
+                            <option value="" selected disabled></option>
+                            {% for item in all_municipios %}
+                            <option value="{{ item.id }}">{{ item.nombre_municipio }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+                    <div class="row">
+                        <label>Género</label>
+                        <div class="radio-group">
+                            <label>Masculino <input type="radio" id="generoMasculino" name="genero" value="M"></label>
+                            <label>Femenino <input type="radio" id="generoFemenino" name="genero" value="F"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label style="display: flex; align-items: center;">
+                        Dirección exacta 
+                        <input type="text" style="width: 500px;" autocomplete="nope" id="direccion" name="direccion">
+                    </label>
+                    <label style="display: flex; align-items: center;">
+                        Cédula 
+                        <input type="text" oninput="validateNumber(this)" maxlength="13"
+                            title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                            autocomplete="nope" id="cedula" name="cedula">
+                    </label>
+                </div>                
+                <div class="row">
+                    <label>Estado Civil
+                        <select id="estadoCivil" name="estadoCivil" style="width: 150px;">
+                            <option value="" selected disabled></option>
+                            <option value="SOLTERO">SOLTERO</option>
+                            <option value="CASADO">CASADO</option>
+                            <option value="DIVORCIADO">DIVORCIADO</option>
+                            <option value="VIUDO">VIUDO</option>
+                            <option value="UNION LIBRE">UNION LIBRE</option>
+                        </select>
+                    </label>
+                    <label style="margin-left: 50px">Tiene hijos <input type="checkbox" id="hijos" name="hijos"></label>
+                    <label>Profesión u oficio <input type="text" autocomplete="nope" id="profesion" name="profesion" style="width: 300px;"></label>
+                </div>
+                <div class="row">
+                    <label>Correo Electrónico <input type="email" autocomplete="nope"    id="correo" name="correo" style="width: 200px;"></label>
+                    <label>Departamento
+                        <select id="departamento" name="departamento">
+                            <option value="" selected></option>
+                            {% for item in all_departamentos_hn %}
+                            <option value="{{ item.id }}">{{ item.nombre_departamentohonduras }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+                    <label>Número de celular <input type="text" autocomplete="nope"  oninput="validateNumber(this)"  id="telefono" name="telefono"></label>
+                </div>
+            </fieldset>
+        
+            <!-- En Caso de Emergencia -->
+            <fieldset>
+                <legend>En Caso de Emergencia Avisar a</legend>
+                <div class="row">
+                    <label>1.Nombre <input type="text" autocomplete="nope" id="emergencia1" name="emergencia1"></label>
+                    <label>Parentesco <input type="text" autocomplete="nope" id="parentesco1" name="parentesco1"></label>
+                    <label>Teléfono <input type="text" autocomplete="nope"  oninput="validateNumber(this)"  id="telefonoEmergencia1" name="telefonoEmergencia1"></label>
+                </div>
+                <div class="row">
+                    <label>2.Nombre <input type="text" autocomplete="nope" id="emergencia2" name="emergencia2"></label>
+                    <label>Parentesco <input type="text" autocomplete="nope" id="parentesco2" name="parentesco2"></label>
+                    <label>Teléfono <input type="text" autocomplete="nope"  oninput="validateNumber(this)"  id="telefonoEmergencia2" name="telefonoEmergencia2"></label>
+                </div>
+            </fieldset>
+        
+            <!-- Nivel Educativo -->
+            <fieldset>
+                <legend>Nivel Educativo</legend>
+                <div class="row">
+                    <label>Alfabeta <input type="radio" id="alfabeta" name="alfabeta" value="ALFABETA"></label>
+                    <label>Analfabeta <input type="radio" id="analfabeta" name="alfabeta" value="ANALFABETA"></label>
+                    <label>Último grado de estudio
+                        <select id="ultimoGrado" name="ultimoGrado" style="width: 200px;">
+                            <option value="" selected disabled></option>
+                            <option value="DOCTORADO">DOCTORADO</option>
+                            <option value="MAESTRIA">MAESTRIA</option>
+                            <option value="PRIMARIA">PRIMARIA</option>
+                            <option value="SECUNDARIA">SECUNDARIA</option>
+                            <option value="SIN ESCOLARIDAD">SIN ESCOLARIDAD</option>
+                            <option value="UNIVERSITARIA">UNIVERSITARIA</option>
+                        </select>
+                    </label>
+                    <label for=""><input type="text" autocomplete="nope" id="ultimogradodetalle" name="ultimogradodetalle" style="width: 300px;"></label>
+                </div>
+                <div class="row">
+                    <label>¿Tiene algún Padecimiento o enfermedad?</label>
+                    <label>Si <input type="radio" id="padecimientoSi" name="padecimiento" value="si"></label>
+                    <label>No <input type="radio" id="padecimientoNo" name="padecimiento" value="no"></label>
+                </div>
+                <div class="row" id="detalleEnfermedad" style="display: none;">
+                    <label>Detalle la enfermedad <input type="text" autocomplete="nope" id="detalleEnfermedadInput" name="detalleEnfermedadInput"></label>
+                </div>
+            </fieldset>
+        
+            <!-- Datos Laborales -->
+            <fieldset>
+                <legend>Datos Laborales</legend>
+                <div class="row">
+                    <label>Puesto de trabajo 
+                        <select id="puesto" name="puesto" class="form-control" style="width: 300px;">
+                            <option value="" selected disabled></option>
+                            {% for item in all_puestos %}
+                            <option value="{{ item.id }}">{{ item.nombre_puestos }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+        
+                    <label>Unidad de negocio                        
+                        <select id="unidadnegocio" name="unidadnegocio" class="form-control">
+                            <option value="" selected disabled></option>
+                            {% for item in all_unidades_negocio %}
+                            <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+        
+                    <label>Salario <input type="text" autocomplete="nope" id="salario" name="salario"></label>
+                </div>
+        
+                <div class="row">
+                    <label>Comisión <input type="text"  autocomplete="nope" id="comision" name="comision"></label>
+                    <label>Bofa <input type="text" autocomplete="nope" id="bofa" name="bofa"></label>
+                    <label>Sucursal
+                        <select id="sucursal" name="sucursal" class="form-control">
+                            <option value="" selected disabled></option>
+                            {% for item in all_sucursales %}
+                            <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+                    <label>Tipo de contrato
+                        <select id="tipocontrato" name="tipocontrato" class="form-control">
+                            <option value="" selected disabled></option>
+                            {% for item in all_tipos_contrato %}
+                            <option value="{{ item.id }}">{{ item.nombre_tipo_de_contrato }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Fecha de ingreso <input type="date" id="fechaIngreso" name="fechaIngreso" class="date-input"></label>
+                    <label>Fecha de vencimiento <input type="date" id="fechavencimiento" name="fechavencimiento" class="date-input"></label>
+                    <label>Departamento de la empresa 
+                        <select id="departamentoEmpresa" name="departamentoEmpresa" class="form-control" style="width: 250px;">
+                            <option value="" selected disabled></option>
+                            {% for item in all_departamentos %}
+                            <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                        {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Direccion de la Empresa 
+                        <select id="direccionempresa" name="direccionempresa">
+                            <option value="" selected disabled></option>
+                            <option value="SAN LORENZO, ALDEA ALTOS DE LA FLOR, CONTIGUO A LA UCENM">SAN LORENZO, ALDEA ALTOS DE LA FLOR, CONTIGUO A LA UCENM</option>
+                            <option value="CARRETERA HACIA SAN MARCOS DE COLÓN 30 METROS ENTRADA AL RECABLIN">CARRETERA HACIA SAN MARCOS DE COLÓN 30 METROS ENTRADA AL RECABLIN</option>
+                            <option value="BARRIO LA CEIBITA">BARRIO LA CEIBITA</option>
+                            <option value="BARRIO LOS MANGOS, BULEVAR ENRIQUE WEDDLE, FRENTE A PIZZA HUT">BARRIO LOS MANGOS, BULEVAR ENRIQUE WEDDLE, FRENTE A PIZZA HUT</option>                        </select>
+                    </label>
+                </div>
+                <div class="row">
+                    <label>Nombre de la Empresa 
+                        <select id="nombreempresa" name="nombreempresa">
+                            <option value="" selected disabled></option>
+                            {% for item in all_empresas %}
+                            <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                        {% endfor %}
+                        </select>                        
+                    </label>
+                    <label>Teléfono de la Empresa <input type="text"  id="telefonoempresa" name="telefonoempresa" disabled value="2758-0530"></label>
+                </div>
+            </fieldset>
+        
+            <!-- Autorización Beneficiario -->
+            <fieldset>
+                <legend>Autorizo como beneficiario en caso de fallecimiento a:</legend>
+                <div class="row">
+                    <label>Nombre <input type="text" autocomplete="nope" id="nombreBeneficiario" name="nombreBeneficiario"></label>
+                    <label>Identidad <input type="text" autocomplete="nope"  oninput="validateNumber(this)" maxlength="13"  id="identidadBeneficiario"
+                        title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}" name="identidadBeneficiario"></label>
+                    <label>Parentesco <input type="text" autocomplete="nope" id="parentescoBeneficiario" name="parentescoBeneficiario"></label>
+                    <div id="porcentajeBeneficiario-container">
+                        <label>Porcentaje 
+                            <input type="text" autocomplete="nope" oninput="validateNumber1(this)" id="porcentajeBeneficiario" name="porcentajeBeneficiario">
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+            <br><br>
+            <!-- Firma o Huella -->
+            <div class="footer">
+                <hr style="width: 400px;">
+                <p>Firma o Huella Digital</p>
+            </div>
+        
+            <div class="footer">
+                <button type="submit" class="print-button" id="guardarButton">Guardar</button>
+            </div>
+        </form>        
+    </div>
+    <button class="print-button1" onclick="window.location.href='{% url 'contrataciones' %}'">Volver</button>
+
+    <script src="{% static 'js/contrataciones/contrataciones.js' %}"></script>
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+</body>
+
+</html>

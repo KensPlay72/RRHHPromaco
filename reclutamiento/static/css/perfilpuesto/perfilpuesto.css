@@ -1,0 +1,729 @@
+.container1 {
+    background-color: white;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+.container2 {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+
+.cinta {
+    width: 50%;
+    height: 20px;
+    background-color: #0F034E;
+    margin: 0;
+    position: relative;
+    clip-path: polygon(0 0, 95% 0, 100% 100%, 0% 100%);
+}
+
+img{
+    width: 500px;
+}
+
+.cinta2 {
+    width: 50%;
+    height: 20px;
+    background-color: #0F034E;
+    margin: 0;
+    position: relative;
+    clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+
+.imgdiv{
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+
+.cinta2div {
+    display: flex;
+    justify-content: flex-end; 
+    width: 100%;
+}
+
+.encabezado{
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    display: flex;
+}
+
+/*perfil de puesto*/
+.tabla-informacion {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; 
+}
+
+.tabla-informacion td {
+    border: 1px solid #000;
+    background-color: #e0edf3; 
+    word-wrap: break-word; 
+}
+
+.tabla-informacion tr td:first-child {
+    background-color: #073C64; 
+    color: white;
+    font-weight: bold;
+    width: 40%;
+}
+
+.tabla-informacion td:nth-child(2) {
+    background-color: #E7F3F7; 
+    width: 60%; 
+}
+
+
+/*perfil de puesto*/
+.tabla-informacion1 {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed; 
+}
+
+.tabla-informacion1 td {
+    border: 1px solid #000;
+    background-color: #e0edf3; 
+    word-wrap: break-word; 
+}
+
+.tabla-informacion1 tr td:first-child {
+    background-color: #073C64; 
+    color: white;
+    width: 40%;
+}
+
+.tabla-informacion1 td:nth-child(2) {
+    background-color: #E7F3F7; 
+    width: 60%; 
+}
+
+.inputpuesto1 {
+    width: 50%;
+    height: 100%; 
+    padding: 10px;
+    margin: 0; 
+    border: none !important; 
+    box-sizing: border-box; 
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: transparent;
+}
+
+.inputpuesto1:focus {
+    outline: none; 
+    background-color: transparent; 
+    box-shadow: none; 
+}
+
+/* Estilos para el select */
+.selectpuesto1 select {
+    width: 50%;
+    padding: 10px;
+    margin-left: 10px;
+    border: none;
+    box-sizing: border-box; 
+    appearance: none;
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    background-color: transparent; 
+    font-size: inherit;
+    color: inherit;
+    margin: 0;
+
+}
+
+.selectpuesto1 p {
+    margin: 0;
+    padding: 0 10px;
+    font-size: 1.8rem;
+    color: #000;
+    display: inline-block;
+}
+
+
+/*perfil de puesto*/
+.tabla-informacion2 {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabla-informacion2 td {
+    border: 1px solid #000;
+    background-color: #e0edf3; 
+    word-wrap: break-word; 
+}
+
+.tabla-informacion2 tr td:first-child {
+    background-color: #073C64; 
+    color: white;
+}
+
+.tabla-informacion2 td:nth-child(2) {
+    background-color: #E7F3F7; 
+}
+
+.selectpuesto select {
+    width: 100%;
+    height: 100%; 
+    padding: 0;
+    padding: 10px;
+    margin: 0; 
+    border: none; 
+    box-sizing: border-box; 
+    appearance: none;
+    -webkit-appearance: none; 
+    -moz-appearance: none; /* Elimina estilo en Firefox */
+    background-color: transparent; /* Fondo transparente */
+    font-size: inherit; /* Hereda el tamaño de fuente */
+    color: inherit; /* Hereda el color del texto */
+}
+
+.selectpuesto select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+
+.inputpuesto {
+    width: 100%;
+    height: 100%; 
+    padding: 10px;
+    margin: 0; 
+    border: none !important; 
+    box-sizing: border-box; 
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: transparent;
+}
+
+.inputpuesto:focus {
+    outline: none; /* Elimina el borde de enfoque */
+    background-color: transparent; 
+    box-shadow: none; /* Asegúrate de que no haya sombra */
+}
+
+
+
+.print-button1 {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde la parte izquierda */
+    z-index: 9999; /* Asegura que esté por encima de otros elementos */
+    padding: 10px 20px;
+    background-color: #0F034E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.print-button1:hover {
+    background-color: #1b0686;
+}
+
+.classbotones{
+    background-color: #0F034E !important;
+    color: white !important;
+}
+  
+.classbotones:hover{
+    background-color: #1b0686 !important;
+    color: white !important;
+}
+
+
+@media print {
+    body {
+        width: 216mm; /* Ancho carta */
+        height: 279mm; /* Alto carta */
+        margin: 0;
+    }
+
+    @page {
+        margin: 5mm; /* Márgenes iguales para todos los lados */
+        size: 216mm 279mm; /* Tamaño carta */
+    }
+
+    .container1, .container2 {
+        box-shadow: none;
+        padding: 10px;
+        width: 100%;
+        height: auto;
+    }
+
+    #toggleButton {
+        display: none;
+    }
+
+    .cinta, .cinta2 {
+        background-color: #0F034E !important; /* Forzar color de fondo específico */
+    }
+
+    .encabezado {
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        display: flex;
+    }
+
+    #tablaFunciones textarea {
+        resize: none; 
+    }
+    
+}
+
+textarea {
+    resize: none;  /* Desactiva el redimensionamiento manual */
+}
+
+
+/*SELECT MULTIPLE*/
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Estilo del select personalizado */
+.custom-select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    background-color: none;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.custom-select:focus {
+    box-shadow: none;
+    border-color: #000;
+}
+.custom-options {
+    display: none;
+    /* Oculto por defecto */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 0;
+}
+
+.custom-options label {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.custom-options label:hover {
+    background-color: #f0f0f0;
+}
+.custom-options input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+
+.custom-select.active+.custom-options {
+    display: block;
+}
+
+
+/*DIV PARA MOSTRAR LA IMAGEN ORGANIGRAMA*/
+.file-drop-area {
+    position: relative;
+    width: 80%;
+    height: 300px;
+    margin: 20px auto;
+    border: 2px dashed #0F034E;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+.file-drop-area.dragover {
+    background-color: #d1d1d1;
+}
+
+.file-message {
+    font-size: 16px;
+    color: #333;
+    z-index: 1; 
+}
+
+.file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0; 
+    cursor: pointer;
+}
+
+#previewImage {
+    width: 90%;
+}
+
+
+
+
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Espacio entre los checkboxes */
+    justify-content: space-between;
+}
+
+.custom-checkbox {
+    width: 30%; /* Ajusta el ancho para que haya 3 elementos por fila */
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+}
+
+.custom-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0; /* Ocultamos el checkbox original */
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #073C64;
+    border-radius: 4px;
+}
+
+.custom-checkbox:hover input[type="checkbox"] ~ .checkmark {
+    background-color: #f0f0f0;
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark {
+    background-color: #073C64;
+}
+
+.custom-checkbox .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark:after {
+    display: block;
+}
+
+.custom-checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Especifico para el campo de texto 'Otros' */
+#inputOtros {
+    width: auto;
+    flex: 1; /* Ocupa el espacio disponible al lado del checkbox "Otros" */
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+
+.custom-checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.custom-checkbox2 {
+    width: 45%; /* Ajusta el ancho para que haya 2 elementos por fila */
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+}
+
+.custom-checkbox2 input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark2 {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%); /* Centra verticalmente el checkmark */
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #073C64;
+    border-radius: 4px;
+}
+
+.custom-checkbox2:hover input[type="checkbox"] ~ .checkmark2 {
+    background-color: #f0f0f0;
+}
+
+.custom-checkbox2 input[type="checkbox"]:checked ~ .checkmark2 {
+    background-color: #073C64;
+}
+
+.custom-checkbox2 .checkmark2:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox2 input[type="checkbox"]:checked ~ .checkmark2:after {
+    display: block;
+}
+
+.custom-checkbox2 .checkmark2:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.selectcentrado {
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    text-align: center; 
+    text-align-last: center;
+    -moz-text-align-last: center; 
+}
+
+.selectcentrado option {
+    text-align: left;
+}
+
+#importanciacargos{
+    text-align: center;
+
+}
+.input-limpio {
+    width: 200px;
+    padding: 5px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    outline: none;
+    font-size: 14px; 
+    margin-left: 10px;
+}
+
+.custom-alertas-button {
+    background-color: #0F034E !important;
+    color: white !important;
+  }
+
+
+  input[type="text"] {
+    text-transform: uppercase;
+  }
+  
+  input[type="text"]::placeholder {
+    text-transform: none;
+  }
+
+  textarea {
+    text-transform: uppercase;
+}
+
+textarea::placeholder {
+    text-transform: none;
+}
+
+
+
+  /*---------filtros excel*/
+  th {
+    position: relative;
+}
+
+th .filter-icon {
+    position: absolute;
+    margin-left: 3%;
+    cursor: pointer;
+}
+
+.filter-popup label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.filter-popup label input {
+    margin-right: 10px;
+}
+
+.filter-popup {
+    background-color: white;
+    border: 1px solid #ccc;
+    position: absolute;
+    z-index: 100;
+    color: black;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 350px;
+    padding: 10px;
+    display: none;
+}
+
+
+
+.checkbox-row1 {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente fila */
+    gap: 15px; /* Espacio entre los elementos */
+}
+
+.custom-checkbox1 {
+    flex-basis: calc(33.333% - 10px); 
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: black;
+    box-sizing: border-box;
+}
+#previewImage_org {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+#table-encabezado {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; 
+}
+
+table.header-table {
+    width: 100%;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.header-table td {
+    border: 1px solid black;
+}
+
+.header-logo {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.header-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    width: 40%;
+    vertical-align: middle;
+}
+.header-info {
+    text-align: left; 
+    vertical-align: middle; 
+    padding-left: 2px; 
+    font-size: 10px;
+    line-height: 1; 
+}
+.header-info p {
+    position: relative;
+    top: 2px; 
+    margin: 0; 
+}
+
+
+.header{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.footerizquierdo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+

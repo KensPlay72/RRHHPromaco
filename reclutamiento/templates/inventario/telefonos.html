@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Telefonos
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+  <div class="encabezado">
+    <form action="{% url 'telefonos' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Telefonos</h1>
+    {% if request.session.inventario_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro" onclick="generarCorrelativo()">Entregar Telefono</button>
+    {% endif %}
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Correlativo</th>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Unidad de Negocio</th>
+                <th>Departamento</th>
+                <th>Id Teléfono</th>
+                <th>Estado</th>
+                {% if request.session.inventario_escribir %}
+                <th>Acciones</th> 
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in telefonia %}
+                <tr>
+                    <td>{{ item.correlativo }}</td>
+                    <td>{{ item.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ item.nombre }}</td> 
+                    <td>{{ item.dni }}</td> 
+                    <td>{{ item.unidad_de_negocio.nombre_unidad_de_negocio }}</td> 
+                    <td>{{ item.departamento.nombre_departamento }}</td> 
+                    <td>{{ item.nombretelefono }}</td> 
+                    <td>{{item.estado}}</td>
+                    {% if request.session.inventario_escribir %}
+                    <td>                       
+                        <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'imprimirentrega' item.id %}'"><ion-icon name="print-outline" class="icon"></ion-icon></button>
+                        {% if item.estado == "ASIGNADO"%}
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalreasignacion" data-editar="{{ item.id }}" onclick="llenarFormularioEditarCorrelativo(this)">
+                            <ion-icon name="repeat-outline" class="icon"></ion-icon>
+                        </button>
+                        {% endif %}     
+                        {% if item.estadotelefono == "NUEVO"  and item.estado == "ASIGNADO"%}
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modaldeduccion" data-editar="{{ item.id }}" onclick="llenarFormularioEditarCorrelativo2(this)">
+                            <ion-icon name="map-outline" class="icon"></ion-icon>
+                        </button>                
+                        {% endif %}     
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+    
+    <!-- Script para pasar los datos de motivos al formulario de edición -->
+    <script type="application/json" id="telefonia-data">
+        [
+            {% for item in telefonia %}
+                {
+                    "id": "{{ item.id }}",
+                    "fecha": "{{ item.fecha }}",
+                    "correlativo": "{{ item.correlativo|escapejs }}",
+                    "nombre": "{{ item.nombre|escapejs }}",
+                    "dni": "{{ item.dni|escapejs }}",
+                    "unidad_de_negocio_id": "{{ item.unidad_de_negocio.id }}",
+                    "unidad_de_negocio_nombre": "{{ item.unidad_de_negocio.nombre_unidad_de_negocio|escapejs }}",
+                    "departamento_id": "{{ item.departamento.id }}",
+                    "departamento_nombre": "{{ item.departamento.nombre_departamento|escapejs }}",
+                    "nombretelefono": "{{ item.nombretelefono|escapejs }}",
+                    "MEI": "{{ item.MEI|escapejs }}",
+                    "lineatelefonica": "{{ item.lineatelefonica|escapejs }}",
+                    "caracter": "{{ item.caracter|escapejs }}",
+                    "valor": "{{ item.valor }}",
+                    "tiempopago": "{{ item.tiempopago }}",
+                    "quinsena": "{{ item.quinsena }}",
+                    "asignacionnueva": "{{ item.asignacionnueva|escapejs }}",
+                    "valortotal": "{{ item.valortotal }}",
+                    "observacion": "{{ item.observacion|escapejs }}",
+                    "valorquincena": "{{ item.valorquincena }}",
+                    "estado": "{{ item.estado|escapejs }}"
+                }
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+    
+ 
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <!-- Enlace a la página anterior -->
+        {% if telefonia.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ telefonia.previous_page_number }}&search={{ search }}">Anterior</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+            </li>
+        {% endif %}
+
+        <!-- Rango de páginas -->
+        {% for num in page_range %}
+            {% if telefonia.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Enlace a la página siguiente -->
+        {% if telefonia.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ telefonia.next_page_number }}&search={{ search }}">Siguiente</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Siguiente</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="botones-container">
+    {% if request.session.inventario_escribir %}
+    <button id="controlTiempoButton" type="button" class="btn classbotones botonesinferioresdiv" onclick="window.location.href='{% url 'inventariotelefonos' %}'">Inventario</button>
+    {% endif %}  
+</div>
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Motivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Correlativo</label>
+                        <input type="text" name="correlativo" id="correlativo" class="form-control" disabled readonly />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" name="fecha" id="fecha" class="form-control"/>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" placeholder="Nombre del Reciviente" class="form-control"/>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">DNI</label>
+                        <input type="text" name="dni" id="dni" class="form-control" maxlength="13" oninput="validateNumber(this)" placeholder="DNI">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocio" id="unidadnegocio" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamento" id="departamento" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                                <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Telefono</label>
+                        <select name="telefono_nombre" id="telefono" class="form-control">
+                            <option value="" selected disabled>Seleccione un Teléfono</option>
+                            {% for item in all_telefonosinventario %}
+                                <option value="{{ item.nombretelefono }} - {{ item.estadotelefono }}">
+                                    {{ item.nombretelefono }} - {{ item.estadotelefono }}
+                                </option>
+                            {% endfor %}
+                        </select>                        
+                    </div>
+                    <input type="hidden" name="telefono_id" id="telefono_id_oculto" value="">
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">MEI</label>
+                        <input type="text" name="MEI" id="MEI" class="form-control" oninput="validateNumber(this)" placeholder="MEI Del Telefono">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">Linea Telefonica</label>
+                        <input type="text" name="lineatelefono" id="lineatelefono" class="form-control" maxlength="13" oninput="validateNumber(this)" placeholder="Linea Telefonica">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">Observación</label>
+                        <textarea name="observacion" id="observacion" row="3" class="form-control"></textarea>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="Nombre">Caracter</label>
+                        <select name="caracter" id="caracter" class="form-control" onchange="toggleDeducidoFields()">
+                            <option value="" disabled selected>SELECCIONE UN CARACTER</option>
+                            <option value="ASIGNADO">ASIGNADO</option>
+                            <option value="DEDUCIDO">DEDUCIDO</option>
+                        </select>
+                    </div>
+                    <br class="ocultardeducido" style="display:none;">
+                    <div class="form-group ocultardeducido" style="display:none;">
+                        <label for="Nombre">Tiempo de Pago</label>
+                        <input type="text" name="tiempopago" id="tiempopago" class="form-control" maxlength="2" oninput="validateNumber(this)" placeholder="Tiempo pago en meses">
+                    </div>
+                    <br class="ocultardeducido" style="display:none;">
+                    <div class="form-group ocultardeducido" style="display:none;">
+                        <label for="Nombre">En quincenas de</label>
+                        <input type="text" name="quincenas" id="quincenas" class="form-control" oninput="validateNumber(this)" placeholder="Valor de las quincenas">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" id="registrartelefonia" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalreasignacion" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Reasignar telefono</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-reciviente">
+                    <div class="form-group">
+                        <label for="nombre">Correlativo</label>
+                        <input type="text" class="form-control" id="correlativoreasignar" name="correlativoreasignar" disabled required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="nombre">Nombre del Reciviente</label>
+                        <input type="text" class="form-control" id="nombre_recivientereasignar" name="nombre_recivientereasignar" placeholder="Nombre del reciviente" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modaldeduccion" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Reasignar telefono</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-deduccion">
+                    <div class="form-group">
+                        <label for="nombre">Correlativo</label>
+                        <input type="text" class="form-control" id="correlativoreasignar2" name="correlativoreasignar2" disabled required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="nombre">Fecha de extravio</label>
+                        <input type="date" class="form-control" id="fechaextravio" name="fechaextravio" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/telefonos/telefonos.js' %}"></script>
+
+{% endblock %}

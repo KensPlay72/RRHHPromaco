@@ -1,0 +1,55 @@
+.container {
+    text-align: center;
+}
+
+h1 {
+    font-size: 3rem;
+    color: #333;
+}
+
+p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+a {
+    color: #3490dc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.encabezadocontroltiempo {
+    width: 100%;
+    height: 100px;
+    background-color: #0F034E;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.encabezadocontroltiempo img {
+    width: 12%;
+    height: 60%;
+    margin-left: 2%;
+}
+
+.encabezadocontroltiempo2 {
+    width: 100%;
+    height: 30px;
+    background-color: #C00000;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

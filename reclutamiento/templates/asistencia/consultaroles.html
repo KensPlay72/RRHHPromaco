@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Roles Registrados{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <link rel="stylesheet" href="{% static 'css/asistencia.css' %}">
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Roles Registrados</h1>
+
+        <div class="form-group">
+            <label for="jefe_select">Seleccionar Jefe:</label>
+            <select id="jefe_select" class="input-field">
+                <option value="">Seleccionar Jefe</option>
+                {% for jefe in jefes %}
+                    <option value="{{ jefe.identidadjefe }}">{{ jefe.nombrejefe }} ({{ jefe.codigo }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+
+        <div id="jefe_info" class="jefe-info" style="display: none;">
+            <div class="form-group">
+                <label for="codigo">Código del Jefe:</label>
+                <input type="text" id="codigo" class="input-field" disabled>
+            </div>
+            <div class="form-group">
+                <label for="nombre">Nombre del Jefe:</label>
+                <input type="text" id="nombre" class="input-field" disabled>
+            </div>
+            <input type="hidden" id="jefe_id">
+        </div>
+
+        <div class="form-group">
+            <label for="select_mes">Seleccionar Mes:</label>
+            <select id="select_mes" class="input-field" style="text-transform: uppercase;" disabled>
+                <option value="">Seleccionar Mes</option>
+                {% for numero, nombre in meses.items %}
+                    <option value="{{ numero }}">{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="select_año">Seleccionar Año:</label>
+            <select id="select_año" class="input-field" disabled>
+                <option value="">Seleccionar Año</option>
+                {% for year in años %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+    </div>
+
+    <div id="tabla_asistencia_container">
+    </div>
+        <div class="botones-container">
+        <a href="{% url 'exportar_asistencia' %}" id="bolsaempleoexcel" class="btn classbotones botonesinferioresdiv">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+        </a>
+    </div>
+        <br>
+
+        <button class="print-button1" onclick="window.location.href='{% url 'dashboard' %}'">Volver</button>
+        <script src="{% static 'js/roles/asistencia.js' %}"></script>
+        <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+
+        <script>
+            document.getElementById('jefe_select').addEventListener('change', function() {
+                const identidad = this.value;  // Obtenemos la identidad del jefe seleccionado
+                if (identidad) {
+                    fetch(`/buscar_jefe_por_identidad1/${identidad}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Código para llenar la información del jefe
+                            document.getElementById('jefe_id').value = data.jefe.id; // Asigna el ID del jefe
+                            document.getElementById('codigo').value = data.jefe.codigo; // Asigna el código del jefe
+                            document.getElementById('nombre').value = data.jefe.nombrejefe; // Asigna el nombre del jefe
+            
+                            // Hacer visible la sección de información del jefe
+                            document.getElementById('jefe_info').style.display = 'block';
+            
+                            // Cargar meses
+                            const selectMes = document.getElementById('select_mes');
+                            selectMes.innerHTML = "<option value=''>Seleccionar Mes</option>";
+                            for (const [numero, nombre] of Object.entries(data.meses)) {
+                                selectMes.innerHTML += `<option value="${numero}">${nombre}</option>`;
+                            }
+                            selectMes.disabled = false;
+            
+                            // Cargar años
+                            const selectAño = document.getElementById('select_año');
+                            selectAño.innerHTML = "<option value=''>Seleccionar Año</option>";
+                            data.años.forEach(year => {
+                                selectAño.innerHTML += `<option value="${year}">${year}</option>`;
+                            });
+                            selectAño.disabled = false;
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Identidad no encontrada.',
+                                icon: 'warning',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        }
+                    });
+                } else {
+                    // Ocultar información si no hay jefe seleccionado
+                    document.getElementById('jefe_info').style.display = 'none';
+                }
+            });
+            
+
+            document.getElementById('select_mes').addEventListener('change', cargarRolesRegistrados);
+            document.getElementById('select_año').addEventListener('change', cargarRolesRegistrados);
+
+            function cargarRolesRegistrados() {
+                const jefeId = document.getElementById('jefe_id').value;
+                const mes = document.getElementById('select_mes').value;
+                const año = document.getElementById('select_año').value;
+
+                if (jefeId && mes && año) {
+                    fetch(`/cargar_roles_registrados/${jefeId}/${mes}/${año}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const container = document.getElementById('tabla_asistencia_container');
+                            container.innerHTML = ""; // Limpiar el contenedor
+
+                            if (data.success) {
+                                // Crear la tabla y encabezados
+                                const table = document.createElement('table');
+                                table.id = 'tablarolesregistrados';
+                                table.border = "1";
+
+                                const thead = document.createElement('thead');
+                                const headerRow = document.createElement('tr');
+                                headerRow.innerHTML = `
+                                    <th>Nombre Colaborador</th>
+                                    <th>Semana</th>
+                                    <th>Horario Semana</th>
+                                    <th>Almuerzo</th>
+                                    <th>Horario Sábado</th>
+                                    <th>Domingo</th>
+                                    <th>Libre o Pagado</th>
+                                `;
+                                thead.appendChild(headerRow);
+                                table.appendChild(thead);
+
+                                const tbody = document.createElement('tbody');
+                                data.data.forEach(registro => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${registro.nombre_colaborador}</td>
+                                        <td>${registro.semana_inicio} - ${registro.semana_fin}</td>
+                                        <td>${registro.horario_semana}</td>
+                                        <td>${registro.almuerzo_inicio} - ${registro.almuerzo_fin}</td>
+                                        <td>${registro.horario_sabado || 'N/A'}</td>
+                                        <td>${registro.dia_libre_domingo ? 'Sí' : 'No'}</td>
+                                        <td>${registro.fecha_domingo_libre || 'N/A'}</td>
+                                    `;
+                                    tbody.appendChild(row);
+                                });
+                                table.appendChild(tbody);
+                                container.appendChild(table); // Añadir la tabla al contenedor
+                                container.style.display = 'block'; // Mostrar el contenedor de la tabla
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'No se encontraron registros.',
+                                    icon: 'info',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                                container.style.display = 'none'; // Ocultar la tabla si no hay datos
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al cargar roles registrados:", error);
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Ocurrió un error al cargar los registros.',
+                                icon: 'error',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        });
+                }
+            }
+
+        </script>
+</body>
+</html>

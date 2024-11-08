@@ -1,0 +1,336 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+img{
+    width: 100px;
+}
+.btn-grid {
+    display: grid;
+    grid-template-columns: 0fr 1fr; 
+    gap: 5px; 
+}
+
+.btn-grid div {
+    display: contents; 
+}
+
+.btn-grid button {
+    width: 45px; 
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    /* Flex para la tabla y el div de la imagen */
+}
+
+table.header-table {
+    width: 80%;
+    /* Reduce el ancho de la tabla */
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.header-table td {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.header-logo {
+    text-align: center;
+    width: 30%;
+    vertical-align: middle;
+}
+
+.header-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    width: 40%;
+    vertical-align: middle;
+}
+
+.header-info {
+    width: 30%;
+    font-size: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+/* Estilo para el div principal de la imagen */
+.photo-div {
+    width: 18%;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+}
+
+/* Estilo para el placeholder de la foto */
+.photo-placeholder {
+    width: 100px;
+    height: 120px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9em;
+    color: #666;
+    overflow: hidden;
+    transition: background-color 0.3s ease; /* Transición para cambio de color */
+}
+
+/* Imagen cargada, adaptada al tamaño del contenedor */
+.uploaded-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Hace que la imagen se ajuste completamente al div */
+}
+
+/* Clase para cambiar el color de fondo del placeholder al arrastrar una imagen */
+.photo-placeholder.drag-over {
+    background-color: #e0e0e0; /* Color gris más oscuro */
+    border-color: #999; /* Cambiar el borde también si es necesario */
+}
+
+
+form {
+    margin-top: 20px;
+}
+
+fieldset {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+legend {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 0 10px;
+    color: #333;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.row1 {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+input[type="date"].empty::before {
+    content: attr(placeholder); /* Usar el placeholder para simular un campo vacío */
+    color: #999;
+}
+
+input[type="date"].empty {
+    color: transparent; /* Ocultar el texto predeterminado dd/mm/yyyy */
+}
+
+input[type="date"]:focus {
+    color: initial; /* Restablecer el color al seleccionar el campo */
+}
+
+
+.row label {
+    flex: 1;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-left: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+input[type="text"]{
+    text-transform: uppercase;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+
+.classbotones{
+    background-color: #0F034E !important;
+    color: white !important;
+}
+  
+.classbotones:hover{
+    background-color: #1b0686 !important;
+    color: white !important;
+}
+
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.footer p {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.print-button {
+    padding: 10px 20px;
+    background-color: #0F034E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 10px;
+}
+
+.print-button:hover {
+    background-color: #1b0686;
+}
+
+.print-button1 {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde la parte izquierda */
+    z-index: 9999; /* Asegura que esté por encima de otros elementos */
+    padding: 10px 20px;
+    background-color: #0F034E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.print-button1:hover {
+    background-color: #1b0686;
+}
+/* Estilos específicos para impresión */
+
+
+#porcentajeBeneficiario-container {
+    position: relative;
+    display: inline-block;
+}
+
+#porcentajeBeneficiario {
+    padding-right: 50px;
+    width: 100px;
+}
+
+#porcentajeBeneficiario-container::after {
+    content: "%";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+    color: #333; /* Color del símbolo */
+}
+
+@media print {
+    body {
+        width: 240mm;
+        height: 297mm;
+        margin: 0;
+    }
+
+    @page {
+        margin: 5mm 10mm;
+        size: A4;
+    }
+
+    .container {
+        box-shadow: none;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .print-button {
+        display: none;
+    }
+
+    .row {
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    fieldset {
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+
+    .footer {
+        page-break-inside: avoid;
+        margin-top: 20px;
+    }
+}
+
+input.transparent-input {
+    background-color: transparent; 
+    border: none;
+    color: black; 
+    outline: none;
+    font-size: 16px; 
+}
+
+/* Evita que los placeholders se vean */
+input.transparent-input::placeholder {
+    color: transparent;
+}
+
+input[type="date"].transparent-input {
+    background-color: transparent;
+    border: none;
+    color: black;
+    outline: none;
+    font-size: inherit; 
+}
+
+
+.custom-alertas-button {
+    background-color: #0F034E !important;
+    color: white !important;
+  }
+
+

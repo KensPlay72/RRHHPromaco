@@ -1,0 +1,628 @@
+{% load static %}
+{% load humanize %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Registrar Perfil de Puesto{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/perfilpuesto/perfilpuesto.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</head>
+
+<body>
+    <div class="container1">   
+        <br><br>
+        <div class="cinta1div">
+            <div class="cinta"></div>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div class="imgdiv">
+            <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO">
+        </div>
+        <div class="imgdiv">
+            <h1 style="font-size: 30px">PERFIL DE PUESTO</h1>
+        </div>
+        <div class="imgdiv">
+            <h1 style="font-size: 30px">{{ perfil_puesto.nombre_cargo }}</h1>
+        </div>
+        <br><br><br><br><br><br><br><br><br>
+        <br><br>
+        <div class="cinta2div">
+        <div class="cinta2"></div>
+        </div>
+        <br><br>
+    </div>
+    <br>
+    <div class="container2">
+        <div class="encabezado">
+            <h3>1.  IDENTIFICACION DEL CARGO</h3>
+            <h5 id="text">Perfil Existente</h5>
+            <button type="button" id="toggleButton" class="btn classbotones" onclick="toggleTextAndField()">Puesto Nuevo</button>
+        </div>
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EMPRESA</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.empresa }}">
+                </td>                
+            </tr>
+            <tr>
+                <td><strong>NOMBRE DEL CARGO</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.nombre_cargo }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>DEPARTAMENTO</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.departamento }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>CARGO AL QUE REPORTA</strong></td>
+                <td class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.cargo_al_que_reporta }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>CARGOS QUE LE REPORTAN</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.cargo_que_le_reportan }}">
+                </td>
+            </tr>
+        </table>     
+        
+        <br>
+        <h4>2.  REQUISITOS Y CONDICIONES DEL PERFIL  </h4>
+
+        <table class="tabla-informacion">
+            <tr>
+                <td><strong>EDUCACIÓN UNIVERSITARIA</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.educacion_universitario }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>POSTGRADOS / ESPECIALIZACIONES </strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.postgrado_especializaciones }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>FORMACIÓN COMPLEMENTARIA</strong></td>
+                <td class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.formacion_complementaria }}">
+                </td>
+            </tr>
+            <tr>
+                <td><strong>IDIOMAS (ESPECIFICAR NIVEL)</strong></td>
+                <td class="selectpuesto1" style="display: flex; width: 100%;">                        
+                    <input type="text" name="idioma" id="idioma_input" class="inputpuesto1" value="{{ perfil_puesto.idiomas }}">
+                    <p>|</p>
+                    <select name="area_experiencia" id="nivel_idioma_select" >
+                        <option value="">{{ perfil_puesto.nivel_idioma }}</option>
+                    </select>
+                </td>             
+            </tr>            
+        </table>    
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td colspan="3" style="text-align:center; padding: 10px;"><strong>COMPETENCIAS DEL CARGO</strong></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;"><strong>TÉCNICAS</strong></td>
+            </tr>      
+            <tr>
+                <td style="display:none;">
+                </td>
+                <td colspan="3" class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="FORMACION BÁSICA: {{ perfil_puesto.educacion_universitario }}">
+                </td>
+            </tr>     
+            <tr>
+                <td style="display:none;">
+                </td>
+                <td colspan="3" class="selectpuesto">
+                    <input type="text" class="inputpuesto" value="FORMACION COMPLEMENTARIA: {{ perfil_puesto.formacion_complementaria }}">
+                </td>
+            </tr>      
+            <tr>
+                <td><strong>AÑOS DE EXPERIENCIA</strong></td>
+                <td colspan="2" class="selectpuesto">                        
+                    <input type="text" class="inputpuesto" value="{{ perfil_puesto.anos_experiencia }}">
+                </td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;"><strong>CONDUCTUALES</strong></td>
+                    <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">NIVEL REQURIDO</td>
+                </tr>  
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>PENSAMIENTO ESTRATEGICO</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                        Comprende rápidamente los cambios del entorno, las oportunidades del mercado, las amenazas competitivas y las fortalezas y debilidades de la organización a la hora de identificar la mejor respuesta estratégica. Posee la capacidad para detectar nuevas oportunidades de negocio, realizar alianzas estratégicas con clientes, proveedores y competidores. Puede adecuarse a los cambios de contexto e interpretar adecuadamente la información de la que dispone. Identificar a las personas que podrían ayudarlo alcanzar objetivos. Es capaz de leer al equipo e identificar la capacidad del mismo ante un desafío.
+                        </p>                 
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_pensamiento" id="nivel_pensamiento_select" class="selectcentrado" >
+                            <option value="">{{ perfil_puesto.pensamiento_estrategico }}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>ENFOQUE AL CLIENTE</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Identifica las necesidades del cliente, muestra deseo de ayudar, comprender y satisfacer su demanda. Implica esforzarse por conocer y resolver los problemas a través de la prestación eficaz de un servicio y la actitud positiva permanente que brindé valor agregado y superé toda expectativa. Incluye comunicación asertiva y sincera con el cliente.                        
+                        </p>                 
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_cliente" id="nivel_cliente_select"  class="selectcentrado" >
+                            <option value="">{{ perfil_puesto.enfoque_al_cliente }}</option>
+
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>PLANIFICACION Y ORGANIZACIÓN</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Determina eficazmente las metas y prioridades de la tarea, área y/o proyecto, estipulando acciones y plazos requeridos. Desarrolla un plan de trabajo para optimizar los recursos y alcanzar los objetivos, incluye la instrumentación de mecanismos de seguimiento y verificación de información.                    
+                        </p>                    
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_planificacion" id="nivel_planificacion_select"  class="selectcentrado" >
+                            <option value="">{{ perfil_puesto.planificacion_y_organizacion }}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>COMUNICACIÓN</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Escucha y expresa conceptos e ideas de forma efectiva y asertiva. Sabe cuándo y a quien debe dirigirse para llevar a cabo su propósito. Escucha activamente, incluye la capacidad de comunicarse con un lenguaje verbal y no verbal adecuado y su redacción clara y precisa.                    
+                        </p>
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_comunicacion" id="nivel_comunicacion_select" class="selectcentrado">
+                            <option value="">{{ perfil_puesto.comunicacion }}</option>
+
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; justify-content:center;"><strong>ORIENTACION AL LOGRO</strong></td>
+                    <td class="selectpuesto" style="text-align:justify; padding: 10px;">       
+                        <p>
+                            Logra resultados actuando con diligencia, agilidad y sentido de urgencia ante las decisiones importantes, alineación de esfuerzos y monitoreando el progreso de sus objetivos. Tiene la capacidad de administrar los procesos establecidos, de forma tal que no interfieran con la consecución de metas, gestionando oportunamente estándares, mejorando y manteniendo altos niveles de rendimiento en el marco de las estrategias de la organización.                        
+                        </p>
+                    </td>
+                    <td class="selectpuesto">
+                        <select name="nivel_logro" id="nivel_logro_select"  class="selectcentrado" >
+                            <option value="">{{ perfil_puesto.orientacion_al_logro }}</option>
+                        </select>
+                    </td>
+                </tr>
+            </tr>
+        </table>
+        <br>
+        <table class="tabla-informacion">
+            <tr>
+                <td style="text-align:center; padding: 10px;">
+                    <strong>MISIÓN DEL CARGO Objetivo/ Propósito</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color: white; color: black; font-weight: normal; padding:10px; text-align: justify;">
+                    {{ perfil_puesto.mision_cargo }}
+                </td>
+            </tr>
+            <tr>
+                <td style="background-color:white; color:black;">
+                    <br>
+                    <p>Organigrama</p>
+                    <div class="file-drop-area">
+                        {% if perfil_puesto.ruta_organigrama %}
+                            <img id="previewImage_org" src="/static/img/organigrama/{{ perfil_puesto.nombre_organigrama }}" alt="Foto" />
+                        {% else %}
+                            Foto
+                        {% endif %}
+                    </div>                                                      
+                    <br><br>
+                </td>
+            </tr>
+        </table>
+        <br><br><br>
+<table class="tabla-informacion2" id="tablaFunciones">
+    <tr>
+        <td colspan="4" style="text-align:center; padding: 10px;">
+            <strong>FUNCIONES DEL CARGO</strong>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">N*</td>
+        <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+            Función: Qué hace, sobre qué y con qué fines
+        </td>
+        <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+            Periodicidad
+        </td>
+        <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+            Importancia de la función para lograr el objetivo del cargo (A-B-C)
+        </td>
+    </tr>
+
+    <!-- Iteramos sobre las funciones cargadas desde el campo JSON -->
+    {% for funcion in perfil_puesto.funciones_cargo %}
+    <tr class="funcionRow">
+        <td class="numero-columna" style="text-align:center; background-color: white; color:black; width: 5%; font-size:12px;">
+            {{ forloop.counter }}
+        </td>
+        <td class="selectpuesto" style="text-align:left; background-color: white; color:black; width: 60%; padding: 8px; text-align: justify; font-size:12px;">
+            {{ funcion.funcion }}
+        </td>
+        <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 20%; font-size:12px;">
+            <select name="periodicidad[]" class="inputpuesto">
+                <option value="" disabled>Seleccione una Periodicidad</option>
+                <option value="SEMANAL" {% if funcion.periodicidad == "SEMANAL" %}selected{% endif %}>SEMANAL</option>
+                <option value="DIARIA" {% if funcion.periodicidad == "DIARIA" %}selected{% endif %}>DIARIA</option>
+                <option value="MENSUAL" {% if funcion.periodicidad == "MENSUAL" %}selected{% endif %}>MENSUAL</option>
+                <option value="SEMANAL Y MENSUAL" {% if funcion.periodicidad == "SEMANAL Y MENSUAL" %}selected{% endif %}>SEMANAL Y MENSUAL</option>
+            </select>
+        </td>
+        <td class="selectpuesto" style="text-align:center; background-color: white; color:black; width: 10%; font-size:12px;">
+            <select name="importancia[]" class="inputpuesto" id="importanciacargos">
+                <option value="" disabled>Seleccione la importancia</option>
+                <option value="A" {% if funcion.importancia == "A" %}selected{% endif %}>A</option>
+                <option value="B" {% if funcion.importancia == "B" %}selected{% endif %}>B</option>
+                <option value="C" {% if funcion.importancia == "C" %}selected{% endif %}>C</option>
+            </select>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+        <br>
+        <p>A: Muy importantes para lograr los objetivos marcados.</p>
+        <p>B: Medianamente importante para lograr los objetivos. </p>
+        <p>C: Prácticamente sin importancia para lograr los objetivos. </p>
+        <table class="tabla-informacion1" id="tablaDificultades">
+            <tr>
+                <td style="text-align:center; padding: 10px;">
+                    <strong>ALCANCE DE LAS DIFICULTADES (RETOS): Son las situaciones más complejas que el cargo podrá afrontar/resolver en el desarrollo de su trabajo o las que pueden generar retrasos.</strong>
+                </td>
+            </tr>
+        
+            {% if perfil_puesto.retos %}
+                {% for reto in perfil_puesto.retos %}
+                <tr class="funcionRow">
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <input type="text" name="dificultad[]" class="inputpuesto funcionInput" value="{{ reto }}" placeholder="Ingrese la Dificultad">
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr class="funcionRow">
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        <input type="text" name="dificultad[]" class="inputpuesto funcionInput" placeholder="Ingrese la Dificultad">
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+            
+        <table class="tabla-informacion1" id="tablaMateriales_equipos">
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;" colspan="3">
+                    <strong>Materiales y Equipos</strong>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding: 10px; background-color:white;">
+                    <div class="checkbox-row1">
+                        {% if perfil_puesto.materiales_equipos %}
+                            {% for material in perfil_puesto.materiales_equipos %}
+                                <label class="custom-checkbox1">{{ material }}</label>
+                            {% endfor %}
+                        {% else %}
+                            <p>No se han seleccionado materiales o equipos.</p>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        <table class="tabla-informacion1">
+            <tr>
+                <td colspan="3" style="text-align:center; padding: 10px;"><strong>CONDICIONES</strong></td>
+            </tr>
+            <tr>
+                <td rowspan="2" style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">
+                    Horarios, turnos y condiciones relacionadas
+                </td>
+                <td colspan="2" class="selectpuesto" style="background-color:white;">
+                    {% if perfil_puesto.residir_en_area %}
+                        <input type="text" class="inputpuesto" value="{{ perfil_puesto.residir_en_area }}" readonly>
+                    {% else %}
+                        <p style="text-align: center; color: black;">No es necesario residir en el área</p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="selectpuesto" style=" background-color:white;">
+                    <input type="text" name="turnoshorario" id="turnoshorario_input" class="inputpuesto" value="{{ perfil_puesto.horario_turnos }}" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Otros que se consideren importantes</td>
+                <td colspan="2" style="background-color:white;">
+                    <textarea id="otros_importantes_textarea" class="inputpuesto" rows="3" readonly>{{ perfil_puesto.otros }}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; background-color: #FFF59D; color:black; padding: 10px;">Plan de compensación</td>
+                <td colspan="2" style="background-color:white; padding: 10px;">
+                    <div class="checkbox-row1">
+                        <!-- Iterar sobre plan de compensación -->
+                        {% if perfil_puesto.plan_de_compensacion %}
+                            {% for compensacion in perfil_puesto.plan_de_compensacion %}
+                                <label class="custom-checkbox1">{{ compensacion }}</label>
+                            {% endfor %}
+                        {% else %}
+                            <p>No se han seleccionado compensaciones.</p>
+                        {% endif %}
+                        
+                        <div style="width: 100%; text-align: left; padding: 10px 0;"><strong>Beneficio Promaco</strong></div>
+        
+                        <!-- Iterar sobre beneficios -->
+                        {% if perfil_puesto.beneficiospromaco %}
+                            {% for beneficio in perfil_puesto.beneficiospromaco %}
+                                <label class="custom-checkbox1">{{ beneficio }}</label>
+                            {% endfor %}
+                        {% else %}
+                            <p>No se han seleccionado beneficios.</p>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        {% if perfil_puesto.montacargas and perfil_puesto.montacargas != "null" or perfil_puesto.esquipo_pegado and perfil_puesto.esquipo_pegado != "null" %}
+        <table class="tabla-informacion1" id="tablaMateriales_pruebas">
+            <tr>
+                <td colspan="3" style="padding: 10px; background-color:white;">
+                    <div class="checkbox-row1" style="display:flex; justify-content:center; align-items:center;">
+                        {% if perfil_puesto.montacargas and perfil_puesto.montacargas != "null" %}
+                            <div class="custom-checkbox1">{{ perfil_puesto.montacargas }}</div>
+                        {% endif %}
+                        {% if perfil_puesto.esquipo_pegado and perfil_puesto.esquipo_pegado != "null" %}
+                            <div class="custom-checkbox1">{{ perfil_puesto.esquipo_pegado }}</div>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        {% endif %}
+        <table class="tabla-informacion">
+            <tr>
+                <td colspan="2" style="text-align:center; padding: 10px;"><strong>PRUEBAS PSICOMETRICAS</strong></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; padding: 10px;">Nivel de la Prueba</td>  
+                <td class="selectpuesto">
+                    <select name="nivel_psicosmart" id="nivel_psicosmart" class="selectcentrado">
+                        <option value="" selected disabled>Seleccione el nivel de la prueba</option>
+                        <option value="1" {% if perfil_puesto.nivel_prueba == "1" %}selected{% endif %}>1</option>
+                        <option value="2" {% if perfil_puesto.nivel_prueba == "2" %}selected{% endif %}>2</option>
+                        <option value="3" {% if perfil_puesto.nivel_prueba == "3" %}selected{% endif %}>3</option>
+                        <option value="4" {% if perfil_puesto.nivel_prueba == "4" %}selected{% endif %}>4</option>
+                    </select>
+                </td>              
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center; padding: 10px; display:none; width: 200%;" id="pruebas_td1"><strong>Nombres de las Pruebas</strong></td>
+            </tr>            
+            <tr>
+                <td style="text-align:center; background-color: white; color:black; padding: 10px; display:none; width: 200%;" id="pruebas_td"></td>
+            </tr>
+        </table>       
+        
+        <table class="tabla-informacion1" id="tablaIndicadores">
+            <tr>
+                <td style="text-align:center; padding: 10px;"><strong>Principales Indicadores</strong></td>
+            </tr>
+            {% if perfil_puesto.principales_indicadores %}
+                {% for indicador in perfil_puesto.principales_indicadores %}
+                <tr class="indicadorRow">
+                    <td class="selectpuesto" style="text-align:left; background-color: white; color:black; padding:10px;text-transform: uppercase;">
+                        {{ indicador }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td class="selectpuesto" style="text-align:center; background-color: white; color:black;">
+                        No hay indicadores disponibles.
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+        <div class="header" style="margin-top: 250px">
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>ELABORADO POR</p>
+            </div>
+            <div class="footerizquierdo">
+                <hr style="width: 300px;">
+                <p>FIRMADO POR</p>
+            </div>
+        </div>
+        <div class="header-section">
+            <table class="header-table" id="table-encabezado">
+                <tr>
+                    <td class="header-logo" rowspan="4">
+                        <img src="{% static 'img/LOGOPRINCIPAL.png' %}" alt="Logo PROMACO" style="width: 100px;">
+                        <p>Proveedora de Materiales de Construcción S de R.L.</p>
+                    </td>
+                    <td class="header-title" rowspan="4">PERFILES DE PUESTO</td>
+                    <td class="header-info">
+                        <p><strong>CÓDIGO:</strong> RRHH-RE-04</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>VERSIÓN:</strong> 02</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>FECHA DE ACTUALIZACIÓN:</strong> {{ perfil_puesto.fechaactualizacion|date:"d/m/Y H:i" }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-info">
+                        <p><strong>ELABORADO POR:</strong> DEPTO. PROCESO</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const textarea = document.getElementById('mision_cargo');
+        
+            function autoResizeTextarea() {
+                textarea.style.height = 'auto'; // Restablece la altura
+                textarea.style.height = (textarea.scrollHeight) + 'px'; // Ajusta la altura según el contenido
+            }
+        
+            autoResizeTextarea(); // Ajustar al cargar
+        
+            // Ajustar el textarea al imprimir
+            window.onbeforeprint = function () {
+                autoResizeTextarea();
+            };
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const textareas = document.querySelectorAll('.funcionInput');
+        
+            textareas.forEach(textarea => {
+                adjustHeight(textarea);
+                textarea.addEventListener('input', function () {
+                    adjustHeight(textarea);
+                });
+            });
+        
+            function adjustHeight(textarea) {
+                textarea.style.height = 'auto';
+                let scrollHeight = textarea.scrollHeight;
+        
+                // Añade un margen solo si el contenido parece cortado
+                if (textarea.scrollHeight > textarea.clientHeight) {
+                    scrollHeight += 8; // Ajusta este valor según el recorte que observes
+                }
+        
+                textarea.style.height = `${scrollHeight}px`;
+            }
+        });
+        
+        
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const nivelSelect = document.getElementById('nivel_psicosmart');
+            const pruebasTd = document.getElementById('pruebas_td');
+            const pruebasTd1 = document.getElementById('pruebas_td1');
+        
+            // Función para realizar la consulta de las pruebas
+            function obtenerPruebasPorNivel(nivelSeleccionado) {
+                if (nivelSeleccionado) {
+                    fetch(`/obtener_pruebas_por_nivel/?nivel=${nivelSeleccionado}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            pruebasTd.innerHTML = ''; // Limpiar el contenido de td
+        
+                            if (data.pruebas.length > 0) {
+                                pruebasTd.style.display = "block";
+                                pruebasTd1.style.display = "block";
+        
+                                const container = document.createElement('div');
+                                container.style.display = "grid";
+                                container.style.gridTemplateColumns = "repeat(3, 1fr)";
+                                container.style.gap = "10px";
+        
+                                data.pruebas.forEach(prueba => {
+                                    const pruebaText = document.createElement('p');
+                                    pruebaText.textContent = prueba.nombre_prueba;
+                                    container.appendChild(pruebaText);
+                                });
+        
+                                pruebasTd.appendChild(container);
+                            } else {
+                                pruebasTd.innerHTML = 'No hay pruebas para este nivel.';
+                                pruebasTd.style.display = "block";
+                                pruebasTd1.style.display = "block";
+                            }
+        
+                            iniciarImpresion();  // Llamada para imprimir después de cargar datos
+                        } else {
+                            pruebasTd.innerHTML = 'Hubo un error al obtener las pruebas.';
+                            pruebasTd.style.display = "block";
+                            pruebasTd1.style.display = "block";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener las pruebas:', error);
+                        pruebasTd.innerHTML = 'Hubo un error al obtener las pruebas.';
+                        pruebasTd.style.display = "block";
+                        pruebasTd1.style.display = "block";
+                    });
+                } else {
+                    pruebasTd.style.display = "none";
+                    pruebasTd1.style.display = "none";
+                }
+            }
+        
+            // Llamar a la función de obtener pruebas si el select ya tiene un valor seleccionado al cargar la página
+            if (nivelSelect.value && nivelSelect.value !== "") {
+                obtenerPruebasPorNivel(nivelSelect.value);
+            }
+        
+            // Función para imprimir después de cargar datos
+            function iniciarImpresion() {
+                window.print();
+                window.onafterprint = function() {
+                    window.location.href = "{% url 'perfilpuesto' %}";
+                };
+            }
+        
+            // Escuchar el cambio en el select
+            nivelSelect.addEventListener('change', function () {
+                var nivelSeleccionado = this.value;
+                obtenerPruebasPorNivel(nivelSeleccionado);
+            });
+        });
+
+    </script>
+    <script>
+        window.onload = function() {
+            window.print();  
+        };
+    
+        window.onafterprint = function() {
+            window.location.href = "{% url 'perfilpuesto' %}";  
+        };
+    </script>
+</body>
+
+</html>

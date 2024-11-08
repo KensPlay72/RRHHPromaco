@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Jefes
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+
+  <div class="encabezado">
+    <form action="{% url 'jefes' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Jefes</h1>
+    {% if request.session.listas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Jefe</button>
+    {% endif %} 
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Código</th>
+                <th>Identidad</th>
+                <th>Nombre del Jefe</th>
+                <th>Estado</th>
+                {% if request.session.listas_escribir %}
+                <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in jefes %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.codigo }}</td>
+                    <td>{{ item.identidadjefe|default:"" }}</td>
+                    <td>{{ item.nombrejefe }}</td>
+                    <td>
+                        {% if item.estado == 'ACTIVO' %}
+                            <b style="color: green;">{{ item.estado }}</b>
+                        {% else %}
+                            <b style="color: red;">{{ item.estado }}</b>
+                        {% endif %}
+                    </td>
+                    {% if request.session.listas_escribir %}
+                    <td>
+                        <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalEditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                            <ion-icon name="create-outline" class="icon"></ion-icon>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</div>
+
+<script type="application/json" id="jefes-data">
+    [
+        {% for item in jefes %}
+            {
+                "codigo": "{{ item.codigo|escapejs }}",
+                "identidadjefe": "{{item.identidadjefe|escapejs }}",
+                "nombrejefe": "{{ item.nombrejefe|escapejs }}",
+                "estado": "{{ item.estado|escapejs }}",
+                "id": "{{ item.id }}"
+            }
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+
+
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      <!-- Botón "Anterior" -->
+      {% if jefes.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ jefes.previous_page_number }}&search={{ search }}">Anterior</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Anterior</span>
+          </li>
+      {% endif %}
+
+      <!-- Mostrar un rango reducido de páginas -->
+      {% for num in page_range %}
+          {% if jefes.number == num %}
+              <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+              </li>
+          {% else %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+              </li>
+          {% endif %}
+      {% endfor %}
+
+      <!-- Botón "Siguiente" -->
+      {% if jefes.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ jefes.next_page_number }}&search={{ search }}">Siguiente</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Siguiente</span>
+          </li>
+      {% endif %}
+  </ul>
+</nav>
+<br>
+
+
+
+
+  <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Registrar Jefe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="register-form-jefes" enctype="multipart/form-data">
+            {% csrf_token %}
+            <form id="register-form-bolsaempleo" enctype="multipart/form-data">
+              <div class="form-group">
+                  <label>DNI</label>
+                  <input type="text" name="identidadjefe" id="identidadjefe" class="form-control" maxlength="13"
+                      oninput="validateNumber(this)"
+                      title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                      placeholder="DNI">
+              </div>
+              <br>
+            <div class="form-group">
+                <label>Codigo del jefe</label>
+              <input type="text" name="codigo" id="codigo" autocomplete="off" class="form-control"  placeholder="Codigo del jefe" />
+            </div>
+            <br>
+            <div class="form-group">
+                <label>Nombre del jefe</label>
+              <input type="text" name="nombrejefe" id="nombrejefe" autocomplete="off" class="form-control" placeholder="Nombre del jefe" required />
+            </div>
+            <br>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select class="form-control" name="estado" id="estado" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Editar Jefe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="update-form-jefes" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>ID</label>
+                  <input type="text" name="idjefe" id="idjefe" autocomplete="off" class="form-control" disabled required />
+                </div>
+                <br>
+                <div class="form-group">
+                  <label>DNI</label>
+                  <input type="text" name="identidadjefeditar" id="identidadjefeditar" class="form-control" maxlength="13"
+                      oninput="validateNumber(this)"
+                      title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                      placeholder="DNI">
+              </div>
+              <br>
+                <div class="form-group">
+                    <label>Código del jefe</label>
+                    <input type="text" name="codigo" id="codigoeditar" autocomplete="off" class="form-control" placeholder="Código del jefe" required />
+                </div>
+                <br>
+                <div class="form-group">
+                    <label>Nombre del jefe</label>
+                    <input type="text" name="nombrejefe" id="nombrejefeeditar" autocomplete="off" class="form-control" placeholder="Nombre del jefe" required />
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="estado">Estado</label>
+                    <select class="form-control" name="estado" id="estadoeditar" required>
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="INACTIVO">INACTIVO</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn classbotones">Guardar</button>
+                </div>
+            </form>            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/modulos/jefes.js' %}"></script>
+{% endblock %}

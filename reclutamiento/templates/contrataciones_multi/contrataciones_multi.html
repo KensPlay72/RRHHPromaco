@@ -1,0 +1,311 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Contrataciones{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bolsaempleo.css' %}">
+
+    <!-- Iconos -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Nerko+One&display=swap" rel="stylesheet">
+
+    <!-- Moment.js y Moment-Timezone -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+    <!-- CSS y JS de Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+</head>
+
+<body id="body-pd">
+
+    {% include 'menu.html' %}
+
+    {% include 'cerrarsesion.html' %}
+
+    
+      <div class="botones-container">
+        <button class="btn classbotones botonesinferioresdiv"><a href="{% url 'exportar_excel_multi' %}" style="color:white;"><i class="fas fa-file-excel"></i> Exportar a Excel</a></button>
+      </div>
+    <form method="GET" action="{% url 'contrataciones_multi' %}" id="filterForm">
+        <div class="encabezado">
+            <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+            </div>
+            <input type="text" class="form-control" placeholder="Buscar" id="buscar" name="search" value="{{ search }}" autocomplete="off" />
+          </div>
+        <h1 class="titulo-encabezado">Contrataciones</h1>
+        {% if request.session.contrataciones_multi_escribir %}
+        <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'registrar_contrataciones_multi' %}'">Registrar Candidato</button>
+    {% endif %}
+        </div>
+
+      <div class="tabla">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Teléfono</th>
+                    <th>
+                        Ciudad
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-municipio')"></ion-icon>
+                        <div id="filtro-municipio" class="filter-popup" style="display: none;">
+                            {% for municipio in municipios_options %}
+                                <label>
+                                    <input type="checkbox" name="municipio" value="{{ municipio }}" 
+                                        {% if municipio in municipio_filter %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ municipio }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Puesto
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-puesto')"></ion-icon>
+                        <div id="filtro-puesto" class="filter-popup" style="display: none;">
+                            {% for puesto in puestos_options %}
+                                <label>
+                                    <input type="checkbox" name="puesto" value="{{ puesto }}" 
+                                        {% if puesto in puesto_filter %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ puesto }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Sucursal
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-sucursal')"></ion-icon>
+                        <div id="filtro-sucursal" class="filter-popup" style="display: none;">
+                            {% for sucursal in sucursales_options %}
+                                <label>
+                                    <input type="checkbox" name="sucursal" value="{{ sucursal }}" 
+                                        {% if sucursal in sucursal_filter %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ sucursal }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    <th>
+                        Fecha de Ingreso
+                        <ion-icon name="funnel-outline" class="filter-icon" onclick="mostrarFiltro('filtro-fecha-ingreso')"></ion-icon>
+                        <div id="filtro-fecha-ingreso" class="filter-popup" style="display: none;">
+                            {% for fecha in fechas_ingreso_options %}
+                                <label>
+                                    <input type="checkbox" name="fecha_ingreso" value="{{ fecha }}" 
+                                        {% if fecha in fecha_ingreso_filter %}checked{% endif %} 
+                                        onchange="document.getElementById('filterForm').submit();">
+                                    {{ fecha }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </th>
+                    {% if request.session.contrataciones_multi_escribir %}
+                    <th>Acciones</th>
+                    {% endif %}
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for contratacion in contrataciones %}
+                <tr>
+                    <td>{{ contratacion.id }}</td> 
+                    <td>{{ contratacion.nombre1 }} {{ contratacion.apellido1 }}</td>
+                    <td>{{ contratacion.telefono }}</td> 
+                    <td>{{ contratacion.municipio }}</td>
+                    <td>{{ contratacion.puestos.nombre_puestos }}</td> 
+                    <td>{{ contratacion.sucursal.nombre_sucursal }}</td>
+                    <td>{{ contratacion.fecha_ingreso|date:"d/m/Y" }}</td> 
+                    {% if request.session.contrataciones_multi_escribir %}
+                    <td>
+                        <div class="btn-grid">
+                            <div>
+                                <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'update_contratacion_multi' contratacion.id %}'">
+                                    <ion-icon name="create-outline" class="icon"></ion-icon>
+                                </button>
+                                <button type="button" class="btn btn classbotones" onclick="window.location.href='{% url 'imprimir_contratacion_multi' contratacion.id %}'">
+                                    <ion-icon name="print-outline" class="icon"></ion-icon>
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-success" id="btninfo" data-bs-toggle="modal" data-bs-target="#modaldetalles" data-id="{{ contratacion.id }}" onclick="mostrardetalles(this)">
+                                    <ion-icon name="information-circle-outline" class="icon"></ion-icon>
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="eliminacion({{ contratacion.id }})" style="margin-top:5px">
+                                    <ion-icon name="trash-outline" class="icon"></ion-icon>
+                                </button>                                         
+                            </div>
+                        </div>
+                    </td>
+                    
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>        
+        </form>
+
+        <script type="application/json" id="contrataciones-data">
+            [
+                {% for contratacion in contrataciones %}
+                    {
+                        "id": "{{ contratacion.id|default:''|escapejs }}",
+                        "tipo_contratacion": "{{ contratacion.tipo_contratacion|default:''|escapejs }}",
+                        "nombre_completo": "{{ contratacion.nombre1|default:''|escapejs }} {{ contratacion.nombre2|default:''|escapejs }} {{ contratacion.apellido1|default:''|escapejs }} {{ contratacion.apellido2|default:''|escapejs }}",
+                        "fecha_nacimiento": "{{ contratacion.fecha_nacimiento|date:'d/m/Y'|default:''|escapejs }}",
+                        "municipio": "{% if contratacion.municipio %}{{ contratacion.municipio.nombre_municipio|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                        "genero": "{{ contratacion.genero|default:''|escapejs }}",
+                        "direccion_exacta": "{{ contratacion.direccionexacta|default:''|escapejs }}",
+                        "dni": "{{ contratacion.dni|default:''|escapejs }}",
+                        "estado_civil": "{{ contratacion.estado_civil|default:''|escapejs }}",
+                        "hijos": "{% if contratacion.hijos %}Sí{% else %}No{% endif %}",
+                        "profesion_oficio": "{{ contratacion.profecion_oficio|default:''|escapejs }}",
+                        "departamento": "{% if contratacion.departamento %}{{ contratacion.departamento.nombre_departamentohonduras|escapejs }}{% else %}N/A{% endif %}",
+                        "telefono": "{{ contratacion.telefono|default:''|escapejs }}",
+                        "emergencia_1_nombre": "{{ contratacion.nombre_emergencia|default:''|escapejs }}",
+                        "emergencia_1_parentesco": "{{ contratacion.parentesco|default:''|escapejs }}",
+                        "emergencia_1_telefono": "{{ contratacion.telefonoemergencia|default:''|escapejs }}",
+                        "nivel_educativo": "{{ contratacion.nivel_educativo|default:''|escapejs }}",
+                        "ultimo_grado_estudio": "{{ contratacion.ultimo_grado_estudio|default:''|escapejs }}",
+                        "salario": "{{ contratacion.salario|default:''|escapejs }}",
+                        "sucursal": "{% if contratacion.sucursal %}{{ contratacion.sucursal.nombre_sucursal|escapejs }}{% else %}{{ ''|escapejs }}{% endif %}",
+                        "fecha_ingreso": "{{ contratacion.fecha_ingreso|date:'d/m/Y'|default:''|escapejs }}",
+                        "nombre_beneficiario": "{{ contratacion.nombre_beneficiario|default:''|escapejs }}",
+                        "dni_beneficiario": "{{ contratacion.dni_beneficiario|default:''|escapejs }}",
+                        "parentesco_beneficiario": "{{ contratacion.parentesco_beneficiario|default:''|escapejs }}",
+                        "porcentaje_beneficiario": "{{ contratacion.porcentaje|default:''|escapejs }}",
+                        "nombre_imagen": "{{ contratacion.nombreimagen|default:''|escapejs }}"
+                    }
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        </script>
+                
+        <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <!-- Botón "Anterior" -->
+        {% if contrataciones.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ contrataciones.previous_page_number }}&search={{ search }}">Anterior</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Anterior</span>
+            </li>
+        {% endif %}
+
+        <!-- Mostrar un rango reducido de páginas -->
+        {% for num in page_range %}
+            {% if contrataciones.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Botón "Siguiente" -->
+        {% if contrataciones.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ contrataciones.next_page_number }}&search={{ search }}">Siguiente</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Siguiente</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+</div>
+
+
+<div class="modal fade" id="modaldetalles" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Detalles de Control de Plazas</h5>
+                <button id="btn-descargar-imagen" class="btn btn classbotones" style="display: none; margin-left: 50px;" onclick="descargarImagen()">
+                    <ion-icon name="image-outline" style="color: white;" class="icon"></ion-icon>
+                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>            
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="detalles-id"></span></p>
+                <hr>
+                <p><strong>Tipo de Contratación:</strong> <span id="detalles-tipo-contratacion"></span></p>
+                <hr>
+                <p><strong>Nombre Completo:</strong> <span id="detalles-nombre-completo"></span></p>
+                <hr>
+                <p><strong>Fecha de Nacimiento:</strong> <span id="detalles-fecha-nacimiento"></span></p>
+                <hr>
+                <p><strong>Municipio:</strong> <span id="detalles-municipio"></span></p>
+                <hr>
+                <p><strong>Género:</strong> <span id="detalles-genero"></span></p>
+                <hr>
+                <p><strong>Dirección Exacta:</strong> <span id="detalles-direccion-exacta"></span></p>
+                <hr>
+                <p><strong>DNI:</strong> <span id="detalles-dni"></span></p>
+                <hr>
+                <p><strong>Estado Civil:</strong> <span id="detalles-estado-civil"></span></p>
+                <hr>
+                <p><strong>Hijos:</strong> <span id="detalles-hijos"></span></p>
+                <hr>
+                <p><strong>Profesión u Oficio:</strong> <span id="detalles-profesion-oficio"></span></p>
+                <hr>
+                <p><strong>Departamento:</strong> <span id="detalles-departamento"></span></p>
+                <hr>
+                <p><strong>Teléfono:</strong> <span id="detalles-telefono"></span></p>
+                <hr>
+                <p><strong>Contacto de Emergencia 1:</strong></p>
+                <p>Nombre: <span id="detalles-emergencia-1-nombre"></span></p>
+                <p>Parentesco: <span id="detalles-emergencia-1-parentesco"></span></p>
+                <p>Teléfono: <span id="detalles-emergencia-1-telefono"></span></p>
+                <hr>
+                <p><strong>Beneficiario:</strong></p>
+                <p>Nombre: <span id="detalles-nombre-beneficiario"></span></p>
+                <p>DNI: <span id="detalles-dni-beneficiario"></span></p>
+                <p>Parentesco: <span id="detalles-parentesco-beneficiario"></span></p>
+                <p>Porcentaje: <span id="detalles-porcentaje-beneficiario"></span></p>
+                <hr>
+                <p><strong>Sucursal:</strong> <span id="detalles-sucursal"></span></p>
+                <p><strong>Fecha de Ingreso:</strong> <span id="detalles-fecha-ingreso"></span></p>
+                <p><strong>Salario:</strong>L. <span id="detalles-salario"></span></p>
+            </div>
+            <div class="modal-footer" style="max-height: 70px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <script src="{% static 'js/contrataciones/contrataciones_multi.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/sweetaler2.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/tiempologout.js' %}"></script>
+

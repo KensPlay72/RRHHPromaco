@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Iniciar Sesión{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="icon" href="{% static 'img/promacoico.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body id="body-pd">
+<div class="encabezadocontroltiempo">
+    <img src=" {% static '/img/logoblanco.png' %}" alt="Logo">
+</div>
+<div class="encabezadocontroltiempo2">
+    <h3>INICIAR SESIÓN</h3>
+</div>
+<div class="centro">
+    <div class="wrapper">
+        <header>Iniciar Sesión</header>
+        <form method="POST">
+            {% csrf_token %} 
+            <div class="field dni">
+                <div class="input-area">
+                    <input type="text" id="dni" name="dni" maxlength="13" placeholder="DNI" autocomplete="off">
+                    <i class="icon fas fa-id-card"></i>
+                    <i class="error error-icon fas fa-exclamation-circle"></i>
+                </div>
+                <div class="error error-txt">Ingrese un número de identidad válido</div>
+            </div>
+            <div class="field password">
+                <div class="input-area">
+                    <input type="password" id="password" name="password" placeholder="Contraseña">
+                    <i class="icon fas fa-lock"></i>
+                    <i class="error error-icon fas fa-exclamation-circle"></i>
+                </div>
+                <div class="error error-txt">Ingrese una contraseña</div>
+            </div>
+            <input type="submit" id="btn-login-usuarios" class="classbotones" value="Iniciar Sesión" autocomplete="off">
+        </form>
+        <div class="sign-txt">RRHH-Promaco</div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaleditarcontralogin" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header restacolor">
+                <h5 class="modal-title" id="exampleModalLongTitle">Por favor Cambia tu Contraseña</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-usuarios">
+                    <div class="form-group">
+                        <label for="contrasenaempleadoeditar">Contraseña</label>
+                        <br>
+                        <input type="password" class="form-control" id="contrasenaempleadoeditar" name="new_password" placeholder="Contraseña del empleado">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="contrasenaempleadoeditar">Validar Contraseña</label>
+                        <br>
+                        <input type="password" class="form-control" id="veri" name="new_password_confirmation" placeholder="Contraseña del empleado">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button id="btn-actualizar-password" class="btn btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/sweetaler2.min.js' %}"></script>
+<script src="{% static 'js/login.js' %}"></script>
+</body>
+
+</html>

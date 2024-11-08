@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Colaboradores
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+{% include 'cerrarsesion.html' %}
+
+
+  <div class="encabezado">
+    <form action="{% url 'colaboradores' %}" method="GET">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><ion-icon name="search-outline" style="font-size: 25px"></ion-icon></span>
+        </div>
+        <input type="text" class="form-control" placeholder="Buscar" name="search" value="{{ search }}" autocomplete="off" />
+      </div>
+    </form>
+    <h1 class="titulo-encabezado">Colaboradores</h1>
+    {% if request.session.listas_escribir %}
+    <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalregistro">Registrar Colaborador</button>
+    {% endif %} 
+  </div>
+
+  <div class="tabla">
+    <table class="styled-table">
+      <thead>
+          <tr>
+              <th>Id</th>
+              <th>Nombre del Colaborador</th>
+              <th>Sucursal</th>
+              <th>Empresa</th>
+              <th>Unidad de Negocio</th>
+              <th>Departamento</th>
+              <th>Jefe</th>
+              <th>Estado</th>
+              {% if request.session.listas_escribir %}
+              <th>Acciones</th>
+              {% endif %}
+          </tr>
+      </thead>
+      <tbody>
+          {% for item in colaboradores %}
+              <tr>
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.codigocolaborador}} - {{ item.nombrecolaborador }}</td>
+                  <td>{{ item.sucursal.nombre_sucursal }}</td>
+                  <td>{{ item.empresa.nombre_empresa }}</td>
+                  <td>{{ item.unidad_de_negocio.nombre_unidad_de_negocio }}</td>
+                  <td>{{ item.departamento.nombre_departamento }}</td>
+                  <td>{{ item.jefe.codigo }} - {{ item.jefe.nombrejefe }}</td>
+                  <td>
+                      {% if item.estado == 'ACTIVO' %}
+                          <b style="color: green;">{{ item.estado }}</b>
+                      {% else %}
+                          <b style="color: red;">{{ item.estado }}</b>
+                      {% endif %}
+                  </td>
+                  {% if request.session.listas_escribir %}
+                  <td>
+                      <button type="button" class="btn btn classbotones" data-bs-toggle="modal" data-bs-target="#modalEditar" data-editar="{{ item.id }}" onclick="llenarFormularioEditar(this)">
+                          <ion-icon name="create-outline" class="icon"></ion-icon>
+                      </button>
+                  </td>
+                  {% endif %}
+              </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  
+</div>
+<script type="application/json" id="colaboradores-data">
+  [
+      {% for item in colaboradores %}
+          {
+              "id": "{{ item.id }}",
+              "codigocolaborador": "{{ item.codigocolaborador|escapejs }}",
+              "nombrecolaborador": "{{ item.nombrecolaborador|escapejs }}",
+              "sucursal_id": "{{ item.sucursal.id }}",
+              "empresa_id": "{{ item.empresa.id }}",
+              "unidad_de_negocio_id": "{{ item.unidad_de_negocio.id }}",
+              "departamento_id": "{{ item.departamento.id }}",
+              "jefe_id": "{{ item.jefe.id }}",
+              "estado": "{{ item.estado|escapejs }}"
+          }
+          {% if not forloop.last %},{% endif %}
+      {% endfor %}
+  ]
+</script>
+
+
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      <!-- Botón "Anterior" -->
+      {% if colaboradores.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ colaboradores.previous_page_number }}&search={{ search }}">Anterior</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Anterior</span>
+          </li>
+      {% endif %}
+
+      <!-- Mostrar un rango reducido de páginas -->
+      {% for num in page_range %}
+          {% if colaboradores.number == num %}
+              <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+              </li>
+          {% else %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+              </li>
+          {% endif %}
+      {% endfor %}
+
+      <!-- Botón "Siguiente" -->
+      {% if colaboradores.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="?page={{ colaboradores.next_page_number }}&search={{ search }}">Siguiente</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <span class="page-link">Siguiente</span>
+          </li>
+      {% endif %}
+  </ul>
+</nav>
+
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Registrar Colaborador</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="register-form-colaborador" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+              <label>Codigo del Colaborador</label>
+            <input type="text" name="codigocolaborador" id="codigocolaborador" autocomplete="off" class="form-control" placeholder="Codigo del Colaborador" required />
+          </div>
+          <br>
+            <div class="form-group">
+                <label>Nombre del Colaborador</label>
+              <input type="text" name="nombrejefe" id="nombrejefe" autocomplete="off" class="form-control" placeholder="Nombre del Colaborador" required />
+            </div>
+            <br>
+            <div class="form-group">
+              <label>Sucursal</label>
+              <select name="sucursal" id="sucursal" class="form-control">
+                  <option value="" selected disabled>Seleccione una Sucursal</option>
+                  {% for item in all_sucursales %}
+                      <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <br>
+          <div class="form-group">
+              <label>Empresa</label>
+              <select name="empresa" id="empresa" class="form-control">
+                  <option value="" selected disabled>Seleccione una Empresa</option>
+                  {% for item in all_empresas %}
+                      <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <br>
+          <div class="form-group">
+              <label>Unidad de Negocio</label>
+              <select name="unidadnegocio" id="unidadnegocio" class="form-control">
+                  <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                  {% for item in all_unidades_negocio %}
+                      <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+          <br>
+          <div class="form-group">
+            <label>Departamento</label>
+            <select name="departamento" id="departamento" class="form-control">
+                <option value="" selected disabled>Seleccione un Departamento</option>
+                {% for item in all_departamentos %}
+                    <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div class="form-group">
+          <label>Jefe</label>
+          <select name="jefes" id="jefes" class="form-control">
+              <option value="" selected disabled>Seleccione un Jefe</option>
+              {% for item in all_jefes %}
+                  <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+              {% endfor %}
+          </select>
+      </div>
+      <br>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select class="form-control" name="estado" id="estado" required>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn classbotones">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Editar Jefe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="update-form-colaboradores" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="form-group">
+                          <label>ID</label>
+                        <input type="text" name="idcolaborador" id="idcolaborador" autocomplete="off" class="form-control" disabled required />
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label>Codigo del Colaborador</label>
+                      <input type="text" name="codigocolaboradoreditar" id="codigocolaboradoreditar" autocomplete="off" class="form-control" placeholder="Codigo del Colaborador" required />
+                    </div>
+                    <br>
+                      <div class="form-group">
+                          <label>Nombre del Colaborador</label>
+                        <input type="text" name="nombrejefeeditar" id="nombrejefeeditar" autocomplete="off" class="form-control" placeholder="Nombre del jefe" required />
+                      </div>
+                      <br>
+                      <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursaleditar" id="sucursaleditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                                <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresaeditar" id="empresaeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                                <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocioeditar" id="unidadnegocioeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                                <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                      <label>Departamento</label>
+                      <select name="departamentoeditar" id="departamentoeditar" class="form-control">
+                          <option value="" selected disabled>Seleccione un Departamento</option>
+                          {% for item in all_departamentos %}
+                              <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                    <label>Jefe</label>
+                    <select name="jefeseditar" id="jefeseditar" class="form-control">
+                        <option value="" selected disabled>Seleccione un Jefe</option>
+                        {% for item in all_jefes %}
+                            <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                  <label for="estado">Estado</label>
+                  <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                    <option value="ACTIVO">ACTIVO</option>
+                    <option value="INACTIVO">INACTIVO</option>
+                  </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn classbotones">Guardar</button>
+                </div>
+            </form>            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/modulos/colaboradores.js' %}"></script>
+{% endblock %}
